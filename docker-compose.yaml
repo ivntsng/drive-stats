@@ -1,0 +1,56 @@
+volumes:
+  postgres-data:
+    external: true
+  pg-admin:
+    external: true
+
+services:
+  pg-admin:
+    container_name: pgAdminDriveStats
+    image: dpage/pgadmin4
+    volumes:
+      - pg-admin:/var/lib/pgadmin
+    ports:
+      - 8082:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@drivestats.com
+      PGADMIN_DEFAULT_PASSWORD: T3SsAIppxO9QMdT9r
+      PGADMIN_DISABLE_POSTFIX: 1
+  fastapi:
+    environment:
+      CORS_HOST: http://localhost:3000
+      DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres/drivestats_db
+      SIGNING_KEY: key
+    build:
+      context: api
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8000:8000
+    volumes:
+      - ./api:/app
+  ghi:
+    image: node:lts-bullseye
+    command: /bin/bash run.sh
+    working_dir: /app
+    volumes:
+      - ./ghi:/app
+    ports:
+      - "3000:3000"
+    environment:
+      HOST_OS: ${OS}
+      NODE_ENV: development
+      HOST: "0.0.0.0"
+      PUBLIC_URL: http://localhost:3000
+      REACT_APP_API_HOST: http://localhost:8000
+  postgres:
+    # versions of postgres: https://hub.docker.com/_/postgres
+    image: postgres:14.5-bullseye
+    # https://stackoverflow.com/questions/42107364/how-to-use-volume-in-docker-compose-for-postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: drivestats_db
+      POSTGRES_USER: casper
+      POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
+    ports:
+      - 15432:5432
