@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, Response, HTTPException
-from typing import Union
+from fastapi import APIRouter, Depends, Response, HTTPException, status
+from typing import Union, List
 from queries.vehicles import VehicleIn, VehicleRepository, VehicleOut, Error
+from pydantic import ValidationError
 
 tags_metadata = [
     {
@@ -17,7 +18,7 @@ def create_vehicle(
     vehicle: VehicleIn, response: Response, repo: VehicleRepository = Depends()
 ):
     try:
-        created_vehicle = repo.create(vehicle)
+        created_vehicle = repo.create_vehicle(vehicle)
         if created_vehicle:
             # Return 200 OK if the vehicle was created successfully
             return created_vehicle
@@ -32,3 +33,24 @@ def create_vehicle(
     except Exception as e:
         # For any other unexpected errors, return 500 Internal Server Error
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/vehicles/{vehicle_id}", response_model=VehicleOut | None)
+async def get_vehicle_by_id(
+    response: Response,
+    vehicle_id: int,
+    vehicle_repo: VehicleRepository = Depends(),
+) -> VehicleOut | None:
+    try:
+        vehicle = vehicle_repo.get_vehicle_by_id(vehicle_id)
+        return vehicle
+    except HTTPException as http_exc:
+        if http_exc.status_code == 404:
+            raise
+        else:
+            print(
+                f"Failed to grab vehicle ID {vehicle_id} due to an error: ",
+                http_exc.detail,
+            )
+            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            return None

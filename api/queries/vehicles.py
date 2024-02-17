@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, validator, ValidationError
 from datetime import datetime
-from typing import Union
+from typing import Union, Optional
+from fastapi import HTTPException
 
 # Assuming 'pool' is correctly defined elsewhere in your code.
 from queries.pool import pool
@@ -44,7 +45,7 @@ class VehicleRepository:
         else:
             return None
 
-    def create(self, vehicle: VehicleIn) -> VehicleOut:
+    def create_vehicle(self, vehicle: VehicleIn) -> VehicleOut:
         try:
             with pool.connection() as conn:
                 with conn.cursor() as cur:
@@ -75,3 +76,23 @@ class VehicleRepository:
         except ValidationError as e:
             print(f"Failed to create vehicle: {e}")
             return None
+
+    def get_vehicle_by_id(self, vehicle_id: int) -> Optional[VehicleOut]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "SELECT * FROM vehicles WHERE id = %s", (vehicle_id,)
+                    )
+                    result = cur.fetchone()
+                    if result is None:
+                        raise HTTPException(
+                            status_code=404,
+                            detail=f"Vehicle ID {vehicle_id} doesn't exist.",
+                        )
+                    result_dict = self.result_to_dict(result)
+                    return VehicleOut(**result_dict)
+        except Exception:
+            raise HTTPException(
+                status_code=500, detail="Internal server error"
+            )
