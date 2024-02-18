@@ -96,3 +96,78 @@ class VehicleRepository:
             raise HTTPException(
                 status_code=500, detail="Internal server error"
             )
+
+    def get_all_vehicles(self) -> Optional[list[VehicleOut]]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute("SELECT * FROM vehicles")
+                    results = cur.fetchall()
+                    vehicles = [
+                        self.result_to_dict(result) for result in results
+                    ]
+                    return [VehicleOut(**vehicle) for vehicle in vehicles]
+        except Exception:
+            raise HTTPException(
+                status_code=500, detail="Internal server error"
+            )
+
+    def update_vehicle(
+        self, vehicle_id: int, vehicle: VehicleIn
+    ) -> Optional[VehicleOut]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        UPDATE vehicles
+                        SET
+                          vehicle_name = %s,
+                          year = %s,
+                          make = %s,
+                          model = %s,
+                          vin = %s,
+                          mileage = %s
+                        WHERE id = %s
+                        RETURNING id, vehicle_name, year, make, model, vin, mileage;
+                        """,
+                        [
+                            vehicle.vehicle_name,
+                            vehicle.year,
+                            vehicle.make,
+                            vehicle.model,
+                            vehicle.vin,
+                            vehicle.mileage,
+                            vehicle_id,
+                        ],
+                    )
+                    result = cur.fetchone()
+                    if result:
+                        result_dict = self.result_to_dict(result)
+                        return VehicleOut(**result_dict)
+                    else:
+                        print("No result found")
+                        return None
+        except ValidationError as e:
+            print(f"Failed to update vehicle: {e}")
+            return None
+
+    def delete_vehicle(self, vehicle_id: int) -> Optional[VehicleOut]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "DELETE FROM vehicles WHERE id = %s RETURNING *",
+                        (vehicle_id,),
+                    )
+                    result = cur.fetchone()
+                    if result:
+                        result_dict = self.result_to_dict(result)
+                        return VehicleOut(**result_dict)
+                    else:
+                        print("No result found")
+                        return None
+        except Exception:
+            raise HTTPException(
+                status_code=500, detail="Internal server error"
+            )
