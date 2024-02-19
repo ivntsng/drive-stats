@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field, validator, ValidationError
-from datetime import datetime
-from typing import Union, Optional
+from typing import Optional
 from fastapi import HTTPException
 
 # Assuming 'pool' is correctly defined elsewhere in your code.
@@ -165,9 +164,8 @@ class VehicleRepository:
                         result_dict = self.result_to_dict(result)
                         return VehicleOut(**result_dict)
                     else:
-                        print("No result found")
+                        print(f"Vehicle ID {vehicle_id} does not exist.")
                         return None
         except Exception:
-            raise HTTPException(
-                status_code=500, detail="Internal server error"
-            )
+            print(f"Error deleting vehicle ID {vehicle_id}")
+            return None

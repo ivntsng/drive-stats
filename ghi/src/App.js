@@ -1,13 +1,14 @@
 import ErrorNotification from "./ErrorNotification";
 import "./App.css";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import MainPage from "./MainPage";
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="App">
-        <ErrorNotification />
-      </div>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+      </Routes>
     </BrowserRouter>
   );
 }
