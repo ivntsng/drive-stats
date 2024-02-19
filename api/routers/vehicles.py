@@ -90,7 +90,10 @@ async def update_vehicle(
     except Exception as e:
         print(f"Failed to update vehicle ID {vehicle_id} due to an error: {e}")
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return Error(detail="Internal server error")
+        return Error(
+            detail="Internal server error",
+            message=f"Vehicle {vehicle_id} does not exist.",
+        )
 
 
 @router.delete(
@@ -106,10 +109,13 @@ async def delete_vehicle(
         if deleted_vehicle:
             return deleted_vehicle
         else:
-            raise HTTPException(
-                status_code=500, detail="Failed to delete vehicle"
+            return Error(
+                detail=f"Vehicle with ID {vehicle_id} does not exist."
             )
     except Exception as e:
         print(f"Failed to delete vehicle ID {vehicle_id} due to an error: {e}")
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return Error(detail="Internal server error")
+        return Error(
+            detail="Internal server error",
+            message=f"Vehicle ID {vehicle_id} does not exist.",
+        )
