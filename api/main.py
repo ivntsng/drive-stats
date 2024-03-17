@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import vehicles
+from routers import vehicles, vehicle_stats
 
 app = FastAPI()
 app.include_router(vehicles.router)
+app.include_router(vehicle_stats.router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -15,8 +16,3 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/")
-def root():
-    return {"message": "You hit the root path!"}

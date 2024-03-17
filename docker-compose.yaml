@@ -1,56 +1,43 @@
+version: '3.8'
+
 volumes:
-  postgres-data:
-    external: true
-  pg-admin:
+  drive-statsDB:
     external: true
 
 services:
-  pg-admin:
-    container_name: pgAdminDriveStats
-    image: dpage/pgadmin4
-    volumes:
-      - pg-admin:/var/lib/pgadmin
-    ports:
-      - 8082:80
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@drivestats.com
-      PGADMIN_DEFAULT_PASSWORD: T3SsAIppxO9QMdT9r
-      PGADMIN_DISABLE_POSTFIX: 1
   fastapi:
-    environment:
-      CORS_HOST: http://localhost:3000
-      DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres/drivestats_db
-      SIGNING_KEY: key
     build:
       context: api
       dockerfile: Dockerfile.dev
     ports:
-      - 8000:8000
+      - "8000:8000"
+    environment:
+      CORS_HOST: http://localhost:5173
+      DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres/drivestats_db
+      SIGNING_KEY: 2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562
     volumes:
       - ./api:/app
-  ghi:
+    user: "1000:1000" # Replace with your real user id and group id on macOS and Linux
+
+  drive-stats:
     image: node:lts-bullseye
     command: /bin/bash run.sh
     working_dir: /app
-    volumes:
-      - ./ghi:/app
-    ports:
-      - "3000:3000"
     environment:
-      HOST_OS: ${OS}
-      NODE_ENV: development
-      HOST: "0.0.0.0"
-      PUBLIC_URL: http://localhost:3000
-      REACT_APP_API_HOST: http://localhost:8000
-  postgres:
-    # versions of postgres: https://hub.docker.com/_/postgres
-    image: postgres:14.5-bullseye
-    # https://stackoverflow.com/questions/42107364/how-to-use-volume-in-docker-compose-for-postgres
+      VITE_API_HOST: http://localhost:8000
+    ports:
+      - "5173:5173"
+    user: "1000:1000" # Replace with your real user id and group id on macOS and Linux
     volumes:
-      - postgres-data:/var/lib/postgresql
+      - ./drive-stats:/app
+
+  postgres:
+    image: postgres:16.2
+    ports:
+      - "15432:5432"
+    volumes:
+      - drive-statsDB:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: drivestats_db
       POSTGRES_USER: casper
       POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
-    ports:
-      - 15432:5432
