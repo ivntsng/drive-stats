@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List
 import os
+from queries.pool import pool
 
 
 class UserIn(BaseModel):
