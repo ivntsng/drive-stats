@@ -80,7 +80,7 @@ class VehicleStatRepository:
                         last_coolant_reservoir_date,
                         last_transmission_fluid_date,
                         last_cabin_filter_date,
-                        last_wiper_blades_date;
+                        last_wiper_blades_date
                         """,
                         [
                             vehicle.vehicle_id,
