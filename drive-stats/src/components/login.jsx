@@ -56,6 +56,7 @@ function LoginForm({ toggle }) {
 
     function handleLogout() {
         localStorage.removeItem('token')
+        sessionStorage.removeItem('token')
         setToken('')
         setUsername('') // Clear username on logout
     }
