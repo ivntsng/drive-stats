@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -16,12 +17,14 @@ function LoginForm({ toggle }) {
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const [token, setToken] = useState(sessionStorage.getItem('token') || '')
+    const { toast } = useToast()
+    const API_HOST = import.meta.env.VITE_API_HOST
 
     async function handleLogin(e) {
         e.preventDefault()
         setIsLoading(true)
         try {
-            const response = await fetch('http://localhost:8000/signin', {
+            const response = await fetch(`${API_HOST}/signin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -36,8 +39,11 @@ function LoginForm({ toggle }) {
                 localStorage.setItem('username', username)
                 setToken(token)
                 setUsername(username)
-                console.log(username)
                 toggle()
+                toast({
+                    title: 'Logged In',
+                    description: `Welcome back, ${username}`,
+                })
             } else {
                 console.error('Login Failed')
             }
