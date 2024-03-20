@@ -12,7 +12,7 @@ function MainPage() {
 
     return (
         <div>
-            <Toaster />
+            <Toaster className="flex min-h-screen" />
             <div className="flex flex-col min-h-screen">
                 <div className="flex-grow mt-32 mb-20">
                     <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
