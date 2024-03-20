@@ -17,6 +17,11 @@ class AccountOut(BaseModel):
     email: str
 
 
+class AccountLogin(BaseModel):
+    username: str
+    password: str
+
+
 class Error(BaseModel):
     message: str
 

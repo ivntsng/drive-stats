@@ -1,9 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainPage from './MainPage';
-import NavBar from './NavBar';
-import { ThemeProvider } from "@/components/theme-provider";
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import MainPage from './MainPage'
+import NavBar from './NavBar'
+import { ThemeProvider } from '@/components/theme-provider'
 // import LoginPage from './login';
-
 
 function App() {
     return (
@@ -13,12 +12,11 @@ function App() {
                     <NavBar />
                     <Routes>
                         <Route path="/" element={<MainPage />} />
-                        {/* <Route path="/login" element={<LoginPage />} /> */}
                     </Routes>
                 </div>
             </ThemeProvider>
         </BrowserRouter>
-    );
+    )
 }
 
-export default App;
+export default App

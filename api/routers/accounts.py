@@ -4,7 +4,7 @@ from pydantic import BaseModel
 import jwt
 from decouple import Config, RepositoryEnv
 from pathlib import Path
-from queries.accounts import AccountIn, AccountOut, AccountRepo
+from queries.accounts import AccountIn, AccountOut, AccountRepo, AccountLogin
 import bcrypt  # Importing bcrypt library for password hashing
 from typing import List, Union, Optional
 
@@ -70,7 +70,7 @@ def get_single_user(
 
 
 @router.post("/signin")
-async def user_login(info: AccountIn, repo: AccountRepo = Depends()):
+async def user_login(info: AccountLogin, repo: AccountRepo = Depends()):
     # Check if the username exists in the database
     user = repo.get_single_user(info.username)
     if user:
@@ -78,7 +78,7 @@ async def user_login(info: AccountIn, repo: AccountRepo = Depends()):
         if bcrypt.checkpw(info.password.encode(), user.password.encode()):
             # Generate JWT token
             token = generate_token(user.id)
-            return {"token": token}
+            return {"token": token, "username": user.username}
         else:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
