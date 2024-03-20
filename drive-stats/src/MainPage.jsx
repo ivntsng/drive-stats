@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import React, { useState } from 'react'
 import LoginForm from './components/login'
+import { Toaster } from '@/components/ui/toaster'
 
 function MainPage() {
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
@@ -11,6 +12,7 @@ function MainPage() {
 
     return (
         <div>
+            <Toaster />
             <div className="flex flex-col min-h-screen">
                 <div className="flex-grow mt-32 mb-20">
                     <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
