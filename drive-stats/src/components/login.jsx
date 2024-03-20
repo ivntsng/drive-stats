@@ -1,67 +1,135 @@
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
 
+function LoginForm({ toggle }) {
+    const [username, setUsername] = useState(
+        localStorage.getItem('username') || ''
+    )
+    const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const [token, setToken] = useState(sessionStorage.getItem('token') || '')
 
-function LoginForm({ className, ...props }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Define isLoading state
+    async function handleLogin(e) {
+        e.preventDefault()
+        setIsLoading(true)
+        try {
+            const response = await fetch('http://localhost:8000/signin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
 
-  function handleLogin(e) {
-    e.preventDefault();
-    // Code to handle login goes here
-    setIsLoading(true); // Set isLoading to true to indicate loading
-    props.toggle();
-  }
+            if (response.ok) {
+                const data = await response.json()
+                const { token, username } = data
+                localStorage.setItem('token', token)
+                localStorage.setItem('username', username)
+                setToken(token)
+                setUsername(username)
+                console.log(username)
+                toggle()
+            } else {
+                console.error('Login Failed')
+            }
+        } catch (error) {
+            console.error('Error: ', error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
-  function handleCancel() {
-    props.toggle();
-  }
+    function handleLogout() {
+        localStorage.removeItem('token')
+        setToken('')
+        setUsername('') // Clear username on logout
+    }
 
-  return (
-    <Card className="w-[500px]">
-      <CardHeader>
-        <CardTitle className="flex justify-center text-2xl font-bold">Login</CardTitle>
-        <CardDescription className="flex justify-center">New? Sign up here</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name" className="font-bold">Username</Label>
-              <Input id="name" placeholder="Username" />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="framework" className="font-bold">Password</Label>
-              <Input id="name" placeholder="Password" />
-            </div>
-          </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={handleCancel}>Cancel</Button>
-        <Button>Login</Button>
-      </CardFooter>
-    </Card>
-  )
+    useEffect(() => {
+        const storedToken = localStorage.getItem('token')
+        if (storedToken) {
+            setToken(storedToken)
+        }
+    }, [])
+
+    return (
+        <Card className="w-full md:w-[500px] mx-auto">
+            <CardHeader>
+                <CardTitle className="flex justify-center text-2xl font-bold">
+                    {token ? 'Logged In' : 'Login'}
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                {token ? (
+                    <div>
+                        <p>Welcome back {username}</p>
+                        <Button onClick={handleLogout}>Logout</Button>
+                    </div>
+                ) : (
+                    <form>
+                        <div className="grid w-full items-center gap-4">
+                            <div className="flex flex-col space-y-1.5">
+                                <label htmlFor="username" className="font-bold">
+                                    Username
+                                </label>
+                                <Input
+                                    id="username"
+                                    placeholder="Username"
+                                    value={username}
+                                    onChange={(e) =>
+                                        setUsername(e.target.value)
+                                    }
+                                    autoComplete="current-username"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-1.5">
+                                <label htmlFor="password" className="font-bold">
+                                    Password
+                                </label>
+                                <Input
+                                    id="password"
+                                    placeholder="Password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) =>
+                                        setPassword(e.target.value)
+                                    }
+                                    autoComplete="current-password"
+                                />
+                            </div>
+                        </div>
+                    </form>
+                )}
+            </CardContent>
+            {!token && (
+                <CardFooter className="flex md:justify-between">
+                    <Button
+                        variant="outline"
+                        onClick={toggle}
+                        className="mr-10"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        type="submit"
+                        onClick={handleLogin}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Logging in...' : 'Login'}
+                    </Button>
+                </CardFooter>
+            )}
+        </Card>
+    )
 }
 
-export default LoginForm;
+export default LoginForm
