@@ -1,15 +1,18 @@
+import React, { useContext, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import React, { useState } from 'react'
 import LoginForm from './components/login'
 import { Toaster } from '@/components/ui/toaster'
+import { UserContext } from './UserContext'
 
 function MainPage() {
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
+    const { user } = useContext(UserContext)
 
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
     }
 
+    console.log(user)
     return (
         <div>
             <Toaster className="flex min-h-screen" />
@@ -23,15 +26,19 @@ function MainPage() {
                                     effortlessly.
                                 </h1>
                                 <div className="flex mt-12">
-                                    <Button className="inline-flex justify-center items-center gap-x-3 text-center hover:bg-green-500 border-2 text-sm lg:text-base font-medium rounded-md transition py-3 px-4">
-                                        Sign Up
-                                    </Button>
-                                    <Button
-                                        className="bg-sky-600 py-3 px-5 inline-flex justify-center ml-8 items-center gap-2 rounded-md border font-medium text-white shadow-sm align-middle hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white transition-all text-sm"
-                                        onClick={togglePop}
-                                    >
-                                        Login
-                                    </Button>
+                                    {!user && ( // If user is not logged in
+                                        <>
+                                            <Button className="inline-flex justify-center items-center gap-x-3 text-center hover:bg-green-500 border-2 text-sm lg:text-base font-medium rounded-md transition py-3 px-4">
+                                                Sign Up
+                                            </Button>
+                                            <Button
+                                                className="bg-sky-600 py-3 px-5 inline-flex justify-center ml-8 items-center gap-2 rounded-md border font-medium text-white shadow-sm align-middle hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white transition-all text-sm"
+                                                onClick={togglePop}
+                                            >
+                                                Login
+                                            </Button>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                             <div className="mt-32 justify-center">
