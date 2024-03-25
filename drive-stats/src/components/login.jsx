@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
+import { UserContext } from '../UserContext'
 import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,13 +11,17 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 
+export function handleLogout(setUser) {
+    // Clear token from session storage
+    sessionStorage.removeItem('token')
+    setUser(null) // Clear user context
+}
+
 function LoginForm({ toggle }) {
-    const [username, setUsername] = useState(
-        localStorage.getItem('username') || ''
-    )
+    const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const [token, setToken] = useState(sessionStorage.getItem('token') || '')
+    const { setUser } = useContext(UserContext)
     const { toast } = useToast()
     const API_HOST = import.meta.env.VITE_API_HOST
 
@@ -35,10 +40,8 @@ function LoginForm({ toggle }) {
             if (response.ok) {
                 const data = await response.json()
                 const { token, username } = data
-                localStorage.setItem('token', token)
-                localStorage.setItem('username', username)
-                setToken(token)
-                setUsername(username)
+                sessionStorage.setItem('token', token)
+                setUser({ username, token })
                 toggle()
                 toast({
                     title: 'Logged In',
@@ -55,86 +58,56 @@ function LoginForm({ toggle }) {
     }
 
     function handleLogout() {
-        localStorage.removeItem('token')
+        // Clear token from session storage
         sessionStorage.removeItem('token')
-        setToken('')
-        setUsername('') // Clear username on logout
+        setUser(null) // Clear user context
+        setUsername('')
+        setPassword('')
     }
-
-    useEffect(() => {
-        const storedToken = localStorage.getItem('token')
-        if (storedToken) {
-            setToken(storedToken)
-        }
-    }, [])
 
     return (
         <Card className="w-full md:w-[500px] mx-auto">
             <CardHeader>
                 <CardTitle className="flex justify-center text-2xl font-bold">
-                    {token ? 'Logged In' : 'Login'}
+                    Login
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                {token ? (
-                    <div>
-                        <p>Welcome back {username}</p>
-                        <Button onClick={handleLogout}>Logout</Button>
-                    </div>
-                ) : (
-                    <form>
-                        <div className="grid w-full items-center gap-4">
-                            <div className="flex flex-col space-y-1.5">
-                                <label htmlFor="username" className="font-bold">
-                                    Username
-                                </label>
-                                <Input
-                                    id="username"
-                                    placeholder="Username"
-                                    value={username}
-                                    onChange={(e) =>
-                                        setUsername(e.target.value)
-                                    }
-                                    autoComplete="current-username"
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-1.5">
-                                <label htmlFor="password" className="font-bold">
-                                    Password
-                                </label>
-                                <Input
-                                    id="password"
-                                    placeholder="Password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) =>
-                                        setPassword(e.target.value)
-                                    }
-                                    autoComplete="current-password"
-                                />
-                            </div>
+                <form onSubmit={handleLogin}>
+                    <div className="grid w-full items-center gap-4">
+                        <div className="flex flex-col space-y-1.5">
+                            <label htmlFor="username" className="font-bold">
+                                Username
+                            </label>
+                            <Input
+                                id="username"
+                                placeholder="Username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                autoComplete="current-username"
+                            />
                         </div>
-                    </form>
-                )}
+                        <div className="flex flex-col space-y-1.5">
+                            <label htmlFor="password" className="font-bold">
+                                Password
+                            </label>
+                            <Input
+                                id="password"
+                                placeholder="Password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                autoComplete="current-password"
+                            />
+                        </div>
+                    </div>
+                    <CardFooter className="flex md:justify-between mt-4">
+                        <Button type="submit" disabled={isLoading}>
+                            {isLoading ? 'Logging in...' : 'Login'}
+                        </Button>
+                    </CardFooter>
+                </form>
             </CardContent>
-            {!token && (
-                <CardFooter className="flex md:justify-between">
-                    <Button
-                        variant="outline"
-                        onClick={toggle}
-                        className="mr-10"
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        type="submit"
-                        onClick={handleLogin}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? 'Logging in...' : 'Login'}
-                    </Button>
-                </CardFooter>
-            )}
         </Card>
     )
 }
