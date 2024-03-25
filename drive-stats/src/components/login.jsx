@@ -12,9 +12,8 @@ import {
 } from '@/components/ui/card'
 
 export function handleLogout(setUser) {
-    // Clear token from session storage
     sessionStorage.removeItem('token')
-    setUser(null) // Clear user context
+    setUser(null)
 }
 
 function LoginForm({ toggle }) {
@@ -55,14 +54,6 @@ function LoginForm({ toggle }) {
         } finally {
             setIsLoading(false)
         }
-    }
-
-    function handleLogout() {
-        // Clear token from session storage
-        sessionStorage.removeItem('token')
-        setUser(null) // Clear user context
-        setUsername('')
-        setPassword('')
     }
 
     return (
