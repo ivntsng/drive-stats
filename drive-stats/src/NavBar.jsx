@@ -27,7 +27,7 @@ function NavBar() {
     return (
         <nav className="bg-white border-gray-200 py-2.5 dark:bg-gray-900">
             <div className="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
-                <a href="#" className="flex items-center">
+                <a href="/" className="flex items-center">
                     <img
                         src="https://www.svgrepo.com/show/471147/car-01.svg"
                         className="h-6 mr-3 sm:h-9"

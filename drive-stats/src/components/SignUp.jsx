@@ -1,8 +1,4 @@
-import React, { useState, useContext } from 'react'
-import { UserContext } from '../UserContext'
-import { useToast } from '@/components/ui/use-toast'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import React, { useState } from 'react'
 import {
     Card,
     CardContent,
@@ -10,49 +6,63 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'
-import { useNavigate } from 'react-router-dom'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { useToast } from '@/components/ui/use-toast'
 
-export function handleLogout(setUser) {
-    sessionStorage.removeItem('token')
-    setUser(null)
-}
-
-function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
+function SignupForm({ toggleSignUp, toggleLogin, closeSignupForm, login }) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [email, setEmail] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const { setUser } = useContext(UserContext)
-    const { toast } = useToast()
-    const navigate = useNavigate()
+    const [showLoginForm, setShowLoginForm] = useState(false)
     const [error, setError] = useState('')
+    const { toast } = useToast()
     const API_HOST = import.meta.env.VITE_API_HOST
 
-    async function handleLogin(e) {
+    const handleSignUp = async (e) => {
         e.preventDefault()
+        if (password !== confirmPassword) {
+            setError('Password do not match!')
+            return
+        }
+
+        setError('')
         setIsLoading(true)
         try {
-            const response = await fetch(`${API_HOST}/signin`, {
+            // const usernameCheckResponse = await fetch(
+            //     `${API_HOST}/users/${username}`
+            // )
+            // if (usernameCheckResponse.ok) {
+            //     const responseData = usernameCheckResponse.status
+            //     console.log(responseData) // This will log the response data
+            // } else {
+            //     console.error('Failed to fetch user data')
+            // }
+
+            const response = await fetch(`${API_HOST}/users/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username, password, email }),
             })
 
             if (response.ok) {
                 setUsername('')
                 setPassword('')
+                setConfirmPassword('')
+                setEmail('')
+                setShowLoginForm(false)
                 const data = await response.json()
-                const { token, username } = data
-                sessionStorage.setItem('token', token)
-                setUser({ username, token })
                 toast({
-                    title: 'Logged In',
-                    description: `Welcome back, ${username}`,
+                    title: 'Account Successfully Created',
+                    description: `Please sign in, ${username}!`,
                 })
-                closeLoginForm()
+                closeSignupForm()
             } else {
-                setError('Wrong username or password.')
+                console.error('Account Creation Failed')
             }
         } catch (error) {
             console.error('Error: ', error)
@@ -61,20 +71,20 @@ function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
         }
     }
 
-    const toggleSignUpForm = async (e) => {
-        toggleSignUp(true)
-        toggleLogin(false)
+    const toggleLoginForm = async (e) => {
+        toggleSignUp(false)
+        toggleLogin(true)
     }
 
     return (
         <Card className="w-full md:w-[400px] mx-auto">
             <CardHeader>
                 <CardTitle className="text-center text-2xl font-bold">
-                    Login
+                    Sign Up
                 </CardTitle>
             </CardHeader>
             <CardContent>
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleSignUp} className="space-y-4">
                     <div className="flex flex-col space-y-2">
                         <label htmlFor="username" className="font-bold">
                             Username
@@ -84,7 +94,7 @@ function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
                             placeholder="Username"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            autoComplete="current-username"
+                            autoComplete="username"
                         />
                     </div>
                     <div className="flex flex-col space-y-2">
@@ -97,7 +107,33 @@ function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            autoComplete="current-password"
+                            autoComplete="new-password"
+                        />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                        <label htmlFor="confirm-password" className="font-bold">
+                            Confirm Password
+                        </label>
+                        <Input
+                            id="confirm-password"
+                            placeholder="Confirm Password"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            autoComplete="new-password"
+                        />
+                    </div>
+                    <div className="flex flex-col space-y-2">
+                        <label htmlFor="email" className="font-bold">
+                            Email
+                        </label>
+                        <Input
+                            id="email"
+                            placeholder="Email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            autoComplete="email"
                         />
                     </div>
                     {error && <p className="text-red-500">{error}</p>}
@@ -108,31 +144,35 @@ function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
                                 disabled={isLoading}
                                 className="w-full md:w-auto"
                             >
-                                {isLoading ? 'Logging in...' : 'Login'}
+                                {isLoading ? 'Signing up...' : 'Sign Up'}
                             </Button>
                         </div>
                         <div className="w-full md:w-auto">
                             <div className="md:hidden">
+                                {' '}
+                                {/* This ensures it's always below on smaller screens */}
                                 <p className="text-sm text-gray-500">
-                                    New to DriveStats?{' '}
+                                    Already have an account?{' '}
                                     <button
                                         type="button"
                                         className="text-purple-600 hover:underline focus:outline-none focus:ring"
-                                        onClick={toggleSignUpForm}
+                                        onClick={toggleLoginForm}
                                     >
-                                        Sign up here
+                                        Log in here
                                     </button>
                                 </p>
                             </div>
                             <div className="hidden md:block">
+                                {' '}
+                                {/* This ensures it's always below on larger screens */}
                                 <p className="text-sm text-gray-500">
-                                    New to DriveStats?{' '}
+                                    Already have an account?{' '}
                                     <button
                                         type="button"
                                         className="text-purple-600 hover:underline focus:outline-none focus:ring"
-                                        onClick={toggleSignUpForm}
+                                        onClick={toggleLoginForm}
                                     >
-                                        Sign up here
+                                        Log in here
                                     </button>
                                 </p>
                             </div>
@@ -144,4 +184,4 @@ function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
     )
 }
 
-export default LoginForm
+export default SignupForm

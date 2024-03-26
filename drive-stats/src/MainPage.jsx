@@ -3,16 +3,21 @@ import { Button } from '@/components/ui/button'
 import LoginForm from './components/login'
 import { Toaster } from '@/components/ui/toaster'
 import { UserContext } from './UserContext'
+import SignupForm from './components/SignUp'
 
 function MainPage() {
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
+    const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
     const { user } = useContext(UserContext)
 
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
     }
 
-    console.log(user)
+    function toggleSignupForm() {
+        setIsSignupFormOpen(!isSignupFormOpen)
+    }
+
     return (
         <div>
             <Toaster className="flex min-h-screen" />
@@ -26,9 +31,12 @@ function MainPage() {
                                     effortlessly.
                                 </h1>
                                 <div className="flex mt-12">
-                                    {!user && ( // If user is not logged in
+                                    {!user && (
                                         <>
-                                            <Button className="inline-flex justify-center items-center gap-x-3 text-center hover:bg-green-500 border-2 text-sm lg:text-base font-medium rounded-md transition py-3 px-4">
+                                            <Button
+                                                className="inline-flex justify-center items-center gap-x-3 text-center hover:bg-green-500 border-2 text-sm lg:text-base font-medium rounded-md transition py-3 px-4"
+                                                onClick={toggleSignupForm}
+                                            >
                                                 Sign Up
                                             </Button>
                                             <Button
@@ -170,7 +178,22 @@ function MainPage() {
             {isLoginFormOpen && (
                 <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
                     <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <LoginForm toggle={togglePop} />
+                        <LoginForm
+                            toggleLogin={togglePop}
+                            toggleSignUp={toggleSignupForm}
+                            closeLoginForm={() => setIsLoginFormOpen(false)}
+                        />
+                    </div>
+                </div>
+            )}
+            {isSignupFormOpen && (
+                <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
+                    <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <SignupForm
+                            toggleSignUp={toggleSignupForm}
+                            toggleLogin={togglePop}
+                            closeSignupForm={() => setIsSignupFormOpen(false)}
+                        />
                     </div>
                 </div>
             )}
