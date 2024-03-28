@@ -10,7 +10,14 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
 
-function SignupForm({ toggleSignUp, toggleLogin, closeSignupForm, login }) {
+function SignupForm({
+    isSignupFormOpen,
+    toggleSignUp,
+    isLoginFormOpen,
+    toggleLogin,
+    closeSignupForm,
+    login,
+}) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -32,15 +39,13 @@ function SignupForm({ toggleSignUp, toggleLogin, closeSignupForm, login }) {
         setError('')
         setIsLoading(true)
         try {
-            // const usernameCheckResponse = await fetch(
-            //     `${API_HOST}/users/${username}`
-            // )
-            // if (usernameCheckResponse.ok) {
-            //     const responseData = usernameCheckResponse.status
-            //     console.log(responseData) // This will log the response data
-            // } else {
-            //     console.error('Failed to fetch user data')
-            // }
+            const checkUser = await fetch(`${API_HOST}/check/users/${username}`)
+            console.log(checkUser)
+            if (checkUser.status !== 500) {
+                setError('Username already exists!')
+                setIsLoading(false)
+                return
+            }
 
             const response = await fetch(`${API_HOST}/users/signup`, {
                 method: 'POST',
@@ -66,14 +71,14 @@ function SignupForm({ toggleSignUp, toggleLogin, closeSignupForm, login }) {
                 console.error('Account Creation Failed')
             }
         } catch (error) {
-            console.error('Error: ', error)
+            console.error('ErrorTest: ', error)
         } finally {
             setIsLoading(false)
         }
     }
 
     const toggleLoginForm = async (e) => {
-        toggleSignUp(false)
+        toggleSignUp(!isSignupFormOpen)
         toggleLogin(true)
     }
 

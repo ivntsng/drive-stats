@@ -54,7 +54,7 @@ function MainPage() {
                                 {/* Adjusted mt-10 for larger margin-top */}
                                 <img
                                     className="w-full rounded-md"
-                                    src="/assets/homepage.jpg"
+                                    src="/assets/R8GT.jpg"
                                     alt="Home page image"
                                 />
                             </div>
@@ -179,8 +179,10 @@ function MainPage() {
                 <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
                     <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <LoginForm
-                            toggleLogin={togglePop}
+                            isSignupFormOpen={isSignupFormOpen}
                             toggleSignUp={toggleSignupForm}
+                            isLoginFormOpen={isLoginFormOpen}
+                            toggleLogin={togglePop}
                             closeLoginForm={() => setIsLoginFormOpen(false)}
                         />
                     </div>
@@ -190,7 +192,9 @@ function MainPage() {
                 <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
                     <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <SignupForm
+                            isSignupFormOpen={isSignupFormOpen}
                             toggleSignUp={toggleSignupForm}
+                            isLoginFormOpen={isLoginFormOpen}
                             toggleLogin={togglePop}
                             closeSignupForm={() => setIsSignupFormOpen(false)}
                         />

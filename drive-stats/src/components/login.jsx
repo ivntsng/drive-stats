@@ -23,7 +23,13 @@ export function handleLogout(setUser) {
     setUser(null)
 }
 
-function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
+function LoginForm({
+    isSignupFormOpen,
+    toggleSignUp,
+    isLoginFormOpen,
+    toggleLogin,
+    closeLoginForm,
+}) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -53,11 +59,11 @@ function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
                 const { token, username } = data
                 sessionStorage.setItem('token', token)
                 setUser({ username, token })
+                closeLoginForm()
                 toast({
                     title: 'Logged In',
                     description: `Welcome back, ${username}`,
                 })
-                closeLoginForm()
             } else {
                 setError('Wrong username or password.')
             }
@@ -69,14 +75,16 @@ function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
     }
 
     const toggleSignUpForm = async (e) => {
-        toggleSignUp(true)
-        toggleLogin(false)
+        toggleSignUp(!isSignupFormOpen)
+        toggleLogin(!isLoginFormOpen)
     }
 
     const handleClickOutside = useCallback(
         (event) => {
             if (formRef.current && !formRef.current.contains(event.target)) {
-                closeLoginForm()
+                if (typeof closeLoginForm === 'function') {
+                    closeLoginForm()
+                }
             }
         },
         [closeLoginForm]
@@ -87,7 +95,7 @@ function LoginForm({ toggleSignUp, toggleLogin, closeLoginForm }) {
         return () => {
             window.removeEventListener('mousedown', handleClickOutside)
         }
-    }, [handleClickOutside])
+    }, [])
 
     return (
         <Card className="w-full md:w-[400px] mx-auto">
