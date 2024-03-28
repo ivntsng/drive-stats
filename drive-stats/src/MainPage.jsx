@@ -3,16 +3,21 @@ import { Button } from '@/components/ui/button'
 import LoginForm from './components/login'
 import { Toaster } from '@/components/ui/toaster'
 import { UserContext } from './UserContext'
+import SignupForm from './components/SignUp'
 
 function MainPage() {
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
+    const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
     const { user } = useContext(UserContext)
 
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
     }
 
-    console.log(user)
+    function toggleSignupForm() {
+        setIsSignupFormOpen(!isSignupFormOpen)
+    }
+
     return (
         <div>
             <Toaster className="flex min-h-screen" />
@@ -26,9 +31,12 @@ function MainPage() {
                                     effortlessly.
                                 </h1>
                                 <div className="flex mt-12">
-                                    {!user && ( // If user is not logged in
+                                    {!user && (
                                         <>
-                                            <Button className="inline-flex justify-center items-center gap-x-3 text-center hover:bg-green-500 border-2 text-sm lg:text-base font-medium rounded-md transition py-3 px-4">
+                                            <Button
+                                                className="inline-flex justify-center items-center gap-x-3 text-center hover:bg-green-500 border-2 text-sm lg:text-base font-medium rounded-md transition py-3 px-4"
+                                                onClick={toggleSignupForm}
+                                            >
                                                 Sign Up
                                             </Button>
                                             <Button
@@ -46,7 +54,7 @@ function MainPage() {
                                 {/* Adjusted mt-10 for larger margin-top */}
                                 <img
                                     className="w-full rounded-md"
-                                    src="/assets/homepage.jpg"
+                                    src="/assets/R8GT.jpg"
                                     alt="Home page image"
                                 />
                             </div>
@@ -170,7 +178,26 @@ function MainPage() {
             {isLoginFormOpen && (
                 <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
                     <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <LoginForm toggle={togglePop} />
+                        <LoginForm
+                            isSignupFormOpen={isSignupFormOpen}
+                            toggleSignUp={toggleSignupForm}
+                            isLoginFormOpen={isLoginFormOpen}
+                            toggleLogin={togglePop}
+                            closeLoginForm={() => setIsLoginFormOpen(false)}
+                        />
+                    </div>
+                </div>
+            )}
+            {isSignupFormOpen && (
+                <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
+                    <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <SignupForm
+                            isSignupFormOpen={isSignupFormOpen}
+                            toggleSignUp={toggleSignupForm}
+                            isLoginFormOpen={isLoginFormOpen}
+                            toggleLogin={togglePop}
+                            closeSignupForm={() => setIsSignupFormOpen(false)}
+                        />
                     </div>
                 </div>
             )}

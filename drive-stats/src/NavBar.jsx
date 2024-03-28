@@ -5,6 +5,15 @@ import { useTheme } from '@/components/theme-provider'
 import { handleLogout } from './components/login'
 import { useToast } from '@/components/ui/use-toast'
 import { UserContext } from './UserContext'
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu'
+import { Link } from 'react-router-dom'
 
 function NavBar() {
     const { setTheme } = useTheme()
@@ -26,21 +35,90 @@ function NavBar() {
 
     return (
         <nav className="bg-white border-gray-200 py-2.5 dark:bg-gray-900">
-            <div className="flex flex-wrap items-center justify-between max-w-screen-xl px-4 mx-auto">
-                <a href="#" className="flex items-center">
-                    <img
-                        src="https://www.svgrepo.com/show/471147/car-01.svg"
-                        className="h-6 mr-3 sm:h-9"
-                        alt="DriveStats Logo"
-                    />
-                    <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
-                        DriveStats
-                    </span>
-                </a>
+            <div className="flex items-center justify-between max-w-screen-xl px-4 mx-auto">
+                <div className="flex items-center">
+                    <a href="/" className="flex items-center">
+                        <img
+                            src="https://www.svgrepo.com/show/471147/car-01.svg"
+                            className="h-6 mr-3 sm:h-9"
+                            alt="DriveStats Logo"
+                        />
+                        <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
+                            DriveStats
+                        </span>
+                    </a>
+                </div>
+                <div className="flex items-center justify-center flex-grow">
+                    <NavigationMenu>
+                        <NavigationMenuList>
+                            <NavigationMenuItem>
+                                <NavigationMenuTrigger>
+                                    My Garage
+                                </NavigationMenuTrigger>
+                                <NavigationMenuContent>
+                                    <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                                        <li className="row-span-3">
+                                            <NavigationMenuLink asChild>
+                                                <a
+                                                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                                                    href="/"
+                                                >
+                                                    {/* Include Icons here if needed */}
+                                                    <div className="mb-2 mt-4 text-lg font-medium">
+                                                        shadcn/ui
+                                                    </div>
+                                                    <p className="text-sm leading-tight text-muted-foreground">
+                                                        Beautifully designed
+                                                        components built with
+                                                        Radix UI and Tailwind
+                                                        CSS.
+                                                    </p>
+                                                </a>
+                                            </NavigationMenuLink>
+                                        </li>
+                                        {/* Include other documentation links here */}
+                                        <li>
+                                            <a
+                                                href="/addvehicle"
+                                                className="text-blue-500"
+                                            >
+                                                Register Vehicle
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                href="/docs/installation"
+                                                className="text-blue-500"
+                                            >
+                                                Add Maintenance Log
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a
+                                                href="/docs/primitives/typography"
+                                                className="text-blue-500"
+                                            >
+                                                Typography
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+                            {/* Include other navigation menu items here */}
+                            <NavigationMenuItem>
+                                <NavigationMenuContent>
+                                    <NavigationMenuList>
+                                        <NavigationMenuItem>
+                                            <Link></Link>
+                                        </NavigationMenuItem>
+                                    </NavigationMenuList>
+                                </NavigationMenuContent>
+                            </NavigationMenuItem>
+                        </NavigationMenuList>
+                    </NavigationMenu>
+                </div>
                 <div className="flex items-center lg:order-2">
-                    <div className="hidden mt-2 mr-4 sm:inline-block">
-                        <span></span>
-                    </div>
+                    {/* Rest of your code for user actions */}
                     {user ? (
                         <Button
                             className="text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 sm:mr-2 lg:mr-0 dark:bg-purple-600 dark:hover:bg-purple-700 focus:outline-none dark:focus:ring-purple-800"
@@ -56,62 +134,15 @@ function NavBar() {
                             Login
                         </Button>
                     )}
-                    <Button
-                        variant="outline"
-                        data-collapse-toggle="mobile-menu-2"
-                        type="button"
-                        className="inline-flex items-center p-2 ml-1 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-                        aria-controls="mobile-menu-2"
-                        aria-expanded="true"
-                    >
-                        <span className="sr-only">Open main menu</span>
-                        <svg
-                            className="w-6 h-6"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                                clipRule="evenodd"
-                            ></path>
-                        </svg>
-                        <svg
-                            className="hidden w-6 h-6"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                fillRule="evenodd"
-                                d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                                clipRule="evenodd"
-                            ></path>
-                        </svg>
-                    </Button>
                 </div>
-                <div
-                    className="items-center justify-between w-full lg:flex lg:w-auto lg:order-1"
-                    id="mobile-menu-2"
-                >
-                    <ul className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
-                        {/* <li>
-              <a href="#"
-                className="block py-2 pl-3 pr-4 text-white bg-purple-700 rounded lg:bg-transparent lg:text-purple-700 lg:p-0 dark:text-white"
-                aria-current="page">Test</a>
-            </li> */}
-                        {/* Other menu items */}
-                    </ul>
-                </div>
-                {isLoginFormOpen && (
-                    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
-                        <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                            <LoginForm toggle={togglePop} />
-                        </div>
-                    </div>
-                )}
             </div>
+            {isLoginFormOpen && (
+                <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
+                    <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <LoginForm toggle={togglePop} />
+                    </div>
+                </div>
+            )}
         </nav>
     )
 }

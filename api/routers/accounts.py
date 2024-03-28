@@ -4,7 +4,13 @@ from pydantic import BaseModel
 import jwt
 from decouple import Config, RepositoryEnv
 from pathlib import Path
-from queries.accounts import AccountIn, AccountOut, AccountRepo, AccountLogin
+from queries.accounts import (
+    AccountIn,
+    AccountOut,
+    AccountRepo,
+    AccountLogin,
+    CheckAccountOut,
+)
 import bcrypt  # Importing bcrypt library for password hashing
 from typing import List, Union, Optional
 
@@ -63,6 +69,21 @@ def get_single_user(
     repo: AccountRepo = Depends(),
 ) -> AccountOut:
     user = repo.get_single_user(username)
+    if user:
+        return user
+    else:
+        raise HTTPException(status_code=500, detail="User does not exist!")
+
+
+@router.get(
+    "/check/users/{username}", response_model=Optional[CheckAccountOut]
+)
+def check_single_user(
+    username: str,
+    response: Response,
+    repo: AccountRepo = Depends(),
+) -> CheckAccountOut:
+    user = repo.check_single_user(username)
     if user:
         return user
     else:

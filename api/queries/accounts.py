@@ -17,6 +17,11 @@ class AccountOut(BaseModel):
     email: str
 
 
+class CheckAccountOut(BaseModel):
+    username: str
+    email: str
+
+
 class AccountLogin(BaseModel):
     username: str
     password: str
@@ -100,6 +105,26 @@ class AccountRepo:
                         id=record[0],
                         username=record[1],
                         password=record[2],
+                        email=record[3],
+                    )
+                else:
+                    return None
+
+    def check_single_user(self, username: str) -> Optional[CheckAccountOut]:
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT *
+                    FROM accounts
+                    WHERE username = %s
+                    """,
+                    [username],
+                )
+                record = cur.fetchone()
+                if record:
+                    return CheckAccountOut(
+                        username=record[1],
                         email=record[3],
                     )
                 else:
