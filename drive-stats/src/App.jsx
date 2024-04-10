@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import MainPage from './MainPage'
+import CreateVehicle from './components/vehicles/CreateVehicle'
 import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
 import React, { useState, useEffect } from 'react'
@@ -42,6 +43,10 @@ function App() {
                         <NavBar />
                         <Routes>
                             <Route path="/" element={<MainPage />} />
+                            <Route
+                                path="addvehicle"
+                                element={<CreateVehicle />}
+                            />
                         </Routes>
                     </UserContext.Provider>
                 </div>
