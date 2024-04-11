@@ -29,6 +29,7 @@ function LoginForm({
     isLoginFormOpen,
     toggleLogin,
     closeLoginForm,
+    toggleSignupForm,
 }) {
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
