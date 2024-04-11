@@ -42,6 +42,10 @@ function LoginForm({
 
     async function handleLogin(e) {
         e.preventDefault()
+        if (!username || !password) {
+            setError('Username and password are required.')
+            return
+        }
         setIsLoading(true)
         try {
             const response = await fetch(`${API_HOST}/signin`, {
@@ -144,18 +148,6 @@ function LoginForm({
                                 </Button>
                             </div>
                             <div className="w-full md:w-auto">
-                                <div className="md:hidden">
-                                    <p className="text-sm text-gray-500">
-                                        New to DriveStats?{' '}
-                                        <button
-                                            type="button"
-                                            className="text-purple-600 hover:underline focus:outline-none focus:ring"
-                                            onClick={toggleSignUpForm}
-                                        >
-                                            Sign up here
-                                        </button>
-                                    </p>
-                                </div>
                                 <div className="hidden md:block">
                                     <p className="text-sm text-gray-500">
                                         New to DriveStats?{' '}
