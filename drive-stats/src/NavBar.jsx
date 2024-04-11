@@ -5,6 +5,15 @@ import { useTheme } from '@/components/theme-provider'
 import { handleLogout } from './components/login'
 import { useToast } from '@/components/ui/use-toast'
 import { UserContext } from './UserContext'
+import {
+    NavigationMenu,
+    NavigationMenuContent,
+    NavigationMenuItem,
+    NavigationMenuLink,
+    NavigationMenuList,
+    NavigationMenuTrigger,
+} from '@/components/ui/navigation-menu'
+import { Link } from 'react-router-dom'
 
 function NavBar() {
     const { setTheme } = useTheme()
