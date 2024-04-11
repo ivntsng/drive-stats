@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/navigation-menu'
 import { Link } from 'react-router-dom'
 
-function NavBar() {
+function NavBar({ toggleSignupForm }) {
     const { setTheme } = useTheme()
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
     const { toast } = useToast()
