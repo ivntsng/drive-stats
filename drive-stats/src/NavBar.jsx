@@ -14,15 +14,21 @@ import {
     NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu'
 import { Link } from 'react-router-dom'
+import SignupForm from './components/SignUp'
 
-function NavBar({ toggleSignupForm }) {
+function NavBar() {
     const { setTheme } = useTheme()
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
+    const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
     const { toast } = useToast()
     const { user, setUser } = useContext(UserContext)
 
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
+    }
+
+    function toggleSignupForm() {
+        setIsSignupFormOpen(!isSignupFormOpen)
     }
 
     function logout() {
@@ -156,6 +162,23 @@ function NavBar({ toggleSignupForm }) {
                             <LoginForm
                                 toggle={togglePop}
                                 closeLoginForm={() => setIsLoginFormOpen(false)}
+                                toggleSignUp={toggleSignupForm}
+                                toggleLogin={togglePop}
+                            />
+                        </div>
+                    </div>
+                )}
+                {isSignupFormOpen && (
+                    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
+                        <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <SignupForm
+                                isSignupFormOpen={isSignupFormOpen}
+                                toggleSignUp={toggleSignupForm}
+                                isLoginFormOpen={isLoginFormOpen}
+                                toggleLogin={togglePop}
+                                closeSignupForm={() =>
+                                    setIsSignupFormOpen(false)
+                                }
                             />
                         </div>
                     </div>
