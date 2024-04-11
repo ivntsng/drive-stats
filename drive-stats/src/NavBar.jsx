@@ -5,15 +5,6 @@ import { useTheme } from '@/components/theme-provider'
 import { handleLogout } from './components/login'
 import { useToast } from '@/components/ui/use-toast'
 import { UserContext } from './UserContext'
-import {
-    NavigationMenu,
-    NavigationMenuContent,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu'
-import { Link } from 'react-router-dom'
 
 function NavBar() {
     const { setTheme } = useTheme()
@@ -137,17 +128,30 @@ function NavBar() {
                         </Button>
                     )}
                 </div>
-            </div>
-            {isLoginFormOpen && (
-                <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
-                    <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <LoginForm
-                            toggle={togglePop}
-                            closeLoginForm={() => setIsLoginFormOpen(false)}
-                        />
-                    </div>
+                <div
+                    className="items-center justify-between w-full lg:flex lg:w-auto lg:order-1"
+                    id="mobile-menu-2"
+                >
+                    <ul className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
+                        {/* <li>
+              <a href="#"
+                className="block py-2 pl-3 pr-4 text-white bg-purple-700 rounded lg:bg-transparent lg:text-purple-700 lg:p-0 dark:text-white"
+                aria-current="page">Test</a>
+            </li> */}
+                        {/* Other menu items */}
+                    </ul>
                 </div>
-            )}
+                {isLoginFormOpen && (
+                    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
+                        <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <LoginForm
+                                toggle={togglePop}
+                                closeLoginForm={() => setIsLoginFormOpen(false)}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
         </nav>
     )
 }
