@@ -59,11 +59,11 @@ function LoginForm({
                 const { token, username } = data
                 sessionStorage.setItem('token', token)
                 setUser({ username, token })
-                closeLoginForm()
                 toast({
                     title: 'Logged In',
                     description: `Welcome back, ${username}`,
                 })
+                closeLoginForm()
             } else {
                 setError('Wrong username or password.')
             }
