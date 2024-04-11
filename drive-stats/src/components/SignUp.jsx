@@ -31,11 +31,18 @@ function SignupForm({
 
     const handleSignUp = async (e) => {
         e.preventDefault()
+        if (!username || !password) {
+            setError('Username and password are required.')
+            return
+        }
+        if (!email) {
+            setError('Email is required.')
+            return
+        }
         if (password !== confirmPassword) {
             setError('Password do not match!')
             return
         }
-
         setError('')
         setIsLoading(true)
         try {

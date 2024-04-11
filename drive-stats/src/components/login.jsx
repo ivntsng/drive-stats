@@ -42,6 +42,10 @@ function LoginForm({
 
     async function handleLogin(e) {
         e.preventDefault()
+        if (!username || !password) {
+            setError('Username and password are required.')
+            return
+        }
         setIsLoading(true)
         try {
             const response = await fetch(`${API_HOST}/signin`, {
