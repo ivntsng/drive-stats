@@ -38,9 +38,9 @@ function App() {
     return (
         <BrowserRouter>
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-                <div className="container">
-                    <UserContext.Provider value={value}>
-                        <NavBar />
+                <UserContext.Provider value={value}>
+                    <NavBar />
+                    <div className="container">
                         <Routes>
                             <Route path="/" element={<MainPage />} />
                             <Route
@@ -48,8 +48,8 @@ function App() {
                                 element={<CreateVehicle />}
                             />
                         </Routes>
-                    </UserContext.Provider>
-                </div>
+                    </div>
+                </UserContext.Provider>
             </ThemeProvider>
         </BrowserRouter>
     )
