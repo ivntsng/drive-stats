@@ -1,6 +1,5 @@
 import time
 from fastapi import APIRouter, Depends, HTTPException, status, Response
-from pydantic import BaseModel
 import jwt
 from decouple import Config, RepositoryEnv
 from pathlib import Path
@@ -10,9 +9,10 @@ from queries.accounts import (
     AccountRepo,
     AccountLogin,
     CheckAccountOut,
+    CheckEmail,
 )
 import bcrypt  # Importing bcrypt library for password hashing
-from typing import List, Union, Optional
+from typing import List, Optional
 
 
 router = APIRouter(tags=["Accounts"])
@@ -69,6 +69,7 @@ def get_single_user(
     repo: AccountRepo = Depends(),
 ) -> AccountOut:
     user = repo.get_single_user(username)
+    print(user)
     if user:
         return user
     else:
@@ -80,7 +81,6 @@ def get_single_user(
 )
 def check_single_user(
     username: str,
-    response: Response,
     repo: AccountRepo = Depends(),
 ) -> CheckAccountOut:
     user = repo.check_single_user(username)
@@ -88,6 +88,18 @@ def check_single_user(
         return user
     else:
         raise HTTPException(status_code=500, detail="User does not exist!")
+
+
+@router.get("/check/email/{email}", response_model=Optional[CheckEmail])
+def check_user_email(
+    email: str,
+    repo: AccountRepo = Depends(),
+) -> CheckEmail:
+    current_email = repo.check_user_email(email)
+    if current_email:
+        return current_email
+    else:
+        raise HTTPException(status_code=500, detail="Email does not exist!")
 
 
 @router.post("/signin")

@@ -22,6 +22,10 @@ class CheckAccountOut(BaseModel):
     email: str
 
 
+class CheckEmail(BaseModel):
+    email: str
+
+
 class AccountLogin(BaseModel):
     username: str
     password: str
@@ -125,6 +129,25 @@ class AccountRepo:
                 if record:
                     return CheckAccountOut(
                         username=record[1],
+                        email=record[3],
+                    )
+                else:
+                    return None
+
+    def check_user_email(self, email: str) -> Optional[CheckEmail]:
+        with pool.connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    """
+                    SELECT *
+                    FROM accounts
+                    WHERE email = %s
+                    """,
+                    [email],
+                )
+                record = cur.fetchone()
+                if record:
+                    return CheckEmail(
                         email=record[3],
                     )
                 else:
