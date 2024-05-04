@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 
 export function handleLogout(setUser) {
     sessionStorage.removeItem('token')
+    sessionStorage.removeItem('username')
     setUser(null)
 }
 
@@ -63,6 +64,7 @@ function LoginForm({
                 const data = await response.json()
                 const { token, username } = data
                 sessionStorage.setItem('token', token)
+                sessionStorage.setItem('username', username)
                 setUser({ username, token })
                 toast({
                     title: 'Logged In',
