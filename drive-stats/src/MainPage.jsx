@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import LoginForm from './components/login'
 import { Toaster } from '@/components/ui/toaster'
@@ -9,10 +9,23 @@ import Footer from './Footer'
 function MainPage() {
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
     const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
+    const [username, setUsername] = useState('')
     const { user } = useContext(UserContext)
 
     const togglePop = () => setIsLoginFormOpen(!isLoginFormOpen)
     const toggleSignupForm = () => setIsSignupFormOpen(!isSignupFormOpen)
+
+    const retrieveUsernameFromSession = useCallback(() => {
+        const storedUsername = sessionStorage.getItem('username')
+        console.log('Stored username:', storedUsername)
+        if (storedUsername) {
+            setUsername(storedUsername)
+        }
+    }, [])
+
+    useEffect(() => {
+        retrieveUsernameFromSession()
+    }, [])
 
     return (
         <div

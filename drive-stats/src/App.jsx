@@ -44,7 +44,7 @@ function App() {
                         <Routes>
                             <Route path="/" element={<MainPage />} />
                             <Route
-                                path="addvehicle"
+                                path="/vehicles/register"
                                 element={<CreateVehicle />}
                             />
                         </Routes>

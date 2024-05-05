@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react'
+import { useContext, useState, useCallback, useEffect } from 'react'
 import LoginForm from './components/login'
 import { Button } from '@/components/ui/button'
 import { handleLogout } from './components/login'
@@ -19,7 +19,20 @@ function NavBar() {
     const { toast } = useToast()
     const { user, setUser } = useContext(UserContext)
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
+    const [username, setUsername] = useState('')
     const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
+
+    const retrieveUsernameFromSession = useCallback(() => {
+        const storedUsername = sessionStorage.getItem('username')
+        console.log('Stored username:', storedUsername)
+        if (storedUsername) {
+            setUsername(storedUsername)
+        }
+    }, [])
+
+    useEffect(() => {
+        retrieveUsernameFromSession()
+    }, [])
 
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
@@ -70,7 +83,9 @@ function NavBar() {
                                                     >
                                                         {/* Include Icons here if needed */}
                                                         <div className="mb-2 mt-4 text-lg font-medium">
-                                                            shadcn/ui
+                                                            {user
+                                                                ? `Hello, ${username}`
+                                                                : 'Hello'}
                                                         </div>
                                                         <p className="text-sm leading-tight text-muted-foreground">
                                                             Beautifully designed
@@ -84,7 +99,7 @@ function NavBar() {
                                             {/* Include other documentation links here */}
                                             <li>
                                                 <a
-                                                    href="/addvehicle"
+                                                    href="/vehicles/register"
                                                     className="text-blue-500"
                                                 >
                                                     Register Vehicle
