@@ -99,7 +99,7 @@ function NavBar() {
                                             {/* Include other documentation links here */}
                                             <li>
                                                 <a
-                                                    href="/addvehicle"
+                                                    href="/vehicles/register"
                                                     className="text-blue-500"
                                                 >
                                                     Register Vehicle
