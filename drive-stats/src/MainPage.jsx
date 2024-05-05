@@ -17,7 +17,6 @@ function MainPage() {
 
     const retrieveUsernameFromSession = useCallback(() => {
         const storedUsername = sessionStorage.getItem('username')
-        console.log('Stored username:', storedUsername)
         if (storedUsername) {
             setUsername(storedUsername)
         }
