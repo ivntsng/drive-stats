@@ -9,11 +9,16 @@ import Footer from './Footer'
 function MainPage() {
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
     const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
+    const [isVehicleRegistrationOpen, setIsVehicleRegistrationOpen] =
+        useState(false)
     const [username, setUsername] = useState('')
     const { user } = useContext(UserContext)
 
     const togglePop = () => setIsLoginFormOpen(!isLoginFormOpen)
     const toggleSignupForm = () => setIsSignupFormOpen(!isSignupFormOpen)
+    const toggleVehicleRegistration = () => {
+        setIsVehicleRegistrationOpen((prevState) => !prevState)
+    }
 
     const retrieveUsernameFromSession = useCallback(() => {
         const storedUsername = sessionStorage.getItem('username')
@@ -96,6 +101,20 @@ function MainPage() {
                             isLoginFormOpen={isLoginFormOpen}
                             toggleLogin={togglePop}
                             closeSignupForm={() => setIsSignupFormOpen(false)}
+                        />
+                    </div>
+                </div>
+            )}
+            {isVehicleRegistrationOpen && (
+                <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
+                    <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <RegisterVehicleForm
+                            isVehicleRegistrationOpen={
+                                isVehicleRegistrationOpen
+                            }
+                            closeVehicleRegistrationForm={() =>
+                                setIsVehicleRegistrationOpen(false)
+                            }
                         />
                     </div>
                 </div>
