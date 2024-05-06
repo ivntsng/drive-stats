@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/navigation-menu'
 import { Link } from 'react-router-dom'
 import SignupForm from './components/SignUp'
+import RegisterVehicleForm from './components/vehicles/CreateVehicle'
 
 function NavBar() {
     const { toast } = useToast()
@@ -21,6 +22,8 @@ function NavBar() {
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
     const [username, setUsername] = useState('')
     const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
+    const [isVehicleRegistrationOpen, setIsVehicleRegistrationOpen] =
+        useState(false)
 
     const retrieveUsernameFromSession = useCallback(() => {
         const storedUsername = sessionStorage.getItem('username')
@@ -47,6 +50,10 @@ function NavBar() {
             title: 'Logged Out',
             description: 'You have been logged out successfully.',
         })
+    }
+
+    const toggleVehicleRegistration = () => {
+        setIsVehicleRegistrationOpen(!isVehicleRegistrationOpen)
     }
 
     return (
@@ -97,12 +104,14 @@ function NavBar() {
                                             </li>
                                             {/* Include other documentation links here */}
                                             <li>
-                                                <a
-                                                    href="/vehicles/register"
+                                                <button
                                                     className="text-blue-500"
+                                                    onClick={
+                                                        toggleVehicleRegistration
+                                                    }
                                                 >
                                                     Register Vehicle
-                                                </a>
+                                                </button>
                                             </li>
                                             <li>
                                                 <a
@@ -184,6 +193,20 @@ function NavBar() {
                                 toggleLogin={togglePop}
                                 closeSignupForm={() =>
                                     setIsSignupFormOpen(false)
+                                }
+                            />
+                        </div>
+                    </div>
+                )}
+                {isVehicleRegistrationOpen && (
+                    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-75">
+                        <div className="bg p-8 rounded-md absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <RegisterVehicleForm
+                                isVehicleRegistrationOpen={
+                                    isVehicleRegistrationOpen
+                                }
+                                closeRegisterNewVehicleForm={() =>
+                                    setIsVehicleRegistrationOpen(false)
                                 }
                             />
                         </div>

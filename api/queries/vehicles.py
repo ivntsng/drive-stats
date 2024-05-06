@@ -16,7 +16,7 @@ class VehicleIn(BaseModel):
     make: str
     model: str
     vin: str
-    mileage: str
+    mileage: int
 
 
 class VehicleOut(BaseModel):
@@ -26,7 +26,7 @@ class VehicleOut(BaseModel):
     make: str
     model: str
     vin: str
-    mileage: str
+    mileage: int
 
 
 class VehicleRepository:
