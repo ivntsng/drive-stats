@@ -36,6 +36,14 @@ function NavBar() {
         retrieveUsernameFromSession()
     }, [])
 
+    useEffect(() => {
+        if (user) {
+            setUsername(user.username) // Assuming username is available in user object
+        } else {
+            setUsername('') // Clear username if user is not logged in
+        }
+    }, [user])
+
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
     }
@@ -91,7 +99,7 @@ function NavBar() {
                                                         <div className="mb-2 mt-4 text-lg font-medium">
                                                             {user
                                                                 ? `Hello, ${username}`
-                                                                : 'Hello'}
+                                                                : 'There is a bug, please submit a report bug.'}
                                                         </div>
                                                         <p className="text-sm leading-tight text-muted-foreground">
                                                             Beautifully designed
