@@ -36,14 +36,6 @@ function NavBar() {
         retrieveUsernameFromSession()
     }, [])
 
-    useEffect(() => {
-        if (user) {
-            setUsername(user.username) // Assuming username is available in user object
-        } else {
-            setUsername('') // Clear username if user is not logged in
-        }
-    }, [user])
-
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
     }
