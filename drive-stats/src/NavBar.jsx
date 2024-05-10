@@ -56,6 +56,8 @@ function NavBar() {
         setIsVehicleRegistrationOpen(!isVehicleRegistrationOpen)
     }
 
+    console.log('nav username: ', username)
+
     return (
         <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full">
             <div className="max-w-[85rem] mx-auto px-4 py-2.5 flex items-center justify-between">
@@ -85,7 +87,7 @@ function NavBar() {
                                                 <NavigationMenuLink asChild>
                                                     <a
                                                         className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                                                        href="/"
+                                                        href="/vehicles/garage"
                                                     >
                                                         {/* Include Icons here if needed */}
                                                         <div className="mb-2 mt-4 text-lg font-medium">
