@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, validator, ValidationError
-from typing import Optional
+from typing import Optional, List
 from fastapi import HTTPException
 
 # Assuming 'pool' is correctly defined elsewhere in your code.
@@ -27,6 +27,7 @@ class VehicleOut(BaseModel):
     model: str
     vin: str
     mileage: int
+    user_id: int
 
 
 class VehicleRepository:
@@ -40,29 +41,31 @@ class VehicleRepository:
                 "model": result[4],
                 "vin": result[5],
                 "mileage": result[6],
+                "user_id": result[7],
             }
         else:
             return None
 
-    def create_vehicle(self, vehicle: VehicleIn) -> VehicleOut:
+    def create_vehicle(self, vehicle_data: dict) -> VehicleOut:
         try:
             with pool.connection() as conn:
                 with conn.cursor() as cur:
                     cur.execute(
                         """
                         INSERT INTO vehicles
-                          (vehicle_name, year, make, model, vin, mileage)
+                          (vehicle_name, year, make, model, vin, mileage, user_id)
                         VALUES
-                          (%s, %s, %s, %s, %s, %s)
-                        RETURNING id, vehicle_name, year, make, model, vin, mileage;
+                          (%s, %s, %s, %s, %s, %s, %s)
+                        RETURNING id, vehicle_name, year, make, model, vin, mileage, user_id;
                         """,
                         [
-                            vehicle.vehicle_name,
-                            vehicle.year,
-                            vehicle.make,
-                            vehicle.model,
-                            vehicle.vin,
-                            vehicle.mileage,
+                            vehicle_data["vehicle_name"],
+                            vehicle_data["year"],
+                            vehicle_data["make"],
+                            vehicle_data["model"],
+                            vehicle_data["vin"],
+                            vehicle_data["mileage"],
+                            vehicle_data["user_id"],
                         ],
                     )
                     result = cur.fetchone()
@@ -107,6 +110,29 @@ class VehicleRepository:
                     ]
                     return [VehicleOut(**vehicle) for vehicle in vehicles]
         except Exception:
+            raise HTTPException(
+                status_code=500, detail="Internal server error"
+            )
+
+    def get_vehicles_by_user_id(self, user_id: int) -> List[VehicleOut]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "SELECT * FROM vehicles WHERE user_id = %s", (user_id,)
+                    )
+                    results = cur.fetchall()
+                    if not results:
+                        raise HTTPException(
+                            status_code=404,
+                            detail=f"No vehicles found for USER ID {user_id}.",
+                        )
+                    return [
+                        VehicleOut(**self.result_to_dict(result))
+                        for result in results
+                    ]
+        except Exception as ex:
+            print(f"Error fetching vehicles for user_id {user_id}: {ex}")
             raise HTTPException(
                 status_code=500, detail="Internal server error"
             )

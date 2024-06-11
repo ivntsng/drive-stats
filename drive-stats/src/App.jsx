@@ -14,6 +14,7 @@ import {
     FormLabel,
     FormMessage,
 } from '@/components/ui/form'
+import Garage from './components/vehicles/Garage'
 
 const API_HOST = import.meta.env.VITE_API_HOST
 
@@ -45,6 +46,10 @@ function App() {
                             <Route
                                 path="/vehicles/register"
                                 element={<CreateVehicle />}
+                            />
+                            <Route
+                                path="/vehicles/garage"
+                                element={<Garage />}
                             />
                         </Routes>
                     </div>

@@ -72,6 +72,7 @@ function LoginForm({
                     description: `Welcome back, ${username}`,
                 })
                 closeLoginForm()
+                navigate('vehicles/garage')
             } else {
                 setError('Wrong username or password.')
             }
