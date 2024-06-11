@@ -84,41 +84,24 @@ async def signin(
     response: Response,
     repo: AccountRepo = Depends(),
 ) -> dict:
-    """
-    Signs the user in when they use the Sign In form
-    """
-    # Check if the username exists in the database
     user = repo.get_single_user(info.username)
-    if user:
-        # Check if the password is correct
-        if verify_password(info.password, user.password):
-            # Generate JWT token
-            token = generate_jwt(user)
+    if user and verify_password(info.password, user.password):
+        token = generate_jwt(user)
+        secure = request.url.scheme == "https"
 
-            # Secure cookies only if running on something besides localhost
-            secure = (
-                True if request.headers.get("origin") == "localhost" else False
-            )
+        response.set_cookie(
+            key="fast_api_token",
+            value=token,
+            httponly=True,
+            samesite="lax",
+            secure=secure,
+        )
 
-            # Set a cookie with the token in it
-            response.set_cookie(
-                key="fast_api_token",
-                value=token,
-                httponly=True,
-                samesite="lax",
-                secure=secure,
-            )
-
-            return {"token": token, "username": user.username}
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect password",
-            )
+        return {"username": user.username}
     else:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
         )
 
 

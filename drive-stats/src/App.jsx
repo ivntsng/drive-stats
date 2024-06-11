@@ -25,11 +25,10 @@ function App() {
     const [user, setUser] = useState(null)
 
     useEffect(() => {
-        // Check for token in session storage during initialization
         const token = sessionStorage.getItem('token')
-        if (token) {
-            // Set user context if token exists
-            setUser({ token })
+        const username = sessionStorage.getItem('username')
+        if (token && username) {
+            setUser({ token, username })
         }
     }, [])
 
