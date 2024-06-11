@@ -17,11 +17,35 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
-export function handleLogout(setUser) {
-    sessionStorage.removeItem('token')
-    sessionStorage.removeItem('username')
-    setUser(null)
+export async function handleLogout(setUser, toast) {
+    const API_HOST = import.meta.env.VITE_API_HOST
+    try {
+        const response = await axios.delete(`${API_HOST}/api/auth/signout`, {
+            withCredentials: true,
+        })
+
+        if (response.status === 200) {
+            sessionStorage.removeItem('token')
+            sessionStorage.removeItem('username')
+            setUser(null)
+            toast({
+                title: 'Logged Out',
+                description: 'You have been logged out successfully.',
+            })
+        } else {
+            throw new Error('Failed to log out')
+        }
+    } catch (error) {
+        console.error('There was an error logging out!', error)
+        toast({
+            title: 'Error',
+            description:
+                'There was an error logging out. Please try again later.',
+            status: 'error',
+        })
+    }
 }
 
 function LoginForm({
@@ -67,12 +91,12 @@ function LoginForm({
                 sessionStorage.setItem('token', token)
                 sessionStorage.setItem('username', username)
                 setUser({ username, token })
+                closeLoginForm()
+                navigate('vehicles/garage')
                 toast({
                     title: 'Logged In',
                     description: `Welcome back, ${username}`,
                 })
-                closeLoginForm()
-                navigate('vehicles/garage')
             } else {
                 setError('Wrong username or password.')
             }

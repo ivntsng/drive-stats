@@ -1,5 +1,6 @@
 import { useContext, useState, useCallback, useEffect } from 'react'
 import { UserContext } from '../../UserContext'
+import axios from 'axios'
 import {
     Table,
     TableBody,
@@ -12,6 +13,55 @@ import {
 
 export default function Garage() {
     const { user, setUser } = useContext(UserContext)
+    const [vehicles, setVehicles] = useState([])
+    const API_HOST = import.meta.env.VITE_API_HOST
+
+    const fetchUser = async () => {
+        try {
+            const response = await axios.get(
+                `${API_HOST}/api/auth/authenticate`,
+                {
+                    withCredentials: true,
+                }
+            )
+            setUser(response.data)
+            return response.data
+        } catch (error) {
+            console.error(
+                'There was an error fetching the user details!',
+                error
+            )
+            return null
+        }
+    }
+
+    // Function to fetch vehicles by user ID
+    const fetchVehicles = async (userId) => {
+        try {
+            const response = await axios.get(
+                `${API_HOST}/vehicles/user/${userId}`
+            )
+            setVehicles(response.data)
+        } catch (error) {
+            console.error('There was an error fetching the vehicles!', error)
+        }
+    }
+
+    const addVehicle = (newVehicle) => {
+        setVehicles([...vehicles, newVehicle])
+    }
+
+    // useEffect to fetch user and vehicles on component mount
+    useEffect(() => {
+        const getUserAndVehicles = async () => {
+            const userData = await fetchUser()
+            if (userData && userData.id) {
+                await fetchVehicles(userData.id)
+            }
+        }
+
+        getUserAndVehicles()
+    }, [])
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -22,39 +72,42 @@ export default function Garage() {
                 <div className="overflow-x-auto rounded-lg border border-gray-300 p-4">
                     <Table className="min-w-full">
                         <TableCaption className="text-center">
-                            You currently have X amount of vehicles.
+                            You currently have {vehicles.length} vehicles
+                            registered.
                         </TableCaption>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[100px] text-center">
+                                <TableHead className="w-[100px] text-center font-bold">
                                     Name
                                 </TableHead>
-                                <TableHead className="text-center">
+                                <TableHead className="text-center font-bold">
                                     Make
                                 </TableHead>
-                                <TableHead className="text-center">
+                                <TableHead className="text-center font-bold">
                                     Model
                                 </TableHead>
-                                <TableHead className="text-center">
+                                <TableHead className="text-center font-bold">
                                     VIN
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            <TableRow>
-                                <TableCell className="font-medium text-center">
-                                    Luna
-                                </TableCell>
-                                <TableCell className="text-center">
-                                    Scion
-                                </TableCell>
-                                <TableCell className="text-center">
-                                    FR-S
-                                </TableCell>
-                                <TableCell className="text-center">
-                                    JF1ZNAA17G9706707
-                                </TableCell>
-                            </TableRow>
+                            {vehicles.map((vehicle) => (
+                                <TableRow key={vehicle.vin}>
+                                    <TableCell className="font-medium text-center">
+                                        {vehicle.vehicle_name}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {vehicle.make}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {vehicle.model}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {vehicle.vin}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
                         </TableBody>
                     </Table>
                 </div>

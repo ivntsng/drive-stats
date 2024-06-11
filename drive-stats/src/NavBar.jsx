@@ -32,12 +32,8 @@ function NavBar() {
         setIsSignupFormOpen(!isSignupFormOpen)
     }
 
-    function logout() {
-        handleLogout(setUser)
-        toast({
-            title: 'Logged Out',
-            description: 'You have been logged out successfully.',
-        })
+    async function logout() {
+        await handleLogout(setUser, toast)
     }
 
     const toggleVehicleRegistration = () => {
