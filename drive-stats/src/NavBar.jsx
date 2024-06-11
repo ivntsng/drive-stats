@@ -44,8 +44,6 @@ function NavBar() {
         setIsVehicleRegistrationOpen(!isVehicleRegistrationOpen)
     }
 
-    console.log('nav username: ', username)
-
     return (
         <nav className="bg-white border-gray-200 dark:bg-gray-900 w-full">
             <div className="max-w-[85rem] mx-auto px-4 py-2.5 flex items-center justify-between">
