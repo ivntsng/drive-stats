@@ -59,7 +59,7 @@ function SignupForm({
                 return
             }
 
-            const response = await fetch(`${API_HOST}/users/signup`, {
+            const response = await fetch(`${API_HOST}/api/auth/signup`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
