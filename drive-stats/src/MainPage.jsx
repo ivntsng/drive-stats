@@ -31,8 +31,6 @@ function MainPage() {
         retrieveUsernameFromSession()
     }, [])
 
-    console.log('Main page username: ', username)
-
     return (
         <div
             style={{
