@@ -1,19 +1,18 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import vehicles, vehicle_stats, accounts
+from routers import vehicles, vehicle_stats, accounts, auth
+import os
+
 
 app = FastAPI()
 app.include_router(vehicles.router)
 app.include_router(vehicle_stats.router)
 app.include_router(accounts.router)
+app.include_router(auth.router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "CORS_HOST",
-        "http://localhost:3000",
-        "http://localhost:5173",
-    ],
+    allow_origins=[os.environ.get("CORS_HOST", "http://localhost:5173")],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

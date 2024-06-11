@@ -50,12 +50,13 @@ function LoginForm({
         }
         setIsLoading(true)
         try {
-            const response = await fetch(`${API_HOST}/signin`, {
+            const response = await fetch(`${API_HOST}/api/auth/signin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ username, password }),
+                credentials: 'include', // Include credentials in the request
             })
 
             if (response.ok) {
@@ -76,6 +77,7 @@ function LoginForm({
             }
         } catch (error) {
             console.error('Error: ', error)
+            setError('Something went wrong. Please try again later.')
         } finally {
             setIsLoading(false)
         }

@@ -20,21 +20,9 @@ function NavBar() {
     const { toast } = useToast()
     const { user, setUser } = useContext(UserContext)
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
-    const [username, setUsername] = useState('')
     const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
     const [isVehicleRegistrationOpen, setIsVehicleRegistrationOpen] =
         useState(false)
-
-    const retrieveUsernameFromSession = useCallback(() => {
-        const storedUsername = sessionStorage.getItem('username')
-        if (storedUsername) {
-            setUsername(storedUsername)
-        }
-    }, [])
-
-    useEffect(() => {
-        retrieveUsernameFromSession()
-    }, [])
 
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
@@ -89,9 +77,9 @@ function NavBar() {
                                                     >
                                                         {/* Include Icons here if needed */}
                                                         <div className="mb-2 mt-4 text-lg font-medium">
-                                                            {user
-                                                                ? `Hello, ${username}`
-                                                                : 'There is a bug, please submit a report bug.'}
+                                                            {user?.username
+                                                                ? `Hello, ${user.username}`
+                                                                : 'Loading...'}
                                                         </div>
                                                         <p className="text-sm leading-tight text-muted-foreground">
                                                             Beautifully designed
