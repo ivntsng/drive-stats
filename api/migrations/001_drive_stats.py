@@ -1,5 +1,20 @@
 steps = [
     [
+        # Creating the accounts table
+        """
+        CREATE TABLE accounts (
+          id SERIAL PRIMARY KEY NOT NULL,
+          username VARCHAR(20) NOT NULL UNIQUE,
+          password VARCHAR(100) NOT NULL,
+          email VARCHAR(100) NOT NULL UNIQUE
+        );
+        """,
+        # Dropping the accounts table
+        """
+        DROP TABLE accounts;
+        """,
+    ],
+    [
         # Creating the vehicles table
         """
         CREATE TABLE vehicles (
@@ -9,7 +24,8 @@ steps = [
             make VARCHAR(100) NOT NULL,
             model VARCHAR(100) NOT NULL,
             vin VARCHAR(100) NOT NULL,
-            mileage VARCHAR(50) NOT NULL
+            mileage VARCHAR(50) NOT NULL,
+            user_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE
         );
         """,
         # Dropping the vehicles table
@@ -22,7 +38,7 @@ steps = [
         """
         CREATE TABLE vehicle_stats (
           id SERIAL PRIMARY KEY,
-          vehicle_id INTEGER REFERENCES vehicles(id), -- This establishes the foreign key relationship
+          vehicle_id INTEGER REFERENCES vehicles(id),
           last_oil_change_date VARCHAR,
           last_tire_rotation_date VARCHAR,
           last_air_filter_date VARCHAR,
@@ -38,18 +54,5 @@ steps = [
         """
         DROP TABLE vehicle_stats;
         """,
-    ],
-    [
-        """
-        CREATE TABLE accounts (
-          id SERIAL PRIMARY KEY NOT NULL,
-          username VARCHAR(20) NOT NULL UNIQUE,
-          password VARCHAR(100) NOT NULL,
-          email VARCHAR(100) NOT NULL UNIQUE
-      );
-      """,
-        """
-      DROP TABLE accounts;
-      """,
     ],
 ]

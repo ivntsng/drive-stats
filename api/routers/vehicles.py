@@ -3,6 +3,7 @@ from typing import Union, List
 from queries.vehicles import VehicleIn, VehicleRepository, VehicleOut, Error
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
+from models.jwt import JWTUserData
 
 tags_metadata = [
     {
@@ -10,36 +11,34 @@ tags_metadata = [
         "description": "Endpoints related to vehicle management.",
     },
 ]
-
 router = APIRouter(tags=["Vehicles"])
 
 
 @router.post("/vehicles", response_model=Union[VehicleOut, Error])
 def create_vehicle(
     vehicle: VehicleIn,
-    response: Response,
     repo: VehicleRepository = Depends(),
-    current_user: dict = Depends(try_get_jwt_user_data),
+    current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ):
-    # Check if the user is authenticated
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
+    # Create a dictionary from the vehicle and add user_id
+    vehicle_data = vehicle.dict()
+    vehicle_data["user_id"] = current_user.id
+
     try:
-        created_vehicle = repo.create_vehicle(vehicle)
+        # Pass vehicle_data as a dictionary to the repository method
+        created_vehicle = repo.create_vehicle(vehicle_data)
         if created_vehicle:
-            # Return 200 OK if the vehicle was created successfully
             return created_vehicle
         else:
-            # If repo.create() returns None, it means an error occurred during creation
             raise HTTPException(
                 status_code=500, detail="Failed to create vehicle"
             )
     except ValidationError as e:
-        # If validation error occurs, return 400 Bad Request with details of the validation error
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        # For any other unexpected errors, return 500 Internal Server Error
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -127,3 +126,27 @@ async def delete_vehicle(
             detail="Internal server error",
             message=f"Vehicle ID {vehicle_id} does not exist.",
         )
+
+
+@router.get("/vehicles/user/{user_id}", response_model=List[VehicleOut])
+async def get_vehicles_by_user_id(
+    response: Response,
+    user_id: int,
+    vehicle_repo: VehicleRepository = Depends(),
+) -> List[VehicleOut]:
+    try:
+        vehicles = vehicle_repo.get_vehicles_by_user_id(user_id)
+        return vehicles
+    except HTTPException as http_exc:
+        if http_exc.status_code == 404:
+            raise
+        else:
+            print(
+                f"Failed to grab USER ID {user_id} due to an error: ",
+                http_exc.detail,
+            )
+            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Internal server error",
+            )
