@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Response, HTTPException, status
 from typing import Union, List
 from queries.vehicles import VehicleIn, VehicleRepository, VehicleOut, Error
 from pydantic import ValidationError
+from utils.authentication import try_get_jwt_user_data
 
 tags_metadata = [
     {
@@ -15,8 +16,15 @@ router = APIRouter(tags=["Vehicles"])
 
 @router.post("/vehicles", response_model=Union[VehicleOut, Error])
 def create_vehicle(
-    vehicle: VehicleIn, response: Response, repo: VehicleRepository = Depends()
+    vehicle: VehicleIn,
+    response: Response,
+    repo: VehicleRepository = Depends(),
+    current_user: dict = Depends(try_get_jwt_user_data),
 ):
+    # Check if the user is authenticated
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
     try:
         created_vehicle = repo.create_vehicle(vehicle)
         if created_vehicle:
