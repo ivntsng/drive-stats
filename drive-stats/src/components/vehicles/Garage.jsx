@@ -65,7 +65,7 @@ export default function Garage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
-            <div className="w-full max-w-4xl p-6 rounded-lg shadow-md mb-[170px]">
+            <div className="w-full max-w-4xl p-0 sm:p-6 md:p-8 rounded-lg shadow-md mb-[170px]">
                 <p className="mb-4 text-xl font-semibold text-center mb-[50px]">
                     Welcome to your garage, {user?.username}!
                 </p>
