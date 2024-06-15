@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, validator, ValidationError
-from typing import Optional, List
+from typing import Optional, List, Union
 from fastapi import HTTPException
 
 # Assuming 'pool' is correctly defined elsewhere in your code.
@@ -7,7 +7,8 @@ from queries.pool import pool
 
 
 class Error(BaseModel):
-    message: str
+    message: Union[str, None] = None
+    detail: str
 
 
 class VehicleIn(BaseModel):
@@ -88,13 +89,11 @@ class VehicleRepository:
                     )
                     result = cur.fetchone()
                     if result is None:
-                        raise HTTPException(
-                            status_code=404,
-                            detail=f"Vehicle ID {vehicle_id} doesn't exist.",
-                        )
+                        return None
                     result_dict = self.result_to_dict(result)
                     return VehicleOut(**result_dict)
-        except Exception:
+        except Exception as ex:
+            print(f"Error getting vehicle ID {vehicle_id}: {ex}")
             raise HTTPException(
                 status_code=500, detail="Internal server error"
             )
