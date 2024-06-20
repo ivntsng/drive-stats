@@ -46,7 +46,7 @@ function NavBar() {
                 <div className="flex items-center">
                     <a href="/" className="flex items-center">
                         <img
-                            src="https://www.svgrepo.com/show/471147/car-01.svg"
+                            src="/assets/drivestats_logo.svg"
                             className="h-6 mr-3 sm:h-9"
                             alt="DriveStats Logo"
                         />
