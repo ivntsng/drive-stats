@@ -25,6 +25,7 @@ steps = [
             model VARCHAR(100) NOT NULL,
             vin VARCHAR(100) NOT NULL,
             mileage VARCHAR(50) NOT NULL,
+            created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             user_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE
         );
         """,

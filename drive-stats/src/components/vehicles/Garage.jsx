@@ -1,5 +1,6 @@
 import { useContext, useState, useCallback, useEffect } from 'react'
 import { UserContext } from '../../UserContext'
+import { Link } from 'react-router-dom'
 import axios from 'axios'
 import {
     Table,
@@ -62,6 +63,7 @@ export default function Garage() {
 
         getUserAndVehicles()
     }, [])
+    console.log(vehicles)
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -95,7 +97,11 @@ export default function Garage() {
                             {vehicles.map((vehicle) => (
                                 <TableRow key={vehicle.vin}>
                                     <TableCell className="font-medium text-center">
-                                        {vehicle.vehicle_name}
+                                        <Link
+                                            to={`/vehicles/garage/${vehicle.id}`}
+                                        >
+                                            {vehicle.vehicle_name}
+                                        </Link>
                                     </TableCell>
                                     <TableCell className="text-center">
                                         {vehicle.make}

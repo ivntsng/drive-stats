@@ -1,9 +1,9 @@
 from pydantic import BaseModel, Field, validator, ValidationError
 from typing import Optional, List, Union
 from fastapi import HTTPException
-
-# Assuming 'pool' is correctly defined elsewhere in your code.
 from queries.pool import pool
+import pytz
+from datetime import datetime, date
 
 
 class Error(BaseModel):
@@ -29,11 +29,14 @@ class VehicleOut(BaseModel):
     vin: str
     mileage: int
     user_id: int
+    created_date: date
 
 
 class VehicleRepository:
     def result_to_dict(self, result):
         if result:
+            utc_time = result[7]
+            local_date = self.convert_to_pst_date(utc_time)
             return {
                 "id": result[0],
                 "vehicle_name": result[1],
@@ -42,12 +45,20 @@ class VehicleRepository:
                 "model": result[4],
                 "vin": result[5],
                 "mileage": result[6],
-                "user_id": result[7],
+                "created_date": local_date,
+                "user_id": result[8],
             }
         else:
             return None
 
-    def create_vehicle(self, vehicle_data: dict) -> VehicleOut:
+    def convert_to_pst_date(self, utc_time):
+        utc = pytz.utc
+        pst = pytz.timezone("America/Los_Angeles")
+        utc_dt = utc.localize(utc_time)
+        pst_dt = utc_dt.astimezone(pst)
+        return pst_dt.date()
+
+    def create_vehicle(self, vehicle_data: dict) -> Optional[VehicleOut]:
         try:
             with pool.connection() as conn:
                 with conn.cursor() as cur:
@@ -57,7 +68,7 @@ class VehicleRepository:
                           (vehicle_name, year, make, model, vin, mileage, user_id)
                         VALUES
                           (%s, %s, %s, %s, %s, %s, %s)
-                        RETURNING id, vehicle_name, year, make, model, vin, mileage, user_id;
+                        RETURNING id, vehicle_name, year, make, model, vin, mileage, created_date, user_id;
                         """,
                         [
                             vehicle_data["vehicle_name"],
