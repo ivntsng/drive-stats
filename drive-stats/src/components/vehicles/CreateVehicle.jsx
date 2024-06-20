@@ -28,6 +28,7 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
         model: '',
         vin: '',
         mileage: '',
+        about: '',
     })
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -54,6 +55,7 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
                     model: '',
                     vin: '',
                     mileage: '',
+                    about: '',
                 })
                 toast({
                     title: `Successfully registered ${registeredVehicleName}.`,
@@ -222,6 +224,26 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
                                         }
                                     }}
                                     autoComplete="current-vehicleMileage"
+                                />
+                            </div>
+                            <div className="flex flex-col space-y-2">
+                                <label
+                                    htmlFor="aboutVehicle"
+                                    className="font-bold"
+                                >
+                                    About
+                                </label>
+                                <Input
+                                    id="aboutVehicle"
+                                    placeholder="(Ex. My First vehicle)"
+                                    value={formData.about}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            about: e.target.value,
+                                        })
+                                    }
+                                    autoComplete="current-vehicleName"
                                 />
                             </div>
                             {error && <p className="text-red-500">{error}</p>}

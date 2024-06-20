@@ -23,8 +23,9 @@ steps = [
             year INTEGER NOT NULL,
             make VARCHAR(100) NOT NULL,
             model VARCHAR(100) NOT NULL,
-            vin VARCHAR(100) NOT NULL,
-            mileage VARCHAR(50) NOT NULL,
+            vin VARCHAR(100),
+            mileage VARCHAR(50),
+            about VARCHAR(65),
             created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             user_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE
         );

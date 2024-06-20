@@ -60,8 +60,7 @@ export default function VehicleDetail() {
                             Vehicle Details: {vehicle.vehicle_name}
                         </CardTitle>
                         <CardDescription>
-                            About:
-                            hasdblfbgsahbfabfdladsbfljabdfajhsbfhbadslbfabfhajblhfbhdbfalhbfahbas
+                            About: {vehicle.about}
                         </CardDescription>
                     </div>
                     <div className="ml-auto flex items-center gap-1">

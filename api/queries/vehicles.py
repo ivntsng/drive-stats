@@ -18,6 +18,7 @@ class VehicleIn(BaseModel):
     model: str
     vin: str
     mileage: int
+    about: str
 
 
 class VehicleOut(BaseModel):
@@ -28,6 +29,7 @@ class VehicleOut(BaseModel):
     model: str
     vin: str
     mileage: int
+    about: str
     user_id: int
     created_date: date
 
@@ -35,7 +37,7 @@ class VehicleOut(BaseModel):
 class VehicleRepository:
     def result_to_dict(self, result):
         if result:
-            utc_time = result[7]
+            utc_time = result[8]
             local_date = self.convert_to_pst_date(utc_time)
             return {
                 "id": result[0],
@@ -45,8 +47,9 @@ class VehicleRepository:
                 "model": result[4],
                 "vin": result[5],
                 "mileage": result[6],
+                "about": result[7],
                 "created_date": local_date,
-                "user_id": result[8],
+                "user_id": result[9],
             }
         else:
             return None
@@ -65,10 +68,10 @@ class VehicleRepository:
                     cur.execute(
                         """
                         INSERT INTO vehicles
-                          (vehicle_name, year, make, model, vin, mileage, user_id)
+                          (vehicle_name, year, make, model, vin, mileage, about, user_id)
                         VALUES
-                          (%s, %s, %s, %s, %s, %s, %s)
-                        RETURNING id, vehicle_name, year, make, model, vin, mileage, created_date, user_id;
+                          (%s, %s, %s, %s, %s, %s, %s, %s)
+                        RETURNING id, vehicle_name, year, make, model, vin, mileage, about, created_date, user_id;
                         """,
                         [
                             vehicle_data["vehicle_name"],
@@ -77,6 +80,7 @@ class VehicleRepository:
                             vehicle_data["model"],
                             vehicle_data["vin"],
                             vehicle_data["mileage"],
+                            vehicle_data["about"],
                             vehicle_data["user_id"],
                         ],
                     )
