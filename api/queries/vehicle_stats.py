@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import HTTPException
 from queries.pool import pool
 from datetime import datetime, date
+import pytz
 
 
 class Error(BaseModel):
@@ -11,89 +12,124 @@ class Error(BaseModel):
 
 class VehicleStatIn(BaseModel):
     vehicle_id: int
-    last_oil_change_date: Optional[str]
-    last_tire_rotation_date: Optional[str]
-    last_air_filter_date: Optional[str]
-    last_brake_fluid_date: Optional[str]
-    last_coolant_reservoir_date: Optional[str]
-    last_transmission_fluid_date: Optional[str]
-    last_cabin_filter_date: Optional[str]
-    last_wiper_blades_date: Optional[str]
+    last_oil_change: Optional[int]
+    last_tire_rotation: Optional[int]
+    last_tire_change: Optional[int]
+    last_air_filter: Optional[int]
+    last_brake_flush: Optional[int]
+    last_brake_rotor: Optional[int]
+    last_brake_pad: Optional[int]
+    last_coolant_flush: Optional[int]
+    last_transmission_fluid_flush: Optional[int]
+    last_cabin_filter_change: Optional[int]
+    last_wiper_blades_change: Optional[int]
 
 
 class VehicleStatOut(BaseModel):
     id: int
     vehicle_id: int
-    last_oil_change_date: Optional[str]
-    last_tire_rotation_date: Optional[str]
-    last_air_filter_date: Optional[str]
-    last_brake_fluid_date: Optional[str]
-    last_coolant_reservoir_date: Optional[str]
-    last_transmission_fluid_date: Optional[str]
-    last_cabin_filter_date: Optional[str]
-    last_wiper_blades_date: Optional[str]
+    last_oil_change: Optional[int]
+    last_tire_rotation: Optional[int]
+    last_tire_change: Optional[int]
+    last_air_filter: Optional[int]
+    last_brake_flush: Optional[int]
+    last_brake_rotor: Optional[int]
+    last_brake_pad: Optional[int]
+    last_coolant_flush: Optional[int]
+    last_transmission_fluid_flush: Optional[int]
+    last_cabin_filter_change: Optional[int]
+    last_wiper_blades_change: Optional[int]
+    last_update_timestamp: date
 
 
 class VehicleStatRepository:
     def result_to_dict(self, result):
         if result:
+            utc_time = result[13]  # Ensure this index is correct
+            local_date = self.convert_to_pst_date(utc_time)
             return {
                 "id": result[0],
                 "vehicle_id": result[1],
-                "last_oil_change_date": result[2],
-                "last_tire_rotation_date": result[3],
-                "last_air_filter_date": result[4],
-                "last_brake_fluid_date": result[5],
-                "last_coolant_reservoir_date": result[6],
-                "last_transmission_fluid_date": result[7],
-                "last_cabin_filter_date": result[8],
-                "last_wiper_blades_date": result[9],
+                "last_oil_change": result[2],
+                "last_tire_rotation": result[3],
+                "last_tire_change": result[4],
+                "last_air_filter": result[5],
+                "last_brake_flush": result[6],
+                "last_brake_rotor": result[7],
+                "last_brake_pad": result[8],
+                "last_coolant_flush": result[9],
+                "last_transmission_fluid_flush": result[10],
+                "last_cabin_filter_change": result[11],
+                "last_wiper_blades_change": result[12],
+                "last_update_timestamp": local_date,
             }
         else:
             return None
+
+    def convert_to_pst_date(self, utc_time):
+        utc = pytz.utc
+        pst = pytz.timezone("America/Los_Angeles")
+        utc_dt = utc.localize(utc_time)
+        pst_dt = utc_dt.astimezone(pst)
+        return pst_dt.date()
 
     def create_vehicle_stat(self, vehicle: VehicleStatIn) -> VehicleStatOut:
         try:
             with pool.connection() as conn:
                 with conn.cursor() as cur:
-                    cur.execute(
-                        """
+                    query = """
                         INSERT INTO vehicle_stats
                           (vehicle_id,
-                          last_oil_change_date,
-                          last_tire_rotation_date,
-                          last_air_filter_date,
-                          last_brake_fluid_date,
-                          last_coolant_reservoir_date,
-                          last_transmission_fluid_date,
-                          last_cabin_filter_date,
-                          last_wiper_blades_date)
+                          last_oil_change,
+                          last_tire_rotation,
+                          last_tire_change,
+                          last_air_filter,
+                          last_brake_flush,
+                          last_brake_rotor,
+                          last_brake_pad,
+                          last_coolant_flush,
+                          last_transmission_fluid_flush,
+                          last_cabin_filter_change,
+                          last_wiper_blades_change)
                         VALUES
-                          (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                          (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                         RETURNING
                         id,
                         vehicle_id,
-                        last_oil_change_date,
-                        last_tire_rotation_date,
-                        last_air_filter_date,
-                        last_brake_fluid_date,
-                        last_coolant_reservoir_date,
-                        last_transmission_fluid_date,
-                        last_cabin_filter_date,
-                        last_wiper_blades_date
-                        """,
-                        [
-                            vehicle.vehicle_id,
-                            vehicle.last_oil_change_date,
-                            vehicle.last_tire_rotation_date,
-                            vehicle.last_air_filter_date,
-                            vehicle.last_brake_fluid_date,
-                            vehicle.last_coolant_reservoir_date,
-                            vehicle.last_transmission_fluid_date,
-                            vehicle.last_cabin_filter_date,
-                            vehicle.last_wiper_blades_date,
-                        ],
-                    )
+                        last_oil_change,
+                        last_tire_rotation,
+                        last_tire_change,
+                        last_air_filter,
+                        last_brake_flush,
+                        last_brake_rotor,
+                        last_brake_pad,
+                        last_coolant_flush,
+                        last_transmission_fluid_flush,
+                        last_cabin_filter_change,
+                        last_wiper_blades_change,
+                        last_update_timestamp
+                    """
+                    values = [
+                        vehicle.vehicle_id,
+                        vehicle.last_oil_change,
+                        vehicle.last_tire_rotation,
+                        vehicle.last_tire_change,
+                        vehicle.last_air_filter,
+                        vehicle.last_brake_flush,
+                        vehicle.last_brake_rotor,
+                        vehicle.last_brake_pad,
+                        vehicle.last_coolant_flush,
+                        vehicle.last_transmission_fluid_flush,
+                        vehicle.last_cabin_filter_change,
+                        vehicle.last_wiper_blades_change,
+                    ]
+
+                    print("Query:", query)
+                    print("Values:", values)
+                    for i, value in enumerate(values):
+                        print(f"Value {i}: {value} (Type: {type(value)})")
+
+                    cur.execute(query, values)
                     result = cur.fetchone()
                     if result:
                         result_dict = self.result_to_dict(result)

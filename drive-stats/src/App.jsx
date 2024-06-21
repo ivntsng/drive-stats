@@ -6,15 +6,6 @@ import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
 import React, { useState, useEffect } from 'react'
 import { UserContext } from './UserContext'
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
 import Garage from './components/vehicles/Garage'
 
 const API_HOST = import.meta.env.VITE_API_HOST
