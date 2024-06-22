@@ -19,10 +19,10 @@ function Footer() {
                     <div className="col-span-1">
                         <h4 className="font-bold text-gray-100">Product</h4>
                         <div className="mt-3 grid space-y-3">
-                            <p>
+                            {/* <p>
                                 <a
                                     className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="https://tracethread.com/pricing"
+                                    href="#"
                                 >
                                     Support
                                 </a>
@@ -30,15 +30,15 @@ function Footer() {
                             <p>
                                 <a
                                     className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="https://tracethread.com/pricing"
+                                    href="#"
                                 >
                                     Documentation
                                 </a>
-                            </p>
+                            </p> */}
                             <p>
                                 <a
                                     className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="https://tracethread.com/pricing"
+                                    href="#"
                                 >
                                     Bug Report
                                 </a>
@@ -51,15 +51,15 @@ function Footer() {
                             <p>
                                 <a
                                     className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="https://tracethread.com/pricing"
+                                    href="#"
                                 >
                                     About Us
                                 </a>
                             </p>
-                            <p>
+                            {/* <p>
                                 <a
                                     className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="https://tracethread.com/pricing"
+                                    href="#"
                                 >
                                     Careers
                                 </a>
@@ -67,11 +67,11 @@ function Footer() {
                             <p>
                                 <a
                                     className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="https://tracethread.com/pricing"
+                                    href="#"
                                 >
                                     Contact Us
                                 </a>
-                            </p>
+                            </p> */}
                         </div>
                     </div>
                     <div className="col-span-2">
