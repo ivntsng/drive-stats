@@ -36,6 +36,7 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
 
     async function registerVehicle(e) {
         e.preventDefault()
+        setIsLoading(true)
         try {
             const response = await fetch(`${API_HOST}/vehicles`, {
                 method: 'POST',
@@ -67,6 +68,9 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
             }
         } catch (error) {
             console.error('Error: ', error)
+            setError('An error occurred while registering the vehicle.')
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -86,11 +90,11 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
         return () => {
             window.removeEventListener('mousedown', handleClickOutside)
         }
-    }, [])
+    }, [handleClickOutside])
 
     return (
-        <div className="flex justify-center items-center h-screen">
-            <Card className="w-full md:w-[400px] mx-auto">
+        <div className="flex justify-center items-center min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+            <Card className="w-[380px] mx-auto p-4">
                 <div ref={formRef}>
                     <CardHeader>
                         <CardTitle className="text-center text-2xl font-bold">
@@ -99,166 +103,118 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={registerVehicle} className="space-y-4">
-                            <div className="flex flex-col space-y-2">
-                                <label
-                                    htmlFor="vehicleName"
-                                    className="font-bold"
-                                >
-                                    Vehicle Name
-                                </label>
-                                <Input
-                                    id="vehicleName"
-                                    placeholder="(Ex. John Doe's Car)"
-                                    value={formData.vehicle_name}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            vehicle_name: e.target.value,
-                                        })
-                                    }
-                                    autoComplete="current-vehicleName"
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <label
-                                    htmlFor="vehicleYear"
-                                    className="font-bold"
-                                >
-                                    Vehicle Year
-                                </label>
-                                <Input
-                                    id="vehicleName"
-                                    placeholder="(Ex. 2012)"
-                                    value={formData.year}
-                                    onChange={(e) => {
-                                        const inputYear = e.target.value
-                                        // Check if the input is a valid integer
-                                        if (/^\d*$/.test(inputYear)) {
-                                            setFormData({
-                                                ...formData,
-                                                year: inputYear,
-                                            })
-                                        }
-                                    }}
-                                    autoComplete="current-vehicleYear"
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <label
-                                    htmlFor="vehicleMake"
-                                    className="font-bold"
-                                >
-                                    Vehicle Make
-                                </label>
-                                <Input
-                                    id="vehicleMake"
-                                    placeholder="(Ex. Toyota)"
-                                    value={formData.make}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            make: e.target.value,
-                                        })
-                                    }
-                                    autoComplete="current-vehicleMake"
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <label
-                                    htmlFor="vehicleModel"
-                                    className="font-bold"
-                                >
-                                    Vehicle Model
-                                </label>
-                                <Input
-                                    id="vehicleModel"
-                                    placeholder="(Ex. Camry)"
-                                    value={formData.model}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            model: e.target.value,
-                                        })
-                                    }
-                                    autoComplete="current-vehicleModel"
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <label
-                                    htmlFor="vehicleVin"
-                                    className="font-bold"
-                                >
-                                    Vehicle VIN
-                                </label>
-                                <Input
-                                    id="vehicleVin"
-                                    placeholder="(Ex. 4T1BF1FK1CU013354)"
-                                    value={formData.vin}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            vin: e.target.value,
-                                        })
-                                    }
-                                    autoComplete="current-vehicleVin"
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <label
-                                    htmlFor="vehicleMileage"
-                                    className="font-bold"
-                                >
-                                    Mileage of vehicle
-                                </label>
-                                <Input
-                                    id="vehicleMileage"
-                                    placeholder="(Ex. 72,629)"
-                                    value={formData.mileage}
-                                    onChange={(e) => {
-                                        const inputMileage = e.target.value
-                                        if (/^\d*$/.test(inputMileage)) {
-                                            setFormData({
-                                                ...formData,
-                                                mileage: inputMileage,
-                                            })
-                                        }
-                                    }}
-                                    autoComplete="current-vehicleMileage"
-                                />
-                            </div>
-                            <div className="flex flex-col space-y-2">
-                                <label
-                                    htmlFor="aboutVehicle"
-                                    className="font-bold"
-                                >
-                                    About
-                                </label>
-                                <Input
-                                    id="aboutVehicle"
-                                    placeholder="(Ex. My First vehicle)"
-                                    value={formData.about}
-                                    onChange={(e) =>
-                                        setFormData({
-                                            ...formData,
-                                            about: e.target.value,
-                                        })
-                                    }
-                                    autoComplete="current-vehicleName"
-                                />
-                            </div>
-                            {error && <p className="text-red-500">{error}</p>}
-                            <CardFooter className="flex flex-col items-center md:flex-row md:justify-center">
-                                <div className="w-full md:w-auto md:mr-4 mb-2 md:mb-0">
-                                    <Button
-                                        type="submit"
-                                        disabled={isLoading}
-                                        className="w-full md:w-auto"
+                            {[
+                                {
+                                    id: 'vehicleName',
+                                    label: 'Vehicle Name',
+                                    placeholder: "(Ex. John Doe's Car)",
+                                    value: formData.vehicle_name,
+                                    key: 'vehicle_name',
+                                },
+                                {
+                                    id: 'vehicleYear',
+                                    label: 'Vehicle Year',
+                                    placeholder: '(Ex. 2012)',
+                                    value: formData.year,
+                                    key: 'year',
+                                    pattern: /^\d*$/,
+                                },
+                                {
+                                    id: 'vehicleMake',
+                                    label: 'Vehicle Make',
+                                    placeholder: '(Ex. Toyota)',
+                                    value: formData.make,
+                                    key: 'make',
+                                },
+                                {
+                                    id: 'vehicleModel',
+                                    label: 'Vehicle Model',
+                                    placeholder: '(Ex. Camry)',
+                                    value: formData.model,
+                                    key: 'model',
+                                },
+                                {
+                                    id: 'vehicleVin',
+                                    label: 'Vehicle VIN',
+                                    placeholder: '(Ex. 4T1BF1FK1CU013354)',
+                                    value: formData.vin,
+                                    key: 'vin',
+                                },
+                                {
+                                    id: 'vehicleMileage',
+                                    label: 'Mileage of vehicle',
+                                    placeholder: '(Ex. 72,629)',
+                                    value: formData.mileage,
+                                    key: 'mileage',
+                                    pattern: /^\d*$/,
+                                },
+                                {
+                                    id: 'aboutVehicle',
+                                    label: 'About',
+                                    placeholder: '(Ex. My First vehicle)',
+                                    value: formData.about,
+                                    key: 'about',
+                                },
+                            ].map(
+                                ({
+                                    id,
+                                    label,
+                                    placeholder,
+                                    value,
+                                    key,
+                                    pattern,
+                                }) => (
+                                    <div
+                                        key={id}
+                                        className="flex flex-col space-y-2"
                                     >
-                                        {isLoading
-                                            ? 'Registering Vehicle to DriveStats...'
-                                            : 'Register Vehicle'}
-                                    </Button>
-                                </div>
+                                        <label
+                                            htmlFor={id}
+                                            className="font-bold"
+                                        >
+                                            {label}
+                                        </label>
+                                        <Input
+                                            id={id}
+                                            placeholder={placeholder}
+                                            value={value}
+                                            onChange={(e) => {
+                                                const inputValue =
+                                                    e.target.value
+                                                if (
+                                                    !pattern ||
+                                                    pattern.test(inputValue)
+                                                ) {
+                                                    setFormData({
+                                                        ...formData,
+                                                        [key]: inputValue,
+                                                    })
+                                                }
+                                            }}
+                                            autoComplete={`current-${id}`}
+                                            className="w-full"
+                                        />
+                                    </div>
+                                )
+                            )}
+                            {error && <p className="text-red-500">{error}</p>}
+                            <CardFooter className="flex flex-col md:flex-row md:justify-center space-y-2 md:space-y-0 md:space-x-4">
+                                <Button
+                                    type="button"
+                                    onClick={closeRegisterNewVehicleForm}
+                                    className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white"
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full md:w-auto"
+                                >
+                                    {isLoading
+                                        ? 'Registering Vehicle to DriveStats...'
+                                        : 'Register Vehicle'}
+                                </Button>
                             </CardFooter>
                         </form>
                     </CardContent>
