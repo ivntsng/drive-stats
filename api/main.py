@@ -5,6 +5,7 @@ import os
 
 
 app = FastAPI()
+
 app.include_router(vehicles.router)
 app.include_router(vehicle_stats.router)
 app.include_router(accounts.router)
