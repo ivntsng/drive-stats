@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Field, validator, ValidationError
+from pydantic import BaseModel, ValidationError
 from typing import Optional, List, Union
 from fastapi import HTTPException
 from queries.pool import pool
 import pytz
-from datetime import datetime, date
+from datetime import date
 
 
 class Error(BaseModel):

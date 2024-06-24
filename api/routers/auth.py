@@ -17,12 +17,8 @@ from queries.user_queries import (
 from utils.exceptions import UserDatabaseException
 from models.users import UserRequest, UserResponse
 from queries.accounts import (
-    AccountIn,
-    AccountOut,
     AccountRepo,
     AccountLogin,
-    CheckAccountOut,
-    CheckEmail,
 )
 
 from utils.authentication import (
