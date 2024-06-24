@@ -3,7 +3,6 @@ import os
 from datetime import date, timedelta, datetime
 import jwt
 
-# Set environment variables directly in the script (not recommended for production)
 os.environ["SECRET_KEY"] = "your_secret_key"
 
 sys.path.insert(
@@ -15,7 +14,7 @@ from fastapi.testclient import TestClient
 from queries.vehicles import VehicleRepository, VehicleIn, VehicleOut
 from routers.auth import (
     try_get_jwt_user_data,
-)  # Import the actual dependency used in your application
+)
 
 client = TestClient(app)
 
@@ -27,8 +26,8 @@ class emptyVehicles:
 
 class demoVehicle(VehicleRepository):
     def create(self, vehicle: VehicleIn) -> VehicleOut:
-        vehicle_data = vehicle.model_dump()  # Updated line
-        vehicle_data["id"] = 1  # Add an ID for the mock
+        vehicle_data = vehicle.dict()
+        vehicle_data["id"] = 1
         return VehicleOut(**vehicle_data)
 
 
@@ -74,32 +73,32 @@ def test_create_vehicle():
     token = create_access_token({"sub": "test_user"})
     vehicle_in = VehicleIn(
         vehicle_name="Test Vehicle",
-        year=2020,
-        make="Test Make",
-        model="Test Model",
-        vin="1234567890ABCDEFG",
-        mileage=10000,
-        about="Test About",
+        year=2024,
+        make="Lamborghini",
+        model="STO",
+        vin="ZHWUA6ZX1RLA25657",
+        mileage=534,
+        about="Lamborghini STO",
         user_id=1,
         created_date=date.today(),
     )
     response = client.post(
         "/vehicles",
-        json=vehicle_in.model_dump(),
+        json=vehicle_in.dict(),
         headers={"Authorization": f"Bearer {token}"},
     )
     app.dependency_overrides = {}
     assert response.status_code == 200
     response_json = response.json()
     expected_response = {
-        "id": response_json["id"],  # Use the actual id returned
+        "id": response_json["id"],
         "vehicle_name": "Test Vehicle",
-        "year": 2020,
-        "make": "Test Make",
-        "model": "Test Model",
-        "vin": "1234567890ABCDEFG",
-        "mileage": 10000,
-        "about": "Test About",
+        "year": 2024,
+        "make": "Lamborghini",
+        "model": "STO",
+        "vin": "ZHWUA6ZX1RLA25657",
+        "mileage": 534,
+        "about": "Lamborghini STO",
         "user_id": 1,
         "created_date": date.today().isoformat(),
     }
