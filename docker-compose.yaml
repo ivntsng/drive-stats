@@ -41,12 +41,3 @@ services:
             POSTGRES_DB: drivestats_db
             POSTGRES_USER: casper
             POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
-
-    test:
-        build:
-            context: .
-            dockerfile: Dockerfile.test
-        volumes:
-            - ./api:/app
-            - ./tests:/app/tests
-        command: ["pytest", "--maxfail=1", "--disable-warnings"]
