@@ -30,13 +30,13 @@ jobs:
               run: docker-compose up -d
 
             - name: Install dependencies
-              run: docker exec pip install -r api/requirements.txt
+              run: docker exec fastapi pip install -r api/requirements.txt
 
             - name: Lint with flake8
-              run: docker exec flake8 api
+              run: docker exec fastapi flake8 api
 
             - name: Run tests
-              run: docker exec python -m pytest api
+              run: docker exec fastapi python -m pytest api
 
             - name: Cleanup
               run: docker-compose down
