@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ValidationError, Field, validator
+from pydantic import BaseModel, ValidationError
 from queries.pool import pool
 from fastapi import HTTPException
 from typing import Optional

@@ -17,7 +17,7 @@ services:
             SIGNING_KEY: 2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562
         volumes:
             - ./api:/app
-        user: "1000:1000" # Replace with your real user id and group id on macOS and Linux
+        user: "1000:1000"
 
     drive-stats:
         image: node:lts-bullseye
@@ -27,7 +27,7 @@ services:
             VITE_API_HOST: http://localhost:8000
         ports:
             - "5173:5173"
-        user: "1000:1000" # Replace with your real user id and group id on macOS and Linux
+        user: "1000:1000"
         volumes:
             - ./drive-stats:/app
 

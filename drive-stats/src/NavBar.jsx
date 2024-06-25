@@ -99,7 +99,7 @@ function NavBar() {
                                             </li>
                                             <li>
                                                 <a
-                                                    href="/docs/installation"
+                                                    href="/vehicles/garage/maintenance-log/"
                                                     className="text-blue-500"
                                                 >
                                                     Add Maintenance Log
