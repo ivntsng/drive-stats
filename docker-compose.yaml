@@ -17,6 +17,9 @@ services:
             SIGNING_KEY: 2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562
         volumes:
             - ./api:/app
+        depends_on:
+            postgres:
+                condition: service_healthy
         user: "1000:1000"
 
     drive-stats:
@@ -41,3 +44,8 @@ services:
             POSTGRES_DB: drivestats_db
             POSTGRES_USER: casper
             POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U casper"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
