@@ -1,0 +1,43 @@
+name: CI Pipeline
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        services:
+            docker:
+                image: docker:dind
+                options: --privileged
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Docker Compose
+              run: |
+                  sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                  sudo chmod +x /usr/local/bin/docker-compose
+
+            - name: Build and start services
+              run: docker-compose up -d
+
+            - name: Install dependencies
+              run: docker exec fastapi pip install -r api/requirements.txt
+
+            - name: Lint with flake8
+              run: docker exec fastapi flake8 api
+
+            - name: Run tests
+              run: docker exec fastapi python -m pytest api
+
+            - name: Cleanup
+              run: docker-compose down
+
+        env:
+            DATABASE_URL: "postgresql://casper:foTVdhgYZzz8bOL6e@postgres/drivestats_db"
+            SIGNING_KEY: "2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562"
