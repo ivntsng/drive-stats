@@ -29,6 +29,16 @@ jobs:
             - name: Build and start services
               run: docker-compose up -d
 
+            - name: Wait for FastAPI to be ready
+              run: |
+                  echo "Waiting for FastAPI to be ready..."
+                  for i in {1..10}; do
+                    docker exec fastapi curl -f http://localhost:8000/ && break || sleep 10;
+                  done
+
+            - name: List running containers
+              run: docker ps
+
             - name: Install dependencies
               run: docker exec fastapi pip install -r api/requirements.txt
 
@@ -37,6 +47,9 @@ jobs:
 
             - name: Run tests
               run: docker exec fastapi python -m pytest api
+
+            - name: Show Docker Compose Logs
+              run: docker-compose logs
 
             - name: Cleanup
               run: docker-compose down
