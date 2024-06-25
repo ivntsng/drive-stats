@@ -1,0 +1,67 @@
+name: CI Pipeline
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        services:
+            docker:
+                image: docker:dind
+                options: --privileged
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Docker Compose
+              run: |
+                  sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+                  sudo chmod +x /usr/local/bin/docker-compose
+
+            - name: Create Docker Volume
+              run: docker volume create --name=drive-statsDB
+
+            - name: Build and start services
+              run: docker-compose up -d
+
+            - name: List running containers
+              run: docker ps
+
+            - name: Show Docker Compose Logs
+              run: docker-compose logs
+
+            - name: Wait for FastAPI to be ready
+              run: |
+                  echo "Waiting for FastAPI to be ready..."
+                  for i in {1..10}; do
+                    if docker exec $(docker ps --filter name=fastapi -q) curl -f http://localhost:8000/; then
+                      echo "FastAPI is ready!"
+                      break
+                    else
+                      echo "Checking FastAPI readiness..."
+                      docker ps -a
+                      docker logs $(docker ps --filter name=fastapi -q)
+                      sleep 10
+                    fi
+                  done
+
+            - name: Install dependencies
+              run: docker exec $(docker ps --filter name=fastapi -q) pip install -r /app/requirements.txt
+
+            - name: Lint with flake8
+              run: docker exec $(docker ps --filter name=fastapi -q) flake8 /app
+
+            - name: Run tests
+              run: docker exec $(docker ps --filter name=fastapi -q) python -m pytest /app
+
+            - name: Cleanup
+              run: docker-compose down
+
+        env:
+            DATABASE_URL: "postgresql://casper:foTVdhgYZzz8bOL6e@postgres/drivestats_db"
+            SIGNING_KEY: "2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562"
