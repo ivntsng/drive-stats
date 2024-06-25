@@ -18,3 +18,13 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the DriveStats API"}
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
