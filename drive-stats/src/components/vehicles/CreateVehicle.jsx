@@ -29,7 +29,6 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
         vin: '',
         mileage: '',
         about: '',
-        about: '',
     })
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)

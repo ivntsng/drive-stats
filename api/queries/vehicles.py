@@ -9,8 +9,6 @@ from datetime import date
 class Error(BaseModel):
     message: Union[str, None] = None
     detail: str
-    message: Union[str, None] = None
-    detail: str
 
 
 class VehicleIn(BaseModel):
