@@ -39,25 +39,25 @@ jobs:
               run: |
                   echo "Waiting for FastAPI to be ready..."
                   for i in {1..10}; do
-                    if docker exec drive-stats_fastapi_1 curl -f http://localhost:8000/; then
+                    if docker exec drive-stats_fastapi curl -f http://localhost:8000/; then
                       echo "FastAPI is ready!"
                       break
                     else
                       echo "Checking FastAPI readiness..."
                       docker ps -a
-                      docker logs drive-stats_fastapi_1
+                      docker logs drive-stats_fastapi
                       sleep 10
                     fi
                   done
 
             - name: Install dependencies
-              run: docker exec drive-stats_fastapi_1 pip install -r api/requirements.txt
+              run: docker exec drive-stats_fastapi pip install -r api/requirements.txt
 
             - name: Lint with flake8
-              run: docker exec drive-stats_fastapi_1 flake8 api
+              run: docker exec drive-stats_fastapi flake8 api
 
             - name: Run tests
-              run: docker exec drive-stats_fastapi_1 python -m pytest api
+              run: docker exec drive-stats_fastapi python -m pytest api
 
             - name: Cleanup
               run: docker-compose down
