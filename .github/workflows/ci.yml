@@ -29,15 +29,26 @@ jobs:
             - name: Build and start services
               run: docker-compose up -d
 
+            - name: List running containers
+              run: docker ps
+
+            - name: Show Docker Compose Logs
+              run: docker-compose logs
+
             - name: Wait for FastAPI to be ready
               run: |
                   echo "Waiting for FastAPI to be ready..."
                   for i in {1..10}; do
-                    docker exec drive-stats_fastapi_1 curl -f http://localhost:8000/ && break || sleep 10;
+                    if docker exec drive-stats_fastapi_1 curl -f http://localhost:8000/; then
+                      echo "FastAPI is ready!"
+                      break
+                    else
+                      echo "Checking FastAPI readiness..."
+                      docker ps -a
+                      docker logs drive-stats_fastapi_1
+                      sleep 10
+                    fi
                   done
-
-            - name: List running containers
-              run: docker ps
 
             - name: Install dependencies
               run: docker exec drive-stats_fastapi_1 pip install -r api/requirements.txt
@@ -47,9 +58,6 @@ jobs:
 
             - name: Run tests
               run: docker exec drive-stats_fastapi_1 python -m pytest api
-
-            - name: Show Docker Compose Logs
-              run: docker-compose logs
 
             - name: Cleanup
               run: docker-compose down
