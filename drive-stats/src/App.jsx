@@ -52,7 +52,6 @@ function App() {
                                 path="/vehicles/garage/maintenance-log/"
                                 element={<VehicleStat />}
                             />
-                            <Route />
                         </Routes>
                     </div>
                 </UserContext.Provider>
