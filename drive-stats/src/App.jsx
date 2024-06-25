@@ -1,19 +1,12 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import MainPage from './MainPage'
 import CreateVehicle from './components/vehicles/CreateVehicle'
+import VehicleDetail from './components/vehicles/VehicleDetail'
+import VehicleStat from './components/vehicle_stats/CreateStatLog'
 import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
 import React, { useState, useEffect } from 'react'
 import { UserContext } from './UserContext'
-import {
-    Form,
-    FormControl,
-    FormDescription,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from '@/components/ui/form'
 import Garage from './components/vehicles/Garage'
 
 const API_HOST = import.meta.env.VITE_API_HOST
@@ -50,6 +43,14 @@ function App() {
                             <Route
                                 path="/vehicles/garage"
                                 element={<Garage />}
+                            />
+                            <Route
+                                path="/vehicles/garage/:vehicle_id"
+                                element={<VehicleDetail />}
+                            />
+                            <Route
+                                path="/vehicles/garage/maintenance-log/"
+                                element={<VehicleStat />}
                             />
                         </Routes>
                     </div>

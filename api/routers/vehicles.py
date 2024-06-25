@@ -42,25 +42,21 @@ def create_vehicle(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/vehicles/{vehicle_id}", response_model=VehicleOut | None)
+@router.get("/vehicles/{vehicle_id}", response_model=VehicleOut)
 async def get_vehicle_by_id(
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleRepository = Depends(),
-) -> VehicleOut | None:
-    try:
-        vehicle = vehicle_repo.get_vehicle_by_id(vehicle_id)
-        return vehicle
-    except HTTPException as http_exc:
-        if http_exc.status_code == 404:
-            raise
-        else:
-            print(
-                f"Failed to grab vehicle ID {vehicle_id} due to an error: ",
-                http_exc.detail,
-            )
-            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return None
+) -> VehicleOut:
+    vehicle = vehicle_repo.get_vehicle_by_id(vehicle_id)
+    if vehicle is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "error": f"Vehicle with ID {vehicle_id} not found",
+            },
+        )
+    return vehicle
 
 
 @router.get("/vehicles", response_model=List[VehicleOut] | None)

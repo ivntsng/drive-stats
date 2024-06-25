@@ -1,12 +1,4 @@
-from fastapi import APIRouter, Depends, Response, HTTPException, status
-from typing import Union, List
-from queries.vehicle_stats import (
-    VehicleStatIn,
-    VehicleStatRepository,
-    VehicleStatOut,
-    Error,
-)
-from pydantic import ValidationError
+from fastapi import APIRouter
 
 
 tags_metadata = [

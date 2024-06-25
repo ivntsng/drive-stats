@@ -9,8 +9,8 @@ from psycopg.rows import class_row
 from typing import Optional
 from models.users import UserWithPw
 from utils.exceptions import UserDatabaseException
-from pydantic import BaseModel, ValidationError, Field, validator
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from pydantic import BaseModel, ValidationError
+from fastapi import HTTPException
 
 
 DATABASE_URL = os.environ.get("DATABASE_URL")

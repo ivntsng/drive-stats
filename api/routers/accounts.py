@@ -1,16 +1,11 @@
-import time
 from fastapi import APIRouter, Depends, HTTPException, status, Response
-from pathlib import Path
 from queries.accounts import (
-    AccountIn,
     AccountOut,
     AccountRepo,
-    AccountLogin,
     CheckAccountOut,
     CheckEmail,
 )
-import bcrypt  # Importing bcrypt library for password hashing
-from typing import List, Optional
+from typing import Optional
 
 
 router = APIRouter(tags=["Accounts"])
@@ -19,15 +14,6 @@ blacklisted_tokens = set()
 
 class DuplicateAccountError(Exception):
     pass
-
-
-def generate_token(user_id: int) -> str:
-    payload = {
-        "user_id": user_id,
-        "expiry": time.time() + 3600,
-    }  # Token expires in 1 hour
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-    return token
 
 
 # @router.post("/users/signup", response_model=AccountOut)

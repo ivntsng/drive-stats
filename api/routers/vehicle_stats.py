@@ -65,7 +65,7 @@ async def get_vehicle_stat_by_id(
 
 
 @router.get(
-    "/all_vehicle_stats/{vehicle_id}",
+    "/vehicle_stats/all/{vehicle_id}",
     response_model=List[VehicleStatOut] | None,
 )
 async def get_all_vehicles_stat_by_id(

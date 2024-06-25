@@ -1,13 +1,14 @@
-from pydantic import BaseModel, Field, validator, ValidationError
-from typing import Optional, List
+from pydantic import BaseModel, ValidationError
+from typing import Optional, List, Union
 from fastapi import HTTPException
-
-# Assuming 'pool' is correctly defined elsewhere in your code.
 from queries.pool import pool
+import pytz
+from datetime import date
 
 
 class Error(BaseModel):
-    message: str
+    message: Union[str, None] = None
+    detail: str
 
 
 class VehicleIn(BaseModel):
@@ -17,6 +18,7 @@ class VehicleIn(BaseModel):
     model: str
     vin: str
     mileage: int
+    about: str
 
 
 class VehicleOut(BaseModel):
@@ -27,12 +29,16 @@ class VehicleOut(BaseModel):
     model: str
     vin: str
     mileage: int
+    about: str
     user_id: int
+    created_date: date
 
 
 class VehicleRepository:
     def result_to_dict(self, result):
         if result:
+            utc_time = result[8]
+            local_date = self.convert_to_pst_date(utc_time)
             return {
                 "id": result[0],
                 "vehicle_name": result[1],
@@ -41,22 +47,31 @@ class VehicleRepository:
                 "model": result[4],
                 "vin": result[5],
                 "mileage": result[6],
-                "user_id": result[7],
+                "about": result[7],
+                "created_date": local_date,
+                "user_id": result[9],
             }
         else:
             return None
 
-    def create_vehicle(self, vehicle_data: dict) -> VehicleOut:
+    def convert_to_pst_date(self, utc_time):
+        utc = pytz.utc
+        pst = pytz.timezone("America/Los_Angeles")
+        utc_dt = utc.localize(utc_time)
+        pst_dt = utc_dt.astimezone(pst)
+        return pst_dt.date()
+
+    def create_vehicle(self, vehicle_data: dict) -> Optional[VehicleOut]:
         try:
             with pool.connection() as conn:
                 with conn.cursor() as cur:
                     cur.execute(
                         """
                         INSERT INTO vehicles
-                          (vehicle_name, year, make, model, vin, mileage, user_id)
+                          (vehicle_name, year, make, model, vin, mileage, about, user_id)
                         VALUES
-                          (%s, %s, %s, %s, %s, %s, %s)
-                        RETURNING id, vehicle_name, year, make, model, vin, mileage, user_id;
+                          (%s, %s, %s, %s, %s, %s, %s, %s)
+                        RETURNING id, vehicle_name, year, make, model, vin, mileage, about, created_date, user_id;
                         """,
                         [
                             vehicle_data["vehicle_name"],
@@ -65,6 +80,7 @@ class VehicleRepository:
                             vehicle_data["model"],
                             vehicle_data["vin"],
                             vehicle_data["mileage"],
+                            vehicle_data["about"],
                             vehicle_data["user_id"],
                         ],
                     )
@@ -88,13 +104,11 @@ class VehicleRepository:
                     )
                     result = cur.fetchone()
                     if result is None:
-                        raise HTTPException(
-                            status_code=404,
-                            detail=f"Vehicle ID {vehicle_id} doesn't exist.",
-                        )
+                        return None
                     result_dict = self.result_to_dict(result)
                     return VehicleOut(**result_dict)
-        except Exception:
+        except Exception as ex:
+            print(f"Error getting vehicle ID {vehicle_id}: {ex}")
             raise HTTPException(
                 status_code=500, detail="Internal server error"
             )

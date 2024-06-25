@@ -1,43 +1,43 @@
-version: '3.8'
+version: "3.8"
 
 volumes:
-  drive-statsDB:
-    external: true
+    drive-statsDB:
+        external: true
 
 services:
-  fastapi:
-    build:
-      context: api
-      dockerfile: Dockerfile.dev
-    ports:
-      - "8000:8000"
-    environment:
-      CORS_HOST: http://localhost:5173
-      DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres/drivestats_db
-      SIGNING_KEY: 2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562
-    volumes:
-      - ./api:/app
-    user: "1000:1000" # Replace with your real user id and group id on macOS and Linux
+    fastapi:
+        build:
+            context: api
+            dockerfile: Dockerfile.dev
+        ports:
+            - "8000:8000"
+        environment:
+            CORS_HOST: http://localhost:5173
+            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres/drivestats_db
+            SIGNING_KEY: 2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562
+        volumes:
+            - ./api:/app
+        user: "1000:1000"
 
-  drive-stats:
-    image: node:lts-bullseye
-    command: /bin/bash run.sh
-    working_dir: /app
-    environment:
-      VITE_API_HOST: http://localhost:8000
-    ports:
-      - "5173:5173"
-    user: "1000:1000" # Replace with your real user id and group id on macOS and Linux
-    volumes:
-      - ./drive-stats:/app
+    drive-stats:
+        image: node:lts-bullseye
+        command: /bin/bash run.sh
+        working_dir: /app
+        environment:
+            VITE_API_HOST: http://localhost:8000
+        ports:
+            - "5173:5173"
+        user: "1000:1000"
+        volumes:
+            - ./drive-stats:/app
 
-  postgres:
-    image: postgres:16.2
-    ports:
-      - "15432:5432"
-    volumes:
-      - drive-statsDB:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: drivestats_db
-      POSTGRES_USER: casper
-      POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
+    postgres:
+        image: postgres:16.2
+        ports:
+            - "15432:5432"
+        volumes:
+            - drive-statsDB:/var/lib/postgresql/data
+        environment:
+            POSTGRES_DB: drivestats_db
+            POSTGRES_USER: casper
+            POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
