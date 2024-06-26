@@ -1,10 +1,4 @@
-import React, {
-    useContext,
-    useState,
-    useRef,
-    useCallback,
-    useEffect,
-} from 'react'
+import React, { useContext, useState, useRef, useEffect } from 'react'
 import { UserContext } from '../../UserContext'
 import axios from 'axios'
 import { useToast } from '@/components/ui/use-toast'
@@ -25,7 +19,6 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { fail } from 'assert'
 
 export default function VehicleStat() {
     const { user, setUser } = useContext(UserContext)
@@ -49,6 +42,7 @@ export default function VehicleStat() {
         last_cabin_filter_change: '',
         last_wiper_blades_change: '',
     })
+    const [selectedVehicleName, setSelectedVehicleName] = useState('')
 
     const fetchUser = async () => {
         try {
@@ -116,6 +110,7 @@ export default function VehicleStat() {
 
             if (response.ok) {
                 setFormData({
+                    vehicle_id: '',
                     last_oil_change: '',
                     last_tire_rotation: '',
                     last_tire_change: '',
@@ -128,6 +123,7 @@ export default function VehicleStat() {
                     last_cabin_filter_change: '',
                     last_wiper_blades_change: '',
                 })
+                setSelectedVehicleName('')
                 toast({
                     title: `Successfully created a new maintenance log!`,
                     description: `You can view the maintenance log in your vehicle details.`,
@@ -138,7 +134,7 @@ export default function VehicleStat() {
         } catch (error) {
             console.error('Error: ', error)
             setError(
-                'An error occured while trying to create a maintenance log.'
+                'An error occurred while trying to create a maintenance log.'
             )
         } finally {
             setIsLoading(false)
@@ -170,7 +166,7 @@ export default function VehicleStat() {
                                     onValueChange={(value) => {
                                         const selectedVehicle = vehicles.find(
                                             (vehicle) =>
-                                                vehicle.vehicle_name === value
+                                                vehicle.id === Number(value)
                                         )
                                         setFormData({
                                             ...formData,
@@ -178,16 +174,24 @@ export default function VehicleStat() {
                                                 ? selectedVehicle.id
                                                 : '',
                                         })
+                                        setSelectedVehicleName(
+                                            selectedVehicle
+                                                ? selectedVehicle.vehicle_name
+                                                : ''
+                                        )
                                     }}
                                 >
                                     <SelectTrigger id="vehicleName">
-                                        <SelectValue placeholder="Select a vehicle" />
+                                        <SelectValue placeholder="Select a vehicle">
+                                            {selectedVehicleName ||
+                                                'Select a vehicle'}
+                                        </SelectValue>
                                     </SelectTrigger>
                                     <SelectContent>
                                         {vehicles.map((vehicle) => (
                                             <SelectItem
                                                 key={vehicle.id}
-                                                value={vehicle.vehicle_name}
+                                                value={vehicle.id.toString()}
                                             >
                                                 {vehicle.vehicle_name}
                                             </SelectItem>

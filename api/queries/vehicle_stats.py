@@ -168,7 +168,7 @@ class VehicleStatRepository:
                     if result is None:
                         raise HTTPException(
                             status_code=404,
-                            detail=f"Vehicle with ID {vehicle_id} does not exist.",
+                            detail=f"Vehicle maintenance log with Vehicle ID ({vehicle_id}) does not exist.",
                         )
                     result_dict = self.result_to_dict(result)
                     return VehicleStatOut(**result_dict)
