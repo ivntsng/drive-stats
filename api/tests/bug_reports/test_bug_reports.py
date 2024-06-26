@@ -12,15 +12,15 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 os.environ["SECRET_KEY"] = "your_secret_key"
 
+# Adjust the path to include the directory where main.py is located
 sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 )
 
+
 from main import app
-from queries.vehicles import VehicleRepository, VehicleIn, VehicleOut
-from routers.auth import (
-    try_get_jwt_user_data,
-)
+from queries.bug_reports import BugQueries, BugReportIn, BugReportOut
+from routers.auth import try_get_jwt_user_data
 
 client = TestClient(app)
 
@@ -44,12 +44,10 @@ class MockJWTUserData:
         self.username = username
 
 
-# Mock function to simulate the authentication dependency
 def get_current_user_override():
     return MockJWTUserData(id=1, username="test_user")
 
 
-# Function to convert UTC to PST
 def convert_to_pst_date(utc_time):
     utc = pytz.utc
     pst = pytz.timezone("America/Los_Angeles")
@@ -58,56 +56,39 @@ def convert_to_pst_date(utc_time):
     return pst_dt.date()
 
 
-def test_get_all_vehicles():
-    with patch.object(VehicleRepository, "get_all_vehicles", return_value=[]):
-        app.dependency_overrides[
-            try_get_jwt_user_data
-        ] = get_current_user_override
-        token = create_access_token({"sub": "test_user"})
-        response = client.get(
-            "/vehicles", headers={"Authorization": f"Bearer {token}"}
-        )
-        app.dependency_overrides = {}
-        assert response.status_code == 200
-        assert response.json() == []
-
-
-def test_create_vehicle():
-    test_date = datetime(2024, 6, 24)  # Fixed date for testing
-    vehicle_out = VehicleOut(
+def test_create_bug_report():
+    test_date = datetime(2022, 3, 14)
+    bug_report_out = BugReportOut(
         id=1,
-        vehicle_name="Hello World Test",
-        year=2020,
-        make="Test Make",
-        model="Test Model",
-        vin="1234567890ABCDEFG",
-        mileage=10000,
-        about="Test About",
-        user_id=1,
+        bug_title="Bug Report Testing",
+        bug_desc="FooBar",
+        bug_steps="Step1, step2, step3,",
+        bug_behavior="Oh No!",
+        expected_behavior="Oh Wow!",
+        bug_rating="Important",
         created_date=test_date.date(),
+        user_id=1,
     )
-
     with patch.object(
-        VehicleRepository, "create_vehicle", return_value=vehicle_out
+        BugQueries, "create_bug_report", return_value=bug_report_out
     ):
         app.dependency_overrides[
             try_get_jwt_user_data
         ] = get_current_user_override
         token = create_access_token({"sub": "test_user"})
-        vehicle_in = VehicleIn(
-            vehicle_name="Hello World Test",
-            year=2020,
-            make="Test Make",
-            model="Test Model",
-            vin="1234567890ABCDEFG",
-            mileage=10000,
-            about="Test About",
-            user_id=1,
+        bug_report_in = BugReportIn(
+            bug_title="Bug Report Testing",
+            bug_desc="FooBar",
+            bug_steps="Step1, step2, step3,",
+            bug_behavior="Oh No!",
+            expected_behavior="Oh Wow!",
+            bug_rating="Important",
             created_date=test_date.date(),
+            user_id=1,
         )
         response = client.post(
-            "/vehicles",
-            json=vehicle_in.model_dump(),
+            "/bug_report",
+            json=bug_report_in.model_dump(),
             headers={"Authorization": f"Bearer {token}"},
         )
         app.dependency_overrides = {}
@@ -115,14 +96,13 @@ def test_create_vehicle():
         response_json = response.json()
         expected_response = {
             "id": 1,
-            "vehicle_name": "Hello World Test",
-            "year": 2020,
-            "make": "Test Make",
-            "model": "Test Model",
-            "vin": "1234567890ABCDEFG",
-            "mileage": 10000,
-            "about": "Test About",
+            "bug_title": "Bug Report Testing",
+            "bug_desc": "FooBar",
+            "bug_steps": "Step1, step2, step3,",
+            "bug_behavior": "Oh No!",
+            "expected_behavior": "Oh Wow!",
+            "bug_rating": "Important",
+            "created_date": test_date.date(),
             "user_id": 1,
-            "created_date": test_date.date().isoformat(),
         }
         assert response_json == expected_response
