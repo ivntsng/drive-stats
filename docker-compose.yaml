@@ -13,13 +13,15 @@ services:
             - "8000:8000"
         environment:
             CORS_HOST: http://localhost:5173
-            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres/drivestats_db
+            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres:5432/drivestats_db
             SIGNING_KEY: 2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562
         volumes:
             - ./api:/app
         depends_on:
             postgres:
                 condition: service_healthy
+        command: >
+            bash -c "uvicorn main:app --host 0.0.0.0 --port 8000"
         user: "1000:1000"
 
     drive-stats:
@@ -37,7 +39,7 @@ services:
     postgres:
         image: postgres:16.2
         ports:
-            - "15432:5432"
+            - "5432:5432"
         volumes:
             - drive-statsDB:/var/lib/postgresql/data
         environment:
@@ -45,7 +47,16 @@ services:
             POSTGRES_USER: casper
             POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U casper"]
+            test: ["CMD-SHELL", "pg_isready -U casper -d drivestats_db"]
             interval: 10s
             timeout: 5s
             retries: 5
+
+    flyway:
+        image: flyway/flyway:latest
+        command: -configFiles=/flyway/flyway.conf migrate
+        volumes:
+            - ./api/sql:/flyway/sql
+            - ./api/flyway.conf:/flyway/flyway.conf
+        depends_on:
+            - postgres
