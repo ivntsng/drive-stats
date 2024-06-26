@@ -43,8 +43,20 @@ jobs:
                     sleep 5
                   done
 
-            - name: Run Flyway migrations
-              run: docker exec $(docker ps --filter name=flyway -q) flyway migrate
+            - name: Wait for Flyway to finish
+              run: |
+                  echo "Waiting for Flyway to finish..."
+                  until [ "`docker inspect -f {{.State.Running}} $(docker ps --filter name=flyway -q)`" == "false" ]; do
+                    echo "Flyway is still running..."
+                    sleep 5
+                  done
+                  if [ "`docker inspect -f {{.State.ExitCode}} $(docker ps --filter name=flyway -q)`" != "0" ]; then
+                    echo "Flyway migration failed!"
+                    docker logs $(docker ps --filter name=flyway -q)
+                    exit 1
+                  else
+                    echo "Flyway migration completed successfully!"
+                  fi
 
             - name: Wait for FastAPI to be ready
               run: |
