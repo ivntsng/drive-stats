@@ -35,6 +35,17 @@ jobs:
             - name: Show Docker Compose Logs
               run: docker-compose logs
 
+            - name: Wait for PostgreSQL to be ready
+              run: |
+                  echo "Waiting for PostgreSQL to be ready..."
+                  until docker exec $(docker ps --filter name=postgres -q) pg_isready -U casper -d drivestats_db; do
+                    echo "Checking PostgreSQL readiness..."
+                    sleep 5
+                  done
+
+            - name: Run Flyway migrations
+              run: docker exec $(docker ps --filter name=flyway -q) flyway migrate
+
             - name: Wait for FastAPI to be ready
               run: |
                   echo "Waiting for FastAPI to be ready..."

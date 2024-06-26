@@ -8,18 +8,16 @@ from pydantic import ValidationError
 class BugQueries:
     def result_to_dict(self, result):
         if result:
-            utc_time = result[7]
+            utc_time = result[5]
             local_date = self.convert_to_pst_date(utc_time)
             return {
                 "id": result[0],
                 "bug_title": result[1],
                 "bug_desc": result[2],
-                "bug_steps": result[3],
-                "bug_behavior": result[4],
-                "expected_behavior": result[5],
-                "bug_rating": result[6],
+                "bug_behavior": result[3],
+                "bug_rating": result[4],
                 "created_date": local_date,
-                "user_id": result[8],
+                "user_id": result[6],
             }
         else:
             return None
@@ -40,17 +38,15 @@ class BugQueries:
                     cur.execute(
                         """
                         INSERT INTO bug_report
-                          (bug_title, bug_desc, bug_steps, bug_behavior, expected_behavior, bug_rating, user_id)
+                          (bug_title, bug_desc, bug_behavior, bug_rating, user_id)
                         VALUES
-                          (%s, %s, %s, %s, %s, %s, %s)
-                        RETURNING id, bug_title, bug_desc, bug_steps, bug_behavior, expected_behavior, bug_rating, created_date, user_id;
+                          (%s, %s, %s, %s, %s)
+                        RETURNING id, bug_title, bug_desc, bug_behavior, bug_rating, created_date, user_id;
                         """,
                         [
                             bug_report_data["bug_title"],
                             bug_report_data["bug_desc"],
-                            bug_report_data["bug_steps"],
                             bug_report_data["bug_behavior"],
-                            bug_report_data["expected_behavior"],
                             bug_report_data["bug_rating"],
                             bug_report_data["user_id"],
                         ],

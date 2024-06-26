@@ -85,9 +85,7 @@ steps = [
                     id SERIAL PRIMARY KEY,
                     bug_title VARCHAR(200),
                     bug_desc VARCHAR,
-                    bug_steps VARCHAR,
                     bug_behavior VARCHAR,
-                    expected_behavior VARCHAR,
                     bug_rating VARCHAR,
                     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     user_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE

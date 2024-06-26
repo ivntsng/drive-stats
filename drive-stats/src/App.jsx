@@ -3,6 +3,7 @@ import MainPage from './MainPage'
 import CreateVehicle from './components/vehicles/CreateVehicle'
 import VehicleDetail from './components/vehicles/VehicleDetail'
 import VehicleStat from './components/vehicle_stats/CreateStatLog'
+import CreateBugReportForm from './components/bug_reports/create_bug_reports'
 import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
 import React, { useState, useEffect } from 'react'
@@ -51,6 +52,10 @@ function App() {
                             <Route
                                 path="/vehicles/garage/maintenance-log/"
                                 element={<VehicleStat />}
+                            />
+                            <Route
+                                path="/bug-report/create"
+                                element={<CreateBugReportForm />}
                             />
                         </Routes>
                     </div>
