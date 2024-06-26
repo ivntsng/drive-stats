@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import vehicles, vehicle_stats, accounts, auth
+from routers import vehicles, vehicle_stats, accounts, auth, bug_reports
 import os
 
 
@@ -10,6 +10,7 @@ app.include_router(vehicles.router)
 app.include_router(vehicle_stats.router)
 app.include_router(accounts.router)
 app.include_router(auth.router)
+app.include_router(bug_reports.router)
 
 app.add_middleware(
     CORSMiddleware,
