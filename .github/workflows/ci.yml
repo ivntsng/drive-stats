@@ -26,7 +26,7 @@ jobs:
             - name: Create Docker Volume
               run: docker volume create --name=drive-statsDB
 
-            - name: Build and start services
+            - name: Build and start services (including Flyway)
               run: docker-compose up -d
 
             - name: List running containers
@@ -34,6 +34,19 @@ jobs:
 
             - name: Show Docker Compose Logs
               run: docker-compose logs
+
+            - name: Wait for PostgreSQL to be ready
+              run: |
+                  echo "Waiting for PostgreSQL to be ready..."
+                  until docker exec $(docker ps --filter name=postgres -q) pg_isready -U casper -d drivestats_db; do
+                    echo "Checking PostgreSQL readiness..."
+                    sleep 5
+                  done
+
+            - name: Check Flyway Logs
+              run: |
+                  echo "Checking Flyway logs..."
+                  docker logs $(docker ps -a --filter "name=drive-stats_flyway_1" --filter "status=exited" -q)
 
             - name: Wait for FastAPI to be ready
               run: |
