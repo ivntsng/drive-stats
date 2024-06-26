@@ -102,7 +102,7 @@ def test_create_bug_report():
             "bug_behavior": "Oh No!",
             "expected_behavior": "Oh Wow!",
             "bug_rating": "Important",
-            "created_date": test_date.date(),
+            "created_date": test_date.date().isoformat(),
             "user_id": 1,
         }
         assert response_json == expected_response
