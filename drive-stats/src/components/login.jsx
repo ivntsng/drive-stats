@@ -30,13 +30,13 @@ function LoginForm({
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const { setUser } = useContext(UserContext) // Get user context
+    const { setUser } = useContext(UserContext)
     const { toast } = useToast()
-    const navigate = useNavigate() // Ensure navigate is defined here
+    const navigate = useNavigate()
     const [error, setError] = useState('')
     const formRef = useRef(null)
     const API_HOST = import.meta.env.VITE_API_HOST
-    const { startLogoutTimer, clearLogoutTimer } = useTimer() // Use TimerContext
+    const { startLogoutTimer, clearLogoutTimer } = useTimer()
 
     async function handleLogin(e) {
         e.preventDefault()

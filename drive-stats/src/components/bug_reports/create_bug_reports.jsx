@@ -17,6 +17,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useNavigate } from 'react-router-dom'
 
 export default function CreateBugReportForm() {
     const { toast } = useToast()
@@ -30,9 +31,38 @@ export default function CreateBugReportForm() {
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const API_HOST = import.meta.env.VITE_API_HOST
+    const navigate = useNavigate()
 
     async function createBugReport(e) {
         e.preventDefault()
+
+        if (!formData.bug_behavior) {
+            setError(
+                'Please select the area where you are experiencing difficulties.'
+            )
+            return
+        }
+
+        if (!formData.bug_rating) {
+            setError(
+                'Please choose the severity level that you believe best corresponds to this issue.'
+            )
+            return
+        }
+
+        if (!formData.bug_title) {
+            setError('Please provide a title for this bug.')
+            return
+        }
+
+        if (!formData.bug_desc) {
+            setError(
+                'Kindly provide a detailed description of the bug to help our development team identify and resolve the issue more efficiently.'
+            )
+            return
+        }
+
+        setError('')
         setIsLoading(true)
         try {
             const response = await fetch(`${API_HOST}/bug_report`, {
@@ -54,6 +84,7 @@ export default function CreateBugReportForm() {
                 toast({
                     title: 'Successfully submitted bug report.',
                 })
+                navigate('/')
             } else {
                 setError('There was an error submitting the bug report.')
             }
@@ -160,7 +191,7 @@ export default function CreateBugReportForm() {
                                 </Label>
                                 <Input
                                     id="subject"
-                                    placeholder="There was an issue when..."
+                                    placeholder="Ex. Issue with creating a vehicle."
                                     value={formData.bug_title}
                                     onChange={(e) =>
                                         setFormData({
