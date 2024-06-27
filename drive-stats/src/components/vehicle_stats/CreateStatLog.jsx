@@ -84,8 +84,6 @@ export default function VehicleStat() {
         getUserAndVehicles()
     }, [])
 
-    console.log(vehicles)
-
     async function createMaintenanceLog(e) {
         e.preventDefault()
         setIsLoading(true)
