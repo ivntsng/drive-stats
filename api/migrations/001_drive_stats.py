@@ -82,12 +82,12 @@ steps = [
         BEGIN
             IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'bug_report') THEN
                 CREATE TABLE bug_report (
-                    id SERIAL PRIMARY KEY,
-                    bug_title VARCHAR(200),
-                    bug_desc VARCHAR,
-                    bug_behavior VARCHAR,
-                    bug_rating VARCHAR,
-                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    id SERIAL PRIMARY KEY NOT NULL,
+                    bug_title VARCHAR(200) NOT NULL,
+                    bug_desc VARCHAR NOT NULL,
+                    bug_behavior VARCHAR NOT NULL,
+                    bug_rating VARCHAR NOT NULL,
+                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                     user_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE
                 );
             END IF;
