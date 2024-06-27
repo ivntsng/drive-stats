@@ -141,31 +141,13 @@ function LoginForm({
                         </div>
                         {error && <p className="text-red-500">{error}</p>}
                         <CardFooter className="flex flex-col items-center md:flex-row md:justify-center">
-                            <div className="w-full md:w-auto md:mr-4 mb-2 md:mb-0">
+                            <div className="w-full md:w-auto mb-2 md:mb-0">
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
                                     className="w-full md:w-auto"
                                 >
                                     {isLoading ? 'Logging in...' : 'Login'}
-                                </Button>
-                            </div>
-                            <div className="w-full md:w-auto">
-                                <Button
-                                    onClick={() => {
-                                        console.log(
-                                            'Manual logout button clicked...'
-                                        )
-                                        handleLogout(
-                                            setUser,
-                                            toast,
-                                            navigate,
-                                            logoutTimerRef
-                                        )
-                                    }}
-                                    className="w-full md:w-auto"
-                                >
-                                    Test Logout
                                 </Button>
                             </div>
                         </CardFooter>
