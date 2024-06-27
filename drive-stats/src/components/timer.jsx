@@ -1,6 +1,5 @@
-// src/contexts/TimerContext.js
 import React, { createContext, useContext, useRef } from 'react'
-import { handleLogout } from '../components/auth' // Ensure the correct import path
+import { handleLogout } from '../components/auth'
 import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/components/ui/use-toast'
 import { UserContext } from '../UserContext'
@@ -14,12 +13,10 @@ export const TimerProvider = ({ children }) => {
     const navigate = useNavigate()
 
     const startLogoutTimer = () => {
-        console.log('Starting logout timer...')
         if (logoutTimerRef.current) {
             clearTimeout(logoutTimerRef.current)
         }
         logoutTimerRef.current = setTimeout(async () => {
-            console.log('Timeout reached, logging out...')
             await handleLogout(setUser, toast, navigate, logoutTimerRef)
         }, 3600000)
     }
@@ -28,7 +25,6 @@ export const TimerProvider = ({ children }) => {
         if (logoutTimerRef.current) {
             clearTimeout(logoutTimerRef.current)
             logoutTimerRef.current = null
-            console.log('Logout timer cleared')
         }
     }
 

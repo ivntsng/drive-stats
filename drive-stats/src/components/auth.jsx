@@ -1,10 +1,8 @@
-// src/components/auth.js
 import axios from 'axios'
 
 export async function handleLogout(setUser, toast, navigate, logoutTimerRef) {
     const API_HOST = import.meta.env.VITE_API_HOST
 
-    // Clear the logout timer if it exists
     if (logoutTimerRef.current) {
         clearTimeout(logoutTimerRef.current)
         logoutTimerRef.current = null
