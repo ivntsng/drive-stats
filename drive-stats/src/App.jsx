@@ -9,6 +9,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import React, { useState, useEffect } from 'react'
 import { UserContext } from './UserContext'
 import Garage from './components/vehicles/Garage'
+import { TimerProvider } from './components/timer'
 
 const API_HOST = import.meta.env.VITE_API_HOST
 
@@ -28,37 +29,38 @@ function App() {
     }, [])
 
     const value = { user, setUser }
-
     return (
         <BrowserRouter>
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                 <UserContext.Provider value={value}>
-                    <NavBar />
-                    <div className="container">
-                        <Routes>
-                            <Route path="/" element={<MainPage />} />
-                            <Route
-                                path="/vehicles/register"
-                                element={<CreateVehicle />}
-                            />
-                            <Route
-                                path="/vehicles/garage"
-                                element={<Garage />}
-                            />
-                            <Route
-                                path="/vehicles/garage/:vehicle_id"
-                                element={<VehicleDetail />}
-                            />
-                            <Route
-                                path="/vehicles/garage/maintenance-log/"
-                                element={<VehicleStat />}
-                            />
-                            <Route
-                                path="/bug-report/create"
-                                element={<CreateBugReportForm />}
-                            />
-                        </Routes>
-                    </div>
+                    <TimerProvider>
+                        <NavBar />
+                        <div className="container">
+                            <Routes>
+                                <Route path="/" element={<MainPage />} />
+                                <Route
+                                    path="/vehicles/register"
+                                    element={<CreateVehicle />}
+                                />
+                                <Route
+                                    path="/vehicles/garage"
+                                    element={<Garage />}
+                                />
+                                <Route
+                                    path="/vehicles/garage/:vehicle_id"
+                                    element={<VehicleDetail />}
+                                />
+                                <Route
+                                    path="/vehicles/garage/maintenance-log/"
+                                    element={<VehicleStat />}
+                                />
+                                <Route
+                                    path="/bug-report/create"
+                                    element={<CreateBugReportForm />}
+                                />
+                            </Routes>
+                        </div>
+                    </TimerProvider>
                 </UserContext.Provider>
             </ThemeProvider>
         </BrowserRouter>
