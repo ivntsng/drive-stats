@@ -63,7 +63,6 @@ export default function Garage() {
 
         getUserAndVehicles()
     }, [])
-    console.log(vehicles)
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">
@@ -99,6 +98,7 @@ export default function Garage() {
                                     <TableCell className="font-medium text-center">
                                         <Link
                                             to={`/vehicles/garage/${vehicle.id}`}
+                                            className="hover:text-purple-600 hover:underline"
                                         >
                                             {vehicle.vehicle_name}
                                         </Link>
@@ -110,7 +110,7 @@ export default function Garage() {
                                         {vehicle.model}
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        View | Edit
+                                        Feature In Progress
                                     </TableCell>
                                 </TableRow>
                             ))}

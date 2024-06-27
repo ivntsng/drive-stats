@@ -4,9 +4,8 @@ from queries.vehicle_stats import (
     VehicleStatIn,
     VehicleStatRepository,
     VehicleStatOut,
-    Error,
 )
-from pydantic import ValidationError
+from pydantic import ValidationError, BaseModel
 
 tags_metadata = [
     {
@@ -16,6 +15,10 @@ tags_metadata = [
 ]
 
 router = APIRouter(tags=["Vehicles Statistics"])
+
+
+class Error(BaseModel):
+    message: str
 
 
 @router.post(
@@ -48,20 +51,33 @@ async def get_vehicle_stat_by_id(
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleStatRepository = Depends(),
-) -> VehicleStatOut | None:
+) -> Union[VehicleStatOut, Error]:
     try:
         vehicle_stat = vehicle_repo.get_vehicle_stats_by_vehicle_id(vehicle_id)
+        if not vehicle_stat:
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return Error(
+                message="This vehicle doesn't have an existing maintenance log."
+            )
         return vehicle_stat
     except HTTPException as http_exc:
         if http_exc.status_code == 404:
-            raise
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return Error(message="This vehicle doesn't exist")
         else:
             print(
                 f"Failed to grab vehicle stat {vehicle_id}",
                 http_exc.detail,
             )
             response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return None
+            return Error(message="Internal server error")
+    except Exception as e:
+        print(
+            f"An unexpected error occurred while fetching vehicle stat {vehicle_id}",
+            str(e),
+        )
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return Error(message="Internal server error")
 
 
 @router.get(

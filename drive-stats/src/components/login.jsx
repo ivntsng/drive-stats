@@ -17,36 +17,7 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
-
-export async function handleLogout(setUser, toast) {
-    const API_HOST = import.meta.env.VITE_API_HOST
-    try {
-        const response = await axios.delete(`${API_HOST}/api/auth/signout`, {
-            withCredentials: true,
-        })
-
-        if (response.status === 200) {
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('username')
-            setUser(null)
-            toast({
-                title: 'Logged Out',
-                description: 'You have been logged out successfully.',
-            })
-        } else {
-            throw new Error('Failed to log out')
-        }
-    } catch (error) {
-        console.error('There was an error logging out!', error)
-        toast({
-            title: 'Error',
-            description:
-                'There was an error logging out. Please try again later.',
-            status: 'error',
-        })
-    }
-}
+import { useTimer } from './timer' // Import TimerContext
 
 function LoginForm({
     isSignupFormOpen,
@@ -59,12 +30,13 @@ function LoginForm({
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
-    const { setUser } = useContext(UserContext)
+    const { setUser } = useContext(UserContext) // Get user context
     const { toast } = useToast()
-    const navigate = useNavigate()
+    const navigate = useNavigate() // Ensure navigate is defined here
     const [error, setError] = useState('')
     const formRef = useRef(null)
     const API_HOST = import.meta.env.VITE_API_HOST
+    const { startLogoutTimer, clearLogoutTimer } = useTimer() // Use TimerContext
 
     async function handleLogin(e) {
         e.preventDefault()
@@ -97,6 +69,7 @@ function LoginForm({
                     title: 'Logged In',
                     description: `Welcome back, ${username}`,
                 })
+                startLogoutTimer() // Start the logout timer on successful login
             } else {
                 setError('Wrong username or password.')
             }
@@ -168,7 +141,7 @@ function LoginForm({
                         </div>
                         {error && <p className="text-red-500">{error}</p>}
                         <CardFooter className="flex flex-col items-center md:flex-row md:justify-center">
-                            <div className="w-full md:w-auto md:mr-4 mb-2 md:mb-0">
+                            <div className="w-full md:w-auto mb-2 md:mb-0">
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
@@ -177,21 +150,19 @@ function LoginForm({
                                     {isLoading ? 'Logging in...' : 'Login'}
                                 </Button>
                             </div>
-                            <div className="w-full md:w-auto">
-                                <div className="hidden md:block">
-                                    <p className="text-sm text-gray-500">
-                                        New to DriveStats?{' '}
-                                        <button
-                                            type="button"
-                                            className="text-purple-600 hover:underline focus:outline-none focus:ring"
-                                            onClick={toggleSignUpForm}
-                                        >
-                                            Sign up here
-                                        </button>
-                                    </p>
-                                </div>
-                            </div>
                         </CardFooter>
+                        <div className="text-center">
+                            <p className="text-sm text-gray-500">
+                                New to DriveStats?{' '}
+                                <button
+                                    type="button"
+                                    className="text-purple-600 hover:underline focus:outline-none focus:ring"
+                                    onClick={toggleSignUpForm}
+                                >
+                                    Sign up here
+                                </button>
+                            </p>
+                        </div>
                     </form>
                 </CardContent>
             </div>

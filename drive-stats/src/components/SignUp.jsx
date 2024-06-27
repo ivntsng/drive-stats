@@ -83,7 +83,7 @@ function SignupForm({
                 console.error('Account Creation Failed')
             }
         } catch (error) {
-            console.error('ErrorTest: ', error)
+            console.error('Error: ', error)
         } finally {
             setIsLoading(false)
         }
@@ -178,7 +178,7 @@ function SignupForm({
                         </div>
                         {error && <p className="text-red-500">{error}</p>}
                         <CardFooter className="flex flex-col items-center md:flex-row md:justify-center">
-                            <div className="w-full md:w-auto md:mr-4 mb-2 md:mb-0">
+                            <div className="w-full md:w-auto mb-2 md:mb-0">
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
@@ -187,37 +187,19 @@ function SignupForm({
                                     {isLoading ? 'Signing up...' : 'Sign Up'}
                                 </Button>
                             </div>
-                            <div className="w-full md:w-auto">
-                                <div className="md:hidden">
-                                    {' '}
-                                    {/* This ensures it's always below on smaller screens */}
-                                    <p className="text-sm text-gray-500">
-                                        Already have an account?{' '}
-                                        <button
-                                            type="button"
-                                            className="text-purple-600 hover:underline focus:outline-none focus:ring"
-                                            onClick={toggleLoginForm}
-                                        >
-                                            Log in here
-                                        </button>
-                                    </p>
-                                </div>
-                                <div className="hidden md:block">
-                                    {' '}
-                                    {/* This ensures it's always below on larger screens */}
-                                    <p className="text-sm text-gray-500">
-                                        Already have an account?{' '}
-                                        <button
-                                            type="button"
-                                            className="text-purple-600 hover:underline focus:outline-none focus:ring"
-                                            onClick={toggleLoginForm}
-                                        >
-                                            Log in here
-                                        </button>
-                                    </p>
-                                </div>
-                            </div>
                         </CardFooter>
+                        <div className="text-center">
+                            <p className="text-sm text-gray-500">
+                                Already have an account?{' '}
+                                <button
+                                    type="button"
+                                    className="text-purple-600 hover:underline focus:outline-none focus:ring"
+                                    onClick={toggleLoginForm}
+                                >
+                                    Log in here
+                                </button>
+                            </p>
+                        </div>
                     </form>
                 </CardContent>
             </div>
