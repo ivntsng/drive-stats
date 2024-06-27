@@ -1,7 +1,7 @@
-import { useContext, useState, useCallback, useEffect, useRef } from 'react'
+import { useContext, useState, useCallback, useEffect } from 'react'
 import LoginForm from './components/login'
 import { Button } from '@/components/ui/button'
-import { handleLogout } from './components/auth' // Updated import path
+import { handleLogout } from './components/login'
 import { useToast } from '@/components/ui/use-toast'
 import { UserContext } from './UserContext'
 import {
@@ -12,7 +12,7 @@ import {
     NavigationMenuList,
     NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu'
-import { Link, useNavigate } from 'react-router-dom' // Ensure useNavigate is imported
+import { Link } from 'react-router-dom'
 import SignupForm from './components/SignUp'
 import RegisterVehicleForm from './components/vehicles/CreateVehicle'
 
@@ -23,8 +23,6 @@ function NavBar() {
     const [isSignupFormOpen, setIsSignupFormOpen] = useState(false)
     const [isVehicleRegistrationOpen, setIsVehicleRegistrationOpen] =
         useState(false)
-    const logoutTimerRef = useRef(null)
-    const navigate = useNavigate() // Ensure navigate is defined here
 
     function togglePop() {
         setIsLoginFormOpen(!isLoginFormOpen)
@@ -35,7 +33,7 @@ function NavBar() {
     }
 
     async function logout() {
-        await handleLogout(setUser, toast, navigate, logoutTimerRef)
+        await handleLogout(setUser, toast)
     }
 
     const toggleVehicleRegistration = () => {
@@ -73,6 +71,7 @@ function NavBar() {
                                                         className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
                                                         href="/vehicles/garage"
                                                     >
+                                                        {/* Include Icons here if needed */}
                                                         <div className="mb-2 mt-4 text-lg font-medium">
                                                             {user?.username
                                                                 ? `Hello, ${user.username}`
@@ -87,6 +86,7 @@ function NavBar() {
                                                     </a>
                                                 </NavigationMenuLink>
                                             </li>
+                                            {/* Include other documentation links here */}
                                             <li>
                                                 <button
                                                     className="text-blue-500"
@@ -116,6 +116,7 @@ function NavBar() {
                                         </ul>
                                     </NavigationMenuContent>
                                 </NavigationMenuItem>
+                                {/* Include other navigation menu items here */}
                                 <NavigationMenuItem>
                                     <NavigationMenuContent>
                                         <NavigationMenuList>
