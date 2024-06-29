@@ -75,14 +75,11 @@ function NavBar() {
                                                     >
                                                         <div className="mb-2 mt-4 text-lg font-medium">
                                                             {user?.username
-                                                                ? `Hello, ${user.username}`
+                                                                ? `Hello, ${user.username}!`
                                                                 : 'Loading...'}
                                                         </div>
                                                         <p className="text-sm leading-tight text-muted-foreground">
-                                                            Beautifully designed
-                                                            components built
-                                                            with Radix UI and
-                                                            Tailwind CSS.
+                                                            View your garage
                                                         </p>
                                                     </a>
                                                 </NavigationMenuLink>
@@ -110,7 +107,7 @@ function NavBar() {
                                                     href="/docs/primitives/typography"
                                                     className="text-blue-500"
                                                 >
-                                                    Typography
+                                                    {/* Typography */}
                                                 </a>
                                             </li>
                                         </ul>

@@ -162,6 +162,9 @@ cython_debug/
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# .gitignore exceptions
+!drive-stats/src/lib/utils.ts
+
 # dependencies
 **/node_modules
 **/*.pnp
