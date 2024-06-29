@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
+import { useNavigate } from 'react-router-dom'
 
 export default function VehicleStat() {
     const { user, setUser } = useContext(UserContext)
@@ -28,6 +29,7 @@ export default function VehicleStat() {
     const [isLoading, setIsLoading] = useState(false)
     const API_HOST = import.meta.env.VITE_API_HOST
     const { toast } = useToast()
+    const navigate = useNavigate()
     const [formData, setFormData] = useState({
         vehicle_id: '',
         last_oil_change: '',
@@ -126,6 +128,7 @@ export default function VehicleStat() {
                     title: `Successfully created a new maintenance log!`,
                     description: `You can view the maintenance log in your vehicle details.`,
                 })
+                navigate('/')
             } else {
                 setError(`There was an issue creating a maintenance log.`)
             }
