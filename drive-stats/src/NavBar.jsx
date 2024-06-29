@@ -85,14 +85,12 @@ function NavBar() {
                                                 </NavigationMenuLink>
                                             </li>
                                             <li>
-                                                <button
+                                                <a
                                                     className="text-blue-500"
-                                                    onClick={
-                                                        toggleVehicleRegistration
-                                                    }
+                                                    href="/vehicles/register"
                                                 >
                                                     Register Vehicle
-                                                </button>
+                                                </a>
                                             </li>
                                             <li>
                                                 <a

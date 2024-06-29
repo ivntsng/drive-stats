@@ -16,8 +16,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
+import { useNavigate } from 'react-router-dom'
 
-function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
+function RegisterVehicleForm() {
     const { user } = useContext(UserContext)
     const { toast } = useToast()
     const formRef = useRef(null)
@@ -32,6 +33,7 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
     })
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)
+    const navigate = useNavigate()
     const API_HOST = import.meta.env.VITE_API_HOST
 
     async function registerVehicle(e) {
@@ -62,7 +64,7 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
                     title: `Successfully registered ${registeredVehicleName}.`,
                     description: `You can now view ${registeredVehicleName} in your garage.`,
                 })
-                closeRegisterNewVehicleForm()
+                navigate('/')
             } else {
                 setError('There was an issue registering the vehicle.')
             }
@@ -73,24 +75,6 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
             setIsLoading(false)
         }
     }
-
-    const handleClickOutside = useCallback(
-        (event) => {
-            if (formRef.current && !formRef.current.contains(event.target)) {
-                if (typeof closeRegisterNewVehicleForm === 'function') {
-                    closeRegisterNewVehicleForm()
-                }
-            }
-        },
-        [closeRegisterNewVehicleForm]
-    )
-
-    useEffect(() => {
-        window.addEventListener('mousedown', handleClickOutside)
-        return () => {
-            window.removeEventListener('mousedown', handleClickOutside)
-        }
-    }, [handleClickOutside])
 
     return (
         <div className="flex justify-center items-center min-h-screen px-4 py-6 sm:px-6 lg:px-8">
@@ -199,13 +183,6 @@ function RegisterVehicleForm({ closeRegisterNewVehicleForm }) {
                             )}
                             {error && <p className="text-red-500">{error}</p>}
                             <CardFooter className="flex flex-col md:flex-row md:justify-center space-y-2 md:space-y-0 md:space-x-4">
-                                <Button
-                                    type="button"
-                                    onClick={closeRegisterNewVehicleForm}
-                                    className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white"
-                                >
-                                    Cancel
-                                </Button>
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
