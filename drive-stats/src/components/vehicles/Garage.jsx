@@ -73,8 +73,27 @@ export default function Garage() {
                 <div className="overflow-x-auto rounded-lg border border-gray-300 p-4">
                     <Table className="min-w-full">
                         <TableCaption className="text-center">
-                            You currently have {vehicles.length} vehicles
-                            registered.
+                            {vehicles.length === 0 ? (
+                                <>
+                                    You don't have any vehicles registered,
+                                    register your vehicle{' '}
+                                    <a
+                                        href="/vehicles/register"
+                                        style={{
+                                            color: '#551A8B',
+                                            textDecoration: 'underline',
+                                        }}
+                                    >
+                                        here
+                                    </a>
+                                    !
+                                </>
+                            ) : (
+                                <>
+                                    You currently have {vehicles.length}{' '}
+                                    vehicles registered.
+                                </>
+                            )}
                         </TableCaption>
                         <TableHeader>
                             <TableRow>
