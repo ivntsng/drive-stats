@@ -23,6 +23,7 @@ class UserResponse(BaseModel):
 
     id: int
     username: str
+    token: Optional[str] = None
 
 
 class UserWithPw(BaseModel):

@@ -79,28 +79,6 @@ def check_user_email(
         raise HTTPException(status_code=500, detail="Email does not exist!")
 
 
-# @router.post("/signin")
-# async def user_login(info: AccountLogin, repo: AccountRepo = Depends()):
-#     # Check if the username exists in the database
-#     user = repo.get_single_user(info.username)
-#     if user:
-#         # Check if the password is correct
-#         if bcrypt.checkpw(info.password.encode(), user.password.encode()):
-#             # Generate JWT token
-#             token = generate_token(user.id)
-#             return {"token": token, "username": user.username}
-#         else:
-#             raise HTTPException(
-#                 status_code=status.HTTP_401_UNAUTHORIZED,
-#                 detail="Incorrect password",
-#             )
-#     else:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail="User not found",
-#         )
-
-
 def is_token_blacklisted(token: str):
     return token in blacklisted_tokens
 

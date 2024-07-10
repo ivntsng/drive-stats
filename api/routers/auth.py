@@ -120,7 +120,11 @@ async def authenticate(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Not logged in"
         )
-    return user
+
+    # Generate a JWT token
+    token = generate_jwt(user)
+
+    return UserResponse(id=user.id, username=user.username, token=token)
 
 
 @router.delete("/signout")

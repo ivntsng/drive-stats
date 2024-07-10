@@ -1,4 +1,11 @@
-from fastapi import APIRouter, Depends, Response, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    Response,
+    HTTPException,
+    status,
+    Request,
+)
 from typing import Union, List
 from queries.vehicles import VehicleIn, VehicleRepository, VehicleOut, Error
 from pydantic import ValidationError
@@ -12,6 +19,8 @@ tags_metadata = [
     },
 ]
 router = APIRouter(tags=["Vehicles"])
+
+ADMIN_ID = "1"
 
 
 @router.post("/vehicles", response_model=Union[VehicleOut, Error])
@@ -47,7 +56,10 @@ async def get_vehicle_by_id(
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleRepository = Depends(),
+    current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ) -> VehicleOut:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
     vehicle = vehicle_repo.get_vehicle_by_id(vehicle_id)
     if vehicle is None:
         raise HTTPException(
@@ -59,18 +71,19 @@ async def get_vehicle_by_id(
     return vehicle
 
 
-@router.get("/vehicles", response_model=List[VehicleOut] | None)
-async def get_all_vehicles(
-    response: Response,
-    vehicle_repo: VehicleRepository = Depends(),
-) -> List[VehicleOut] | None:
+@router.get("/vehicles", response_model=Union[List[VehicleOut], Error])
+def list_vehicles(
+    repo: VehicleRepository = Depends(),
+    current_user: JWTUserData = Depends(try_get_jwt_user_data),
+):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
     try:
-        vehicles = vehicle_repo.get_all_vehicles()
+        vehicles = repo.get_vehicles_by_user_id(current_user.id)
         return vehicles
     except Exception as e:
-        print(f"Failed to grab all vehicles due to an error: {e}")
-        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-        return None
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.put("/vehicles/{vehicle_id}", response_model=Union[VehicleOut, Error])
@@ -79,7 +92,10 @@ async def update_vehicle(
     vehicle_id: int,
     vehicle: VehicleIn,
     vehicle_repo: VehicleRepository = Depends(),
+    current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ) -> Union[VehicleOut, Error]:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
     try:
         updated_vehicle = vehicle_repo.update_vehicle(vehicle_id, vehicle)
         if updated_vehicle:
@@ -106,7 +122,10 @@ async def delete_vehicle(
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleRepository = Depends(),
+    current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ) -> Union[VehicleOut, Error]:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
     try:
         deleted_vehicle = vehicle_repo.delete_vehicle(vehicle_id)
         if deleted_vehicle:
@@ -126,10 +145,15 @@ async def delete_vehicle(
 
 @router.get("/vehicles/user/{user_id}", response_model=List[VehicleOut])
 async def get_vehicles_by_user_id(
+    request: Request,
     response: Response,
     user_id: int,
     vehicle_repo: VehicleRepository = Depends(),
+    current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ) -> List[VehicleOut]:
+    print("Request headers:", request.headers)  # Log headers
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
     try:
         vehicles = vehicle_repo.get_vehicles_by_user_id(user_id)
         return vehicles
