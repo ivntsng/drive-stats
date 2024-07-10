@@ -13,3 +13,10 @@ repos:
       rev: 4.0.1
       hooks:
           - id: flake8
+    - repo: local
+      hooks:
+          - id: run-act
+            name: Run Act
+            entry: bash -c "act push --container-architecture linux/amd64"
+            language: system
+            files: ^(.github/workflows/.*|Dockerfile|docker-compose\.yml)$
