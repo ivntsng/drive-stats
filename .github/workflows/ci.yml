@@ -38,13 +38,13 @@ jobs:
             - name: Wait for PostgreSQL to be ready
               run: |
                   echo "Waiting for PostgreSQL to be ready..."
-                  until docker exec $(docker ps --filter name=postgres -q) pg_isready -U casper -d drivestats_db; do
+                  until docker exec $(docker ps --filter name=postgres -q) pg_isready -U casper -d postgres; do
                     echo "Checking PostgreSQL readiness..."
                     sleep 5
                   done
 
             - name: Create Test Database
-              run: docker exec $(docker ps --filter name=postgres -q) psql -U casper -c "CREATE DATABASE test_drivestats_db;"
+              run: docker exec $(docker ps --filter name=postgres -q) psql -U casper -d postgres -c "CREATE DATABASE test_drivestats_db;"
 
             - name: Check Flyway Logs
               run: |
@@ -78,7 +78,7 @@ jobs:
               run: docker exec $(docker ps --filter name=fastapi -q) python -m pytest /app
 
             - name: Drop Test Database
-              run: docker exec $(docker ps --filter name=postgres -q) psql -U casper -c "DROP DATABASE test_drivestats_db;"
+              run: docker exec $(docker ps --filter name=postgres -q) psql -U casper -d postgres -c "DROP DATABASE test_drivestats_db;"
 
             - name: Cleanup
               run: docker-compose down
