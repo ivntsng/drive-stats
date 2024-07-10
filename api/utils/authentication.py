@@ -6,15 +6,14 @@ import os
 import bcrypt
 from calendar import timegm
 from datetime import datetime, timedelta
-from fastapi import Cookie
+from fastapi import Cookie, HTTPException, status, Header
 from jose import JWTError, jwt
 from jose.constants import ALGORITHMS
-from typing import Annotated, Optional
+from typing import Optional
 from models.jwt import JWTPayload, JWTUserData
-
 from queries.user_queries import UserWithPw
 
-# If you ever need to change the hashing algorith, you can change it here
+# If you ever need to change the hashing algorithm, you can change it here
 ALGORITHM = ALGORITHMS.HS256
 
 # We pull this from the environment
@@ -24,11 +23,8 @@ if not SIGNING_KEY:
 
 
 async def decode_jwt(token: str) -> Optional[JWTPayload]:
-    """
-    Helper function to decode the JWT from a token string
-    """
     try:
-        payload = jwt.decode(token, SIGNING_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SIGNING_KEY, algorithms=["HS256"])
         return JWTPayload(**payload)
     except (JWTError, AttributeError) as e:
         print(e)
@@ -36,43 +32,35 @@ async def decode_jwt(token: str) -> Optional[JWTPayload]:
 
 
 async def try_get_jwt_user_data(
-    fast_api_token: Annotated[str | None, Cookie()] = None,
-) -> Optional[JWTUserData]:
-    """
-    This function can be dependency injected into a route
+    fast_api_token: Optional[str] = Cookie(None),
+    authorization: Optional[str] = Header(None),
+) -> JWTUserData:
+    if not fast_api_token and not authorization:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
 
-    It checks the JWT token from the cookie and attempts to get the user
-    from the payload of the JWT
+    token = fast_api_token
+    if authorization:
+        scheme, _, param = authorization.partition(" ")
+        if scheme.lower() != "bearer":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid authorization scheme",
+            )
+        token = param
 
-    *NOTE* this does not get the user from the database, if you
-    need to do that you must call another method after calling this
-
-    Returns None when the user isn't logged in
-
-    Example usage:
-
-    ```python
-    @app.get("/some-protected-route"):
-    def some_protected_route(user: Depends(try_get_user_data)):
-        if not user:
-            # Do somthing when not logged in
-        else:
-            # Do something when logged in
-    ```
-    """
-    # If there's no cookie at all, return None
-    if not fast_api_token:
-        return
-
-    # If the payload doesn't exist, return None
-    payload = await decode_jwt(fast_api_token)
+    payload = await decode_jwt(token)
     if not payload:
-        return
-
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
     return payload.user
 
 
-def verify_password(plain_password, hashed_password) -> bool:
+def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     This verifies the user's password, by hashing the plain
     password and then comparing it to the hashed password
@@ -83,7 +71,7 @@ def verify_password(plain_password, hashed_password) -> bool:
     )
 
 
-def hash_password(plain_password) -> str:
+def hash_password(plain_password: str) -> str:
     """
     Helper function that hashes a password
     """
@@ -105,7 +93,5 @@ def generate_jwt(user: UserWithPw) -> str:
         sub=user.username,
         user=JWTUserData(username=user.username, id=user.id),
     )
-    encoded_jwt = jwt.encode(
-        jwt_data.model_dump(), SIGNING_KEY, algorithm=ALGORITHMS.HS256
-    )
+    encoded_jwt = jwt.encode(jwt_data.dict(), SIGNING_KEY, algorithm=ALGORITHM)
     return encoded_jwt

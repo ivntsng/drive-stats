@@ -1,4 +1,4 @@
-import { useContext, useState, useCallback, useEffect } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { UserContext } from '../../UserContext'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
@@ -36,11 +36,15 @@ export default function Garage() {
         }
     }
 
-    // Function to fetch vehicles by user ID
-    const fetchVehicles = async (userId) => {
+    const fetchVehicles = async (userId, token) => {
         try {
             const response = await axios.get(
-                `${API_HOST}/vehicles/user/${userId}`
+                `${API_HOST}/vehicles/user/${userId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             )
             setVehicles(response.data)
         } catch (error) {
@@ -48,16 +52,11 @@ export default function Garage() {
         }
     }
 
-    const addVehicle = (newVehicle) => {
-        setVehicles([...vehicles, newVehicle])
-    }
-
-    // useEffect to fetch user and vehicles on component mount
     useEffect(() => {
         const getUserAndVehicles = async () => {
             const userData = await fetchUser()
             if (userData && userData.id) {
-                await fetchVehicles(userData.id)
+                await fetchVehicles(userData.id, userData.token)
             }
         }
 

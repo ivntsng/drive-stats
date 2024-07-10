@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import { UserContext } from '../../UserContext'
 import { Button } from '@/components/ui/button'
 import {
     Card,
@@ -26,14 +27,38 @@ import { ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react'
 
 export default function VehicleDetail() {
     const { vehicle_id } = useParams()
+    const { user, setUser } = useContext(UserContext)
     const [vehicle, setVehicle] = useState(null)
     const [vehicleStats, setVehicleStats] = useState(null)
     const [showVehicleDetails, setShowVehicleDetails] = useState(true)
     const API_HOST = import.meta.env.VITE_API_HOST
 
-    const fetchVehicle = async (id) => {
+    const fetchUser = async () => {
         try {
-            const response = await axios.get(`${API_HOST}/vehicles/${id}`)
+            const response = await axios.get(
+                `${API_HOST}/api/auth/authenticate`,
+                {
+                    withCredentials: true,
+                }
+            )
+            setUser(response.data)
+            return response.data
+        } catch (error) {
+            console.error(
+                'There was an error fetching the user details!',
+                error
+            )
+            return null
+        }
+    }
+
+    const fetchVehicle = async (id, token) => {
+        try {
+            const response = await axios.get(`${API_HOST}/vehicles/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
             setVehicle(response.data)
         } catch (error) {
             console.error(
@@ -43,9 +68,16 @@ export default function VehicleDetail() {
         }
     }
 
-    const fetchVehicleStats = async (id) => {
+    const fetchVehicleStats = async (id, token) => {
         try {
-            const response = await axios.get(`${API_HOST}/vehicle_stats/${id}`)
+            const response = await axios.get(
+                `${API_HOST}/vehicle_stats/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
             setVehicleStats(response.data)
         } catch (error) {
             console.error(
@@ -56,12 +88,21 @@ export default function VehicleDetail() {
     }
 
     useEffect(() => {
-        fetchVehicle(vehicle_id)
+        const getUserAndVehicle = async () => {
+            const userData = await fetchUser()
+            if (userData && userData.token) {
+                await fetchVehicle(vehicle_id, userData.token)
+            }
+        }
+
+        getUserAndVehicle()
     }, [vehicle_id])
 
-    const handleNext = () => {
-        fetchVehicleStats(vehicle_id)
-        setShowVehicleDetails(false)
+    const handleNext = async () => {
+        if (user && user.token) {
+            await fetchVehicleStats(vehicle_id, user.token)
+            setShowVehicleDetails(false)
+        }
     }
 
     const handlePrevious = () => {
