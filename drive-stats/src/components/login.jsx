@@ -121,7 +121,7 @@ function LoginForm({
                             <Input
                                 id="username"
                                 placeholder="Username"
-                                value={username}
+                                value={username.toLowerCase()}
                                 onChange={(e) => setUsername(e.target.value)}
                                 autoComplete="current-username"
                             />
