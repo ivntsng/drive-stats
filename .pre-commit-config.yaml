@@ -20,3 +20,4 @@ repos:
             entry: bash -c "act push --container-architecture linux/amd64"
             language: system
             files: ^(.github/workflows/.*|Dockerfile|docker-compose\.yml)$
+            always_run: true
