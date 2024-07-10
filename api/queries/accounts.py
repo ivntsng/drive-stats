@@ -57,6 +57,8 @@ class AccountRepo:
         try:
             with pool.connection() as conn:
                 with conn.cursor() as cur:
+                    lowercase_username = account.username.lower()
+                    lowercase_email = account.email.lower()
                     cur.execute(
                         """
                         INSERT INTO accounts
@@ -67,9 +69,9 @@ class AccountRepo:
                         id, username, password, email
                         """,
                         [
-                            account.username,
+                            lowercase_username,
                             hashed_password,
-                            account.email,
+                            lowercase_email,
                         ],
                     )
                     result = cur.fetchone()
