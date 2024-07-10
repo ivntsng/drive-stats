@@ -43,6 +43,9 @@ jobs:
                     sleep 5
                   done
 
+            - name: Create Test Database
+              run: docker exec $(docker ps --filter name=postgres -q) psql -U casper -c "CREATE DATABASE test_drivestats_db;"
+
             - name: Check Flyway Logs
               run: |
                   echo "Checking Flyway logs..."
@@ -70,7 +73,12 @@ jobs:
               run: docker exec $(docker ps --filter name=fastapi -q) flake8 /app
 
             - name: Run tests
+              env:
+                  DATABASE_URL: "postgresql://casper:foTVdhgYZzz8bOL6e@postgres/test_drivestats_db"
               run: docker exec $(docker ps --filter name=fastapi -q) python -m pytest /app
+
+            - name: Drop Test Database
+              run: docker exec $(docker ps --filter name=postgres -q) psql -U casper -c "DROP DATABASE test_drivestats_db;"
 
             - name: Cleanup
               run: docker-compose down
