@@ -46,8 +46,14 @@ function SignupForm({
         setError('')
         setIsLoading(true)
         try {
-            const checkUser = await fetch(`${API_HOST}/check/users/${username}`)
-            const checkEmail = await fetch(`${API_HOST}/check/email/${email}`)
+            const lowerCaseUsername = username.toLowerCase()
+            const lowerCaseEmail = email.toLowerCase()
+            const checkUser = await fetch(
+                `${API_HOST}/check/users/${lowerCaseUsername}`
+            )
+            const checkEmail = await fetch(
+                `${API_HOST}/check/email/${lowerCaseEmail}`
+            )
             if (checkUser.status !== 500) {
                 setError('Username already exists!')
                 setIsLoading(false)

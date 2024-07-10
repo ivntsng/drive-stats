@@ -43,6 +43,7 @@ async def signup(
     """
     Creates a new user when someone submits the signup form
     """
+    new_user.username = new_user.username.lower()
     # Hash the password the user sent us
     hashed_password = hash_password(new_user.password)
 

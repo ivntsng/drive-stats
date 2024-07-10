@@ -16,29 +16,6 @@ class DuplicateAccountError(Exception):
     pass
 
 
-# @router.post("/users/signup", response_model=AccountOut)
-# async def user_signup(info: AccountIn, repo: AccountRepo = Depends()):
-#     hashed_password_bytes = bcrypt.hashpw(
-#         info.password.encode(), bcrypt.gensalt()
-#     )  # Hashing the password using bcrypt
-#     hashed_password_str = (
-#         hashed_password_bytes.decode()
-#     )  # Converting bytes to string
-#     try:
-#         result_dict = repo.create_user(info, hashed_password_str)
-#         if result_dict:
-#             return result_dict
-#         else:
-#             raise HTTPException(
-#                 status_code=500, detail="Failed to create account."
-#             )
-#     except DuplicateAccountError:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail="Cannot create an account with those credentials",
-#         )
-
-
 @router.get("/users/{username}", response_model=Optional[AccountOut])
 def get_single_user(
     username: str,
