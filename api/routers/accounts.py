@@ -1,4 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+# routers/accounts.py
+
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status,
+    Response,
+    Request,
+)
 from queries.accounts import (
     AccountOut,
     AccountRepo,
@@ -6,7 +15,13 @@ from queries.accounts import (
     CheckEmail,
 )
 from typing import Optional
+from dotenv import load_dotenv
+from utils.authentication import try_get_jwt_user_data
 
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 router = APIRouter(tags=["Accounts"])
 blacklisted_tokens = set()
@@ -16,14 +31,31 @@ class DuplicateAccountError(Exception):
     pass
 
 
-@router.get("/users/{username}", response_model=Optional[AccountOut])
+# Get the API_HOST from environment variables
+API_HOST = os.getenv("VITE_API_HOST", "").strip().lower().rstrip("/")
+
+
+def verify_api_host(request: Request):
+    host = request.headers.get("host", "").strip().lower().rstrip("/")
+    expected_host = API_HOST
+    print(f"Host header: {host}, Expected: {expected_host}")
+    if host != expected_host:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access Forbidden"
+        )
+
+
+@router.get(
+    "/users/{username}",
+    response_model=Optional[AccountOut],
+    dependencies=[Depends(verify_api_host), Depends(try_get_jwt_user_data)],
+)
 def get_single_user(
     username: str,
     response: Response,
     repo: AccountRepo = Depends(),
 ) -> AccountOut:
     user = repo.get_single_user(username)
-    print(user)
     if user:
         return user
     else:
@@ -31,7 +63,9 @@ def get_single_user(
 
 
 @router.get(
-    "/check/users/{username}", response_model=Optional[CheckAccountOut]
+    "/check/users/{username}",
+    response_model=Optional[CheckAccountOut],
+    dependencies=[Depends(verify_api_host), Depends(try_get_jwt_user_data)],
 )
 def check_single_user(
     username: str,
@@ -44,7 +78,11 @@ def check_single_user(
         raise HTTPException(status_code=500, detail="User does not exist!")
 
 
-@router.get("/check/email/{email}", response_model=Optional[CheckEmail])
+@router.get(
+    "/check/email/{email}",
+    response_model=Optional[CheckEmail],
+    dependencies=[Depends(verify_api_host), Depends(try_get_jwt_user_data)],
+)
 def check_user_email(
     email: str,
     repo: AccountRepo = Depends(),
@@ -60,7 +98,10 @@ def is_token_blacklisted(token: str):
     return token in blacklisted_tokens
 
 
-@router.post("/logout")
+@router.post(
+    "/logout",
+    dependencies=[Depends(verify_api_host), Depends(try_get_jwt_user_data)],
+)
 async def user_logout(token: str):
     if is_token_blacklisted(token):
         raise HTTPException(

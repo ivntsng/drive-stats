@@ -46,12 +46,16 @@ function LoginForm({
         }
         setIsLoading(true)
         try {
+            const formData = new URLSearchParams()
+            formData.append('username', username)
+            formData.append('password', password)
+
             const response = await fetch(`${API_HOST}/api/auth/signin`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: JSON.stringify({ username, password }),
+                body: formData.toString(),
                 credentials: 'include', // Include credentials in the request
             })
 

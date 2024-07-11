@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from routers import vehicles, vehicle_stats, accounts, auth, bug_reports
+from fastapi.security import OAuth2PasswordBearer
+from typing import Annotated
 import os
 
 
