@@ -94,7 +94,7 @@ async def signin(
             secure=secure,
         )
 
-        return {"username": user.username}
+        return {"username": user.username, "token": token}
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
