@@ -151,7 +151,6 @@ async def get_vehicles_by_user_id(
     vehicle_repo: VehicleRepository = Depends(),
     current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ) -> List[VehicleOut]:
-    print("Request headers:", request.headers)  # Log headers
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
     try:

@@ -19,11 +19,9 @@ const ProtectedRoute = ({ element }) => {
                         },
                     }
                 )
-                console.log('API response:', response)
 
                 if (response.ok) {
                     const data = await response.json()
-                    console.log('User data:', data)
                     setUser({ ...user, ...data })
                     setIsAuthenticated(true)
                 } else {
@@ -47,9 +45,7 @@ const ProtectedRoute = ({ element }) => {
         }
     }, [user, setUser, isAuthenticated])
 
-    useEffect(() => {
-        console.log('Authentication status:', isAuthenticated)
-    }, [isAuthenticated])
+    useEffect(() => {}, [isAuthenticated])
 
     if (isLoading) {
         return <div>Loading...</div>
