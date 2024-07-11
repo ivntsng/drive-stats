@@ -6,13 +6,15 @@ import os
 import bcrypt
 from calendar import timegm
 from datetime import datetime, timedelta
-from fastapi import Cookie, HTTPException, status, Header
+from fastapi import Cookie, HTTPException, status, Header, Depends
 from jose import JWTError, jwt
 from jose.constants import ALGORITHMS
 from typing import Optional
 from models.jwt import JWTPayload, JWTUserData
 from queries.user_queries import UserWithPw
+from fastapi.security import OAuth2PasswordBearer
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/signin")
 # If you ever need to change the hashing algorithm, you can change it here
 ALGORITHM = ALGORITHMS.HS256
 
@@ -32,25 +34,8 @@ async def decode_jwt(token: str) -> Optional[JWTPayload]:
 
 
 async def try_get_jwt_user_data(
-    fast_api_token: Optional[str] = Cookie(None),
-    authorization: Optional[str] = Header(None),
+    token: str = Depends(oauth2_scheme),
 ) -> JWTUserData:
-    if not fast_api_token and not authorization:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-        )
-
-    token = fast_api_token
-    if authorization:
-        scheme, _, param = authorization.partition(" ")
-        if scheme.lower() != "bearer":
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid authorization scheme",
-            )
-        token = param
-
     payload = await decode_jwt(token)
     if not payload:
         raise HTTPException(

@@ -15,6 +15,7 @@ services:
             CORS_HOST: http://localhost:5173
             DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres:5432/drivestats_db
             SIGNING_KEY: 2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562
+            VITE_API_HOST: localhost:8000
         volumes:
             - ./api:/app
         depends_on:

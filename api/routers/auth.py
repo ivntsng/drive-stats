@@ -1,26 +1,18 @@
-"""
-User Authentication API Router
-"""
+# routers/auth.py
 
 from fastapi import (
+    APIRouter,
     Depends,
     Request,
     Response,
     HTTPException,
     status,
-    APIRouter,
 )
-from queries.user_queries import (
-    UserQueries,
-)
-
-from utils.exceptions import UserDatabaseException
+from fastapi.security import OAuth2PasswordRequestForm
+from queries.user_queries import UserQueries
 from models.users import UserRequest, UserResponse
-from queries.accounts import (
-    AccountRepo,
-    AccountLogin,
-)
-
+from queries.accounts import AccountRepo
+from utils.exceptions import UserDatabaseException
 from utils.authentication import (
     try_get_jwt_user_data,
     hash_password,
@@ -28,8 +20,6 @@ from utils.authentication import (
     verify_password,
 )
 
-# Note we are using a prefix here,
-# This saves us typing in all the routes below
 router = APIRouter(tags=["Authentication"], prefix="/api/auth")
 
 
@@ -76,13 +66,13 @@ async def signup(
 
 @router.post("/signin")
 async def signin(
-    info: AccountLogin,
     request: Request,
     response: Response,
     repo: AccountRepo = Depends(),
+    form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> dict:
-    user = repo.get_single_user(info.username)
-    if user and verify_password(info.password, user.password):
+    user = repo.get_single_user(form_data.username)
+    if user and verify_password(form_data.password, user.password):
         token = generate_jwt(user)
         secure = request.url.scheme == "https"
 
