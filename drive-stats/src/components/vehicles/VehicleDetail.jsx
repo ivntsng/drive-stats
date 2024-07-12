@@ -34,10 +34,15 @@ export default function VehicleDetail() {
     const API_HOST = import.meta.env.VITE_API_HOST
 
     const fetchUser = async () => {
+        const token = sessionStorage.getItem('token')
+        if (!token) return null
         try {
             const response = await axios.get(
                 `${API_HOST}/api/auth/authenticate`,
                 {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                     withCredentials: true,
                 }
             )

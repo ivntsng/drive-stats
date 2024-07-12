@@ -1,7 +1,3 @@
-"""
-Helper functions for implementing authentication
-"""
-
 import os
 import bcrypt
 from calendar import timegm
@@ -13,9 +9,8 @@ from typing import Annotated, Optional
 from models.jwt import JWTPayload, JWTUserData
 
 from queries.user_queries import UserWithPw
-from fastapi.security import OAuth2PasswordBearer
 
-# If you ever need to change the hashing algorith, you can change it here
+# If you ever need to change the hashing algorithm, you can change it here
 ALGORITHM = ALGORITHMS.HS256
 
 # We pull this from the environment
@@ -40,29 +35,21 @@ async def try_get_jwt_user_data(
     fast_api_token: Annotated[str | None, Cookie()] = None,
     authorization: Annotated[str | None, Header()] = None,
 ) -> Optional[JWTUserData]:
-    """
-    This function can be dependency injected into a route
-
-    It checks the JWT token from the cookie or Authorization header and attempts to get the user
-    from the payload of the JWT
-
-    Returns None when the user isn't logged in
-    """
     token = fast_api_token
     if not token and authorization:
         if authorization.startswith("Bearer "):
             token = authorization[len("Bearer ") :]  # noqa: E203
 
-    # If there's no token at all, return None
     if not token:
         print("No JWT token found in cookies or Authorization header.")
         return None
 
-    # If the payload doesn't exist, return None
     payload = await decode_jwt(token)
     if not payload:
         print("JWT token decoding failed or payload is empty.")
         return None
+
+    print(f"JWT token successfully decoded. Payload: {payload}")
     return payload.user
 
 

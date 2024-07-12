@@ -18,10 +18,14 @@ export default function Garage() {
     const API_HOST = import.meta.env.VITE_API_HOST
 
     const fetchUser = async () => {
+        const token = sessionStorage.getItem('token')
         try {
             const response = await axios.get(
                 `${API_HOST}/api/auth/authenticate`,
                 {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                     withCredentials: true,
                 }
             )
@@ -36,7 +40,8 @@ export default function Garage() {
         }
     }
 
-    const fetchVehicles = async (userId, token) => {
+    const fetchVehicles = async (userId) => {
+        const token = sessionStorage.getItem('token')
         try {
             const response = await axios.get(
                 `${API_HOST}/vehicles/user/${userId}`,
@@ -56,7 +61,7 @@ export default function Garage() {
         const getUserAndVehicles = async () => {
             const userData = await fetchUser()
             if (userData && userData.id) {
-                await fetchVehicles(userData.id, userData.token)
+                await fetchVehicles(userData.id)
             }
         }
 

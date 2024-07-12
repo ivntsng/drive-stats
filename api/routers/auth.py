@@ -1,18 +1,15 @@
-# routers/auth.py
-
 from fastapi import (
     APIRouter,
     Depends,
+    HTTPException,
     Request,
     Response,
-    HTTPException,
     status,
-    Cookie,
 )
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from queries.user_queries import UserQueries
 from models.users import UserRequest, UserResponse
-from queries.accounts import AccountRepo, AccountLogin
+from queries.accounts import AccountRepo
 from utils.exceptions import UserDatabaseException
 from utils.authentication import (
     try_get_jwt_user_data,
@@ -22,6 +19,8 @@ from utils.authentication import (
 )
 
 router = APIRouter(tags=["Authentication"], prefix="/api/auth")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 
 @router.post("/signup")
@@ -82,16 +81,32 @@ async def signin(
         )
 
 
+@router.post("/token")
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    repo: AccountRepo = Depends(),
+):
+    user = repo.get_single_user(form_data.username)
+    if not user or not verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = generate_jwt(user)
+    return {"id": user.id, "access_token": token, "token_type": "bearer"}
+
+
 @router.get("/authenticate")
 async def authenticate(
+    token: str = Depends(oauth2_scheme),
     user: UserResponse = Depends(try_get_jwt_user_data),
-    fast_api_token: str = Cookie(None),
-) -> dict:
+) -> UserResponse:
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Not logged in"
         )
-    return {"id": user.id, "username": user.username, "token": fast_api_token}
+    return {"id": user.id, "username": user.username, "token": token}
 
 
 @router.delete("/signout")
@@ -99,18 +114,8 @@ async def signout(
     request: Request,
     response: Response,
 ):
-    """
-    Signs the user out by deleting their JWT Cookie
-    """
-    # Secure cookies only if running on something besides localhost
-    secure = True if request.headers.get("origin") == "localhost" else False
-
-    # Delete the cookie
+    secure = request.url.scheme == "https"
     response.delete_cookie(
         key="fast_api_token", httponly=True, samesite="lax", secure=secure
     )
-
-    # There's no need to return anything in the response.
-    # All that has to happen is the cookie header must come back
-    # Which causes the browser to delete the cookie
     return {"message": "Successfully logged out"}

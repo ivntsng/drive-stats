@@ -47,10 +47,15 @@ export default function VehicleStat() {
     const [selectedVehicleName, setSelectedVehicleName] = useState('')
 
     const fetchUser = async () => {
+        const token = sessionStorage.getItem('token')
+        if (!token) return null
         try {
             const response = await axios.get(
                 `${API_HOST}/api/auth/authenticate`,
                 {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                     withCredentials: true,
                 }
             )
