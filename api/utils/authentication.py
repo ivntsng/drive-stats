@@ -13,6 +13,7 @@ from typing import Annotated, Optional
 from models.jwt import JWTPayload, JWTUserData
 
 from queries.user_queries import UserWithPw
+from fastapi.security import OAuth2PasswordBearer
 
 # If you ever need to change the hashing algorith, you can change it here
 ALGORITHM = ALGORITHMS.HS256
