@@ -49,14 +49,13 @@ function LoginForm({
             const formData = new URLSearchParams()
             formData.append('username', username)
             formData.append('password', password)
-
             const response = await fetch(`${API_HOST}/api/auth/signin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: formData.toString(),
-                credentials: 'include', // Include credentials in the request
+                credentials: 'include',
             })
 
             if (response.ok) {
@@ -73,12 +72,11 @@ function LoginForm({
                     title: 'Logged In',
                     description: `Welcome back, ${username}`,
                 })
-                startLogoutTimer() // Start the logout timer on successful login
+                startLogoutTimer()
             } else {
                 setError('Wrong username or password.')
             }
         } catch (error) {
-            console.error('Error: ', error)
             setError('Something went wrong. Please try again later.')
         } finally {
             setIsLoading(false)
@@ -106,7 +104,7 @@ function LoginForm({
         return () => {
             window.removeEventListener('mousedown', handleClickOutside)
         }
-    }, [])
+    }, [handleClickOutside])
 
     return (
         <Card className="w-full md:w-[400px] mx-auto">
@@ -125,8 +123,10 @@ function LoginForm({
                             <Input
                                 id="username"
                                 placeholder="Username"
-                                value={username.toLowerCase()}
-                                onChange={(e) => setUsername(e.target.value)}
+                                value={username}
+                                onChange={(e) =>
+                                    setUsername(e.target.value.toLowerCase())
+                                }
                                 autoComplete="current-username"
                             />
                         </div>

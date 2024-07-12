@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import MainPage from './MainPage'
 import CreateVehicle from './components/vehicles/CreateVehicle'
@@ -11,6 +11,7 @@ import { UserContext } from './UserContext'
 import Garage from './components/vehicles/Garage'
 import { TimerProvider } from './components/timer'
 import ProtectedRoute from './components/ProtectedRoute'
+import { useToast } from '@/components/ui/use-toast'
 
 const API_HOST = import.meta.env.VITE_API_HOST
 
@@ -27,14 +28,43 @@ function App() {
         }
         return null
     })
+    const { toast } = useToast()
 
     useEffect(() => {
-        const token = sessionStorage.getItem('token')
-        const username = sessionStorage.getItem('username')
-        if (token && username && !user) {
-            setUser({ token, username })
+        const checkAuthStatus = async () => {
+            try {
+                const response = await fetch(
+                    `${API_HOST}/api/auth/authenticate`,
+                    {
+                        method: 'GET',
+                        credentials: 'include',
+                    }
+                )
+
+                if (response.ok) {
+                    const data = await response.json()
+                    const { id, username, token } = data
+                    if (token) {
+                        sessionStorage.setItem('token', token)
+                        sessionStorage.setItem('username', username)
+                        setUser({ id, username, token })
+                        toast({
+                            title: 'Authenticated',
+                            description: `Welcome back, ${username}`,
+                        })
+                    } else {
+                        console.warn('Token is missing in the response')
+                    }
+                } else {
+                    console.warn('User is not authenticated')
+                }
+            } catch (error) {
+                console.error('Error during authentication check:', error)
+            }
         }
-    }, [user])
+
+        checkAuthStatus()
+    }, [API_HOST, setUser, toast])
 
     const value = { user, setUser }
     return (

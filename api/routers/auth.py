@@ -7,11 +7,12 @@ from fastapi import (
     Response,
     HTTPException,
     status,
+    Cookie,
 )
 from fastapi.security import OAuth2PasswordRequestForm
 from queries.user_queries import UserQueries
 from models.users import UserRequest, UserResponse
-from queries.accounts import AccountRepo
+from queries.accounts import AccountRepo, AccountLogin
 from utils.exceptions import UserDatabaseException
 from utils.authentication import (
     try_get_jwt_user_data,
@@ -30,30 +31,19 @@ async def signup(
     response: Response,
     queries: UserQueries = Depends(),
 ) -> UserResponse:
-    """
-    Creates a new user when someone submits the signup form
-    """
     new_user.username = new_user.username.lower()
-    # Hash the password the user sent us
     hashed_password = hash_password(new_user.password)
 
-    # Create the user in the database
     try:
         user = queries.create_user(new_user, hashed_password)
     except UserDatabaseException as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    # Generate a JWT token
     token = generate_jwt(user)
-
-    # Convert the UserWithPW to a UserOut
     user_out = UserResponse(**user.model_dump())
 
-    # Secure cookies only if running on something besides localhost
-    secure = True if request.headers.get("origin") == "localhost" else False
-
-    # Set a cookie with the token in it
+    secure = request.url.scheme == "https"
     response.set_cookie(
         key="fast_api_token",
         value=token,
@@ -68,8 +58,8 @@ async def signup(
 async def signin(
     request: Request,
     response: Response,
-    repo: AccountRepo = Depends(),
     form_data: OAuth2PasswordRequestForm = Depends(),
+    repo: AccountRepo = Depends(),
 ) -> dict:
     user = repo.get_single_user(form_data.username)
     if user and verify_password(form_data.password, user.password):
@@ -95,27 +85,13 @@ async def signin(
 @router.get("/authenticate")
 async def authenticate(
     user: UserResponse = Depends(try_get_jwt_user_data),
-) -> UserResponse:
-    """
-    This function returns the user if the user is logged in.
-
-    The `try_get_jwt_user_data` function tries to get the user and validate
-    the JWT
-
-    If the user isn't logged in this returns a 404
-
-    This can be used in your frontend to determine if a user
-    is logged in or not
-    """
+    fast_api_token: str = Cookie(None),
+) -> dict:
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Not logged in"
         )
-
-    # Generate a JWT token
-    token = generate_jwt(user)
-
-    return UserResponse(id=user.id, username=user.username, token=token)
+    return {"id": user.id, "username": user.username, "token": fast_api_token}
 
 
 @router.delete("/signout")
