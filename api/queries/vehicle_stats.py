@@ -124,8 +124,6 @@ class VehicleStatRepository:
                         vehicle.last_wiper_blades_change,
                     ]
 
-                    print("Query:", query)
-                    print("Values:", values)
                     for i, value in enumerate(values):
                         print(f"Value {i}: {value} (Type: {type(value)})")
 
