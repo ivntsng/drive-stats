@@ -29,7 +29,7 @@ export default function VehicleDetail() {
     const { vehicle_id } = useParams()
     const { user, setUser } = useContext(UserContext)
     const [vehicle, setVehicle] = useState(null)
-    const [vehicleStats, setVehicleStats] = useState(null)
+    const [vehicleStats, setVehicleStats] = useState([])
     const [showVehicleDetails, setShowVehicleDetails] = useState(true)
     const API_HOST = import.meta.env.VITE_API_HOST
 
@@ -76,14 +76,52 @@ export default function VehicleDetail() {
     const fetchVehicleStats = async (id, token) => {
         try {
             const response = await axios.get(
-                `${API_HOST}/vehicle_stats/${id}`,
+                `${API_HOST}/vehicle_stats/all/${id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
                 }
             )
-            setVehicleStats(response.data)
+            console.log('Fetched vehicle stats:', response.data) // Logging the fetched data
+
+            const stats = response.data
+                .map((stat) => {
+                    return Object.keys(stat).reduce((acc, key) => {
+                        if (
+                            stat[key] !== 0 &&
+                            key !== 'id' &&
+                            key !== 'vehicle_id' &&
+                            key !== 'last_update_timestamp'
+                        ) {
+                            acc.push({
+                                name: key,
+                                value: stat[key],
+                                last_update_timestamp:
+                                    stat.last_update_timestamp,
+                            })
+                        }
+                        return acc
+                    }, [])
+                })
+                .flat()
+
+            // Create a dictionary to keep only the most recent entry for each type
+            const uniqueStats = stats.reduce((acc, stat) => {
+                if (
+                    !acc[stat.name] ||
+                    new Date(acc[stat.name].last_update_timestamp) <
+                        new Date(stat.last_update_timestamp)
+                ) {
+                    acc[stat.name] = stat
+                }
+                return acc
+            }, {})
+
+            // Convert the dictionary back into an array
+            const filteredStats = Object.values(uniqueStats)
+
+            setVehicleStats(filteredStats)
         } catch (error) {
             console.error(
                 'There was an error fetching the vehicle statistics!',
@@ -211,6 +249,7 @@ export default function VehicleDetail() {
                                 Maintenance Log:
                             </CardTitle>
                             <CardDescription>
+                                Most recent logs for vehicle:{' '}
                                 {vehicle.vehicle_name}
                             </CardDescription>
                         </div>
@@ -241,175 +280,23 @@ export default function VehicleDetail() {
                     <CardContent className="p-6 text-sm">
                         <div className="grid gap-3">
                             <ul className="grid gap-3">
-                                {vehicleStats?.last_oil_change != null &&
-                                    vehicleStats.last_oil_change !== 0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Oil Change:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {vehicleStats.last_oil_change}
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_tire_rotation != null &&
-                                    vehicleStats.last_tire_rotation !== 0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Tire Rotation:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {
-                                                    vehicleStats.last_tire_rotation
-                                                }
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_tire_change != null &&
-                                    vehicleStats.last_tire_change !== 0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Tire Change:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {vehicleStats.last_tire_change}
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_air_filter != null &&
-                                    vehicleStats.last_air_filter !== 0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Air Filter Change:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {vehicleStats.last_air_filter}
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_brake_flush != null &&
-                                    vehicleStats.last_brake_flush !== 0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Brake Flush:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {vehicleStats.last_brake_flush}
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_brake_rotor != null &&
-                                    vehicleStats.last_brake_rotor !== 0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Brake Rotor Change:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {vehicleStats.last_brake_rotor}
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_brake_pad != null &&
-                                    vehicleStats.last_brake_pad !== 0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Brake Pad Change:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {vehicleStats.last_brake_pad}
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_coolant_flush != null &&
-                                    vehicleStats.last_coolant_flush !== 0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Coolant Flush:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {
-                                                    vehicleStats.last_coolant_flush
-                                                }
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_transmission_fluid_flush !=
-                                    null &&
-                                    vehicleStats.last_transmission_fluid_flush !==
-                                        0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Transmission Fluid
-                                                    Flush:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {
-                                                    vehicleStats.last_transmission_fluid_flush
-                                                }
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_cabin_filter_change !=
-                                    null &&
-                                    vehicleStats.last_cabin_filter_change !==
-                                        0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Cabin Filter Change:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {
-                                                    vehicleStats.last_cabin_filter_change
-                                                }
-                                            </span>
-                                        </li>
-                                    )}
-                                {vehicleStats?.last_wiper_blades_change !=
-                                    null &&
-                                    vehicleStats.last_wiper_blades_change !==
-                                        0 && (
-                                        <li className="flex items-center justify-between">
-                                            <span className="text-muted-foreground">
-                                                <strong>
-                                                    Last Wiper Blade Replaced:
-                                                </strong>
-                                            </span>
-                                            <span>
-                                                {
-                                                    vehicleStats.last_wiper_blades_change
-                                                }
-                                            </span>
-                                        </li>
-                                    )}
+                                {vehicleStats.map((stat, index) => (
+                                    <li
+                                        key={index}
+                                        className="flex items-center justify-between"
+                                    >
+                                        <span className="text-muted-foreground">
+                                            <strong>
+                                                {stat.name.replace(/_/g, ' ')}:
+                                            </strong>
+                                        </span>
+                                        <span>{stat.value} miles</span>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
-                        <div className="text-xs text-muted-foreground">
-                            Lastest Update:{' '}
-                            {vehicleStats?.last_update_timestamp ||
-                                'There is no maintenance log available for this vehicle yet - Add one here'}
-                        </div>
                         <Pagination className="ml-auto mr-0 w-auto">
                             <PaginationContent>
                                 <PaginationItem>
