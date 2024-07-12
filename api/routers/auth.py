@@ -1,14 +1,12 @@
-# routers/auth.py
-
 from fastapi import (
     APIRouter,
     Depends,
+    HTTPException,
     Request,
     Response,
-    HTTPException,
     status,
 )
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from queries.user_queries import UserQueries
 from models.users import UserRequest, UserResponse
 from queries.accounts import AccountRepo
@@ -22,6 +20,8 @@ from utils.authentication import (
 
 router = APIRouter(tags=["Authentication"], prefix="/api/auth")
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
+
 
 @router.post("/signup")
 async def signup(
@@ -30,30 +30,19 @@ async def signup(
     response: Response,
     queries: UserQueries = Depends(),
 ) -> UserResponse:
-    """
-    Creates a new user when someone submits the signup form
-    """
     new_user.username = new_user.username.lower()
-    # Hash the password the user sent us
     hashed_password = hash_password(new_user.password)
 
-    # Create the user in the database
     try:
         user = queries.create_user(new_user, hashed_password)
     except UserDatabaseException as e:
         print(e)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    # Generate a JWT token
     token = generate_jwt(user)
-
-    # Convert the UserWithPW to a UserOut
     user_out = UserResponse(**user.model_dump())
 
-    # Secure cookies only if running on something besides localhost
-    secure = True if request.headers.get("origin") == "localhost" else False
-
-    # Set a cookie with the token in it
+    secure = request.url.scheme == "https"
     response.set_cookie(
         key="fast_api_token",
         value=token,
@@ -68,8 +57,8 @@ async def signup(
 async def signin(
     request: Request,
     response: Response,
-    repo: AccountRepo = Depends(),
     form_data: OAuth2PasswordRequestForm = Depends(),
+    repo: AccountRepo = Depends(),
 ) -> dict:
     user = repo.get_single_user(form_data.username)
     if user and verify_password(form_data.password, user.password):
@@ -92,30 +81,32 @@ async def signin(
         )
 
 
+@router.post("/token")
+async def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    repo: AccountRepo = Depends(),
+):
+    user = repo.get_single_user(form_data.username)
+    if not user or not verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    token = generate_jwt(user)
+    return {"id": user.id, "access_token": token, "token_type": "bearer"}
+
+
 @router.get("/authenticate")
 async def authenticate(
+    token: str = Depends(oauth2_scheme),
     user: UserResponse = Depends(try_get_jwt_user_data),
 ) -> UserResponse:
-    """
-    This function returns the user if the user is logged in.
-
-    The `try_get_jwt_user_data` function tries to get the user and validate
-    the JWT
-
-    If the user isn't logged in this returns a 404
-
-    This can be used in your frontend to determine if a user
-    is logged in or not
-    """
     if not user:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Not logged in"
         )
-
-    # Generate a JWT token
-    token = generate_jwt(user)
-
-    return UserResponse(id=user.id, username=user.username, token=token)
+    return {"id": user.id, "username": user.username, "token": token}
 
 
 @router.delete("/signout")
@@ -123,18 +114,8 @@ async def signout(
     request: Request,
     response: Response,
 ):
-    """
-    Signs the user out by deleting their JWT Cookie
-    """
-    # Secure cookies only if running on something besides localhost
-    secure = True if request.headers.get("origin") == "localhost" else False
-
-    # Delete the cookie
+    secure = request.url.scheme == "https"
     response.delete_cookie(
         key="fast_api_token", httponly=True, samesite="lax", secure=secure
     )
-
-    # There's no need to return anything in the response.
-    # All that has to happen is the cookie header must come back
-    # Which causes the browser to delete the cookie
     return {"message": "Successfully logged out"}

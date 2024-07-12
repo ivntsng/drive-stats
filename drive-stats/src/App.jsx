@@ -11,6 +11,7 @@ import { UserContext } from './UserContext'
 import Garage from './components/vehicles/Garage'
 import { TimerProvider } from './components/timer'
 import ProtectedRoute from './components/ProtectedRoute'
+import axios from 'axios'
 
 const API_HOST = import.meta.env.VITE_API_HOST
 
@@ -30,11 +31,23 @@ function App() {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token')
-        const username = sessionStorage.getItem('username')
-        if (token && username && !user) {
-            setUser({ token, username })
+        if (token) {
+            axios
+                .get(`${API_HOST}/api/auth/authenticate`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    withCredentials: true,
+                })
+                .then((response) => {
+                    setUser(response.data)
+                })
+                .catch((error) => {
+                    console.error('User re-authentication failed:', error)
+                    setUser(null)
+                })
         }
-    }, [user])
+    }, [])
 
     const value = { user, setUser }
     return (

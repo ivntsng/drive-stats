@@ -9,20 +9,27 @@ const ProtectedRoute = ({ element }) => {
 
     useEffect(() => {
         const checkAuth = async () => {
+            const token = sessionStorage.getItem('token')
+            if (!token) {
+                setIsAuthenticated(false)
+                setIsLoading(false)
+                return
+            }
+
             try {
                 const response = await fetch(
                     `${import.meta.env.VITE_API_HOST}/api/auth/authenticate`,
                     {
                         method: 'GET',
                         headers: {
-                            Authorization: `Bearer ${user?.token}`,
+                            Authorization: `Bearer ${token}`,
                         },
                     }
                 )
 
                 if (response.ok) {
                     const data = await response.json()
-                    setUser({ ...user, ...data })
+                    setUser({ ...user, ...data, token })
                     setIsAuthenticated(true)
                 } else {
                     setIsAuthenticated(false)
@@ -35,17 +42,8 @@ const ProtectedRoute = ({ element }) => {
             }
         }
 
-        if (user && !isAuthenticated) {
-            checkAuth()
-        } else if (!user) {
-            setIsLoading(false)
-        } else {
-            setIsLoading(false)
-            setIsAuthenticated(true)
-        }
-    }, [user, setUser, isAuthenticated])
-
-    useEffect(() => {}, [isAuthenticated])
+        checkAuth()
+    }, [setUser])
 
     if (isLoading) {
         return <div>Loading...</div>

@@ -5,7 +5,6 @@ from fastapi.security import OAuth2PasswordBearer
 from typing import Annotated
 import os
 
-
 app = FastAPI()
 
 app.include_router(vehicles.router)
@@ -14,9 +13,14 @@ app.include_router(accounts.router)
 app.include_router(auth.router)
 app.include_router(bug_reports.router)
 
+# Set CORS origins to allow specific frontend hosts
+origins = [
+    os.environ.get("CORS_HOST", "http://localhost:5173"),
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.environ.get("CORS_HOST", "http://localhost:5173")],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

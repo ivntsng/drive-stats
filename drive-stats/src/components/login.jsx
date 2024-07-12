@@ -50,35 +50,34 @@ function LoginForm({
             formData.append('username', username)
             formData.append('password', password)
 
-            const response = await fetch(`${API_HOST}/api/auth/signin`, {
+            const response = await fetch(`${API_HOST}/api/auth/token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: formData.toString(),
-                credentials: 'include', // Include credentials in the request
             })
 
             if (response.ok) {
-                setUsername('')
-                setPassword('')
                 const data = await response.json()
-                const { token, username } = data
-                sessionStorage.setItem('token', token)
-                sessionStorage.setItem('username', username)
-                setUser({ username, token })
+                const { access_token } = data
+                console.log('Login successful. Received token:', access_token)
+                sessionStorage.setItem('token', access_token)
+                setUser({ username, token: access_token })
                 closeLoginForm()
                 navigate('vehicles/garage')
                 toast({
                     title: 'Logged In',
                     description: `Welcome back, ${username}`,
                 })
-                startLogoutTimer() // Start the logout timer on successful login
+                startLogoutTimer()
             } else {
+                const errorText = await response.text()
+                console.error('Login failed:', errorText)
                 setError('Wrong username or password.')
             }
         } catch (error) {
-            console.error('Error: ', error)
+            console.error('Error during login:', error)
             setError('Something went wrong. Please try again later.')
         } finally {
             setIsLoading(false)
@@ -106,7 +105,7 @@ function LoginForm({
         return () => {
             window.removeEventListener('mousedown', handleClickOutside)
         }
-    }, [])
+    }, [handleClickOutside])
 
     return (
         <Card className="w-full md:w-[400px] mx-auto">
@@ -125,8 +124,10 @@ function LoginForm({
                             <Input
                                 id="username"
                                 placeholder="Username"
-                                value={username.toLowerCase()}
-                                onChange={(e) => setUsername(e.target.value)}
+                                value={username}
+                                onChange={(e) =>
+                                    setUsername(e.target.value.toLowerCase())
+                                }
                                 autoComplete="current-username"
                             />
                         </div>
