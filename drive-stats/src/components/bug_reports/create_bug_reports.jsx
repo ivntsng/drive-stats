@@ -18,9 +18,11 @@ import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useNavigate } from 'react-router-dom'
+import { UserContext } from '../../UserContext'
 
 export default function CreateBugReportForm() {
     const { toast } = useToast()
+    const { user } = useContext(UserContext)
     const formRef = useRef(null)
     const [formData, setFormData] = useState({
         bug_title: '',
@@ -69,6 +71,7 @@ export default function CreateBugReportForm() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user?.token}`,
                 },
                 body: JSON.stringify(formData),
                 credentials: 'include',
