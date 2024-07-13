@@ -48,8 +48,6 @@ async def try_get_jwt_user_data(
     if not payload:
         print("JWT token decoding failed or payload is empty.")
         return None
-
-    print(f"JWT token successfully decoded. Payload: {payload}")
     return payload.user
 
 
