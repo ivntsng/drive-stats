@@ -79,10 +79,18 @@ function NavBar() {
                                                                 : 'Loading...'}
                                                         </div>
                                                         <p className="text-sm leading-tight text-muted-foreground">
-                                                            View your garage
+                                                            Account Settings
                                                         </p>
                                                     </a>
                                                 </NavigationMenuLink>
+                                            </li>
+                                            <li>
+                                                <a
+                                                    className="text-blue-500"
+                                                    href="/vehicles/garage"
+                                                >
+                                                    Garage
+                                                </a>
                                             </li>
                                             <li>
                                                 <a

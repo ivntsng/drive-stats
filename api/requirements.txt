@@ -53,3 +53,4 @@ pytz==2024.1
 PyJWT==2.8.0
 pre-commit
 flake8
+passlib

@@ -13,6 +13,7 @@ from queries.accounts import (
     AccountRepo,
     CheckAccountOut,
     CheckEmail,
+    UpdatePasswordIn,
 )
 from typing import Optional
 from dotenv import load_dotenv
@@ -38,7 +39,6 @@ API_HOST = os.getenv("VITE_API_HOST", "").strip().lower().rstrip("/")
 def verify_api_host(request: Request):
     host = request.headers.get("host", "").strip().lower().rstrip("/")
     expected_host = API_HOST
-    print(f"Host header: {host}, Expected: {expected_host}")
     if host != expected_host:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Access Forbidden"
@@ -92,6 +92,23 @@ def check_user_email(
         return current_email
     else:
         raise HTTPException(status_code=500, detail="Email does not exist!")
+
+
+@router.put(
+    "/account/update-password",
+    response_model=Optional[AccountOut],
+    dependencies=[Depends(verify_api_host), Depends(try_get_jwt_user_data)],
+)
+async def update_password(
+    update_password_data: UpdatePasswordIn,
+    repo: AccountRepo = Depends(),
+):
+    updated_account = repo.update_user_password(
+        username=update_password_data.username,
+        old_password=update_password_data.old_password,
+        new_password=update_password_data.new_password,
+    )
+    return updated_account
 
 
 def is_token_blacklisted(token: str):
