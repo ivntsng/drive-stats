@@ -52,34 +52,6 @@ async def signup(
     return user_out
 
 
-@router.post("/signin")
-async def signin(
-    request: Request,
-    response: Response,
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    repo: AccountRepo = Depends(),
-) -> dict:
-    user = repo.get_single_user(form_data.username)
-    if user and verify_password(form_data.password, user.password):
-        token = generate_jwt(user)
-        secure = request.url.scheme == "https"
-
-        response.set_cookie(
-            key="fast_api_token",
-            value=token,
-            httponly=True,
-            samesite="lax",
-            secure=secure,
-        )
-
-        return {"username": user.username, "token": token}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-        )
-
-
 @router.post("/token")
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
