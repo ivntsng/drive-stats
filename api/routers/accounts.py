@@ -105,7 +105,7 @@ async def update_password(
 ):
     updated_account = repo.update_user_password(
         username=update_password_data.username,
-        old_password=update_password_data.old_password,
+        current_password=update_password_data.current_password,
         new_password=update_password_data.new_password,
     )
     return updated_account

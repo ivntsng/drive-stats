@@ -5,6 +5,7 @@ import CreateVehicle from './components/vehicles/CreateVehicle'
 import VehicleDetail from './components/vehicles/VehicleDetail'
 import VehicleStat from './components/vehicle_stats/CreateStatLog'
 import CreateBugReportForm from './components/bug_reports/create_bug_reports'
+import MyAccount from './components/accounts/myAccount'
 import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
 import { UserContext } from './UserContext'
@@ -94,6 +95,14 @@ function App() {
                                     element={
                                         <ProtectedRoute
                                             element={<CreateBugReportForm />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/accounts/settings"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<MyAccount />}
                                         />
                                     }
                                 />

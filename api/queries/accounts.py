@@ -44,7 +44,7 @@ class DuplicateAccountError(ValueError):
 
 class UpdatePasswordIn(BaseModel):
     username: str
-    old_password: str
+    current_password: str
     new_password: str
 
 
@@ -165,7 +165,7 @@ class AccountRepo:
                     return None
 
     def update_user_password(
-        self, username: str, old_password: str, new_password: str
+        self, username: str, current_password: str, new_password: str
     ) -> Optional[AccountOut]:
         try:
             with pool.connection() as conn:
@@ -182,7 +182,7 @@ class AccountRepo:
                     if result:
                         user_id, current_hashed_password = result
                         if not pwd_context.verify(
-                            old_password, current_hashed_password
+                            current_password, current_hashed_password
                         ):
                             raise HTTPException(
                                 status_code=403, detail="Invalid old password."

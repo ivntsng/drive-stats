@@ -24,6 +24,7 @@ class UserResponse(BaseModel):
     id: int
     username: str
     token: Optional[str] = None
+    email: Optional[EmailStr]
 
 
 class UserWithPw(BaseModel):
