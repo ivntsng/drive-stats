@@ -11,6 +11,8 @@ from queries.vehicles import VehicleIn, VehicleRepository, VehicleOut, Error
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
+from config import verify_api_host, oauth2_scheme
+
 
 tags_metadata = [
     {
@@ -20,10 +22,12 @@ tags_metadata = [
 ]
 router = APIRouter(tags=["Vehicles"])
 
-ADMIN_ID = "1"
 
-
-@router.post("/vehicles", response_model=Union[VehicleOut, Error])
+@router.post(
+    "/vehicles",
+    response_model=Union[VehicleOut, Error],
+    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+)
 def create_vehicle(
     vehicle: VehicleIn,
     repo: VehicleRepository = Depends(),
@@ -51,7 +55,11 @@ def create_vehicle(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/vehicles/{vehicle_id}", response_model=VehicleOut)
+@router.get(
+    "/vehicles/{vehicle_id}",
+    response_model=VehicleOut,
+    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+)
 async def get_vehicle_by_id(
     response: Response,
     vehicle_id: int,
@@ -71,7 +79,11 @@ async def get_vehicle_by_id(
     return vehicle
 
 
-@router.get("/vehicles", response_model=Union[List[VehicleOut], Error])
+@router.get(
+    "/vehicles",
+    response_model=Union[List[VehicleOut], Error],
+    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+)
 def list_vehicles(
     repo: VehicleRepository = Depends(),
     current_user: JWTUserData = Depends(try_get_jwt_user_data),
@@ -86,7 +98,11 @@ def list_vehicles(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.put("/vehicles/{vehicle_id}", response_model=Union[VehicleOut, Error])
+@router.put(
+    "/vehicles/{vehicle_id}",
+    response_model=Union[VehicleOut, Error],
+    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+)
 async def update_vehicle(
     response: Response,
     vehicle_id: int,
@@ -116,7 +132,9 @@ async def update_vehicle(
 
 
 @router.delete(
-    "/vehicles/{vehicle_id}", response_model=Union[VehicleOut, Error]
+    "/vehicles/{vehicle_id}",
+    response_model=Union[VehicleOut, Error],
+    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
 async def delete_vehicle(
     response: Response,
@@ -143,7 +161,11 @@ async def delete_vehicle(
         )
 
 
-@router.get("/vehicles/user/{user_id}", response_model=List[VehicleOut])
+@router.get(
+    "/vehicles/user/{user_id}",
+    response_model=List[VehicleOut],
+    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+)
 async def get_vehicles_by_user_id(
     request: Request,
     response: Response,

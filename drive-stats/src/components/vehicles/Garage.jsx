@@ -79,8 +79,8 @@ export default function Garage() {
                         <TableCaption className="text-center">
                             {vehicles.length === 0 ? (
                                 <>
-                                    You don't have any vehicles registered,
-                                    register your vehicle{' '}
+                                    Your garage is empty! Register your first
+                                    vehicle{' '}
                                     <a
                                         href="/vehicles/register"
                                         style={{

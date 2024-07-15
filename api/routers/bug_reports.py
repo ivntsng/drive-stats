@@ -4,6 +4,7 @@ from queries.bug_reports import BugReportIn, BugReportOut, BugQueries, Error
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
+from config import oauth2_scheme, verify_api_host
 
 tags_metadata = [
     {
@@ -15,7 +16,11 @@ tags_metadata = [
 router = APIRouter(tags=["Bug Reports"])
 
 
-@router.post("/bug_report", response_model=Union[BugReportOut, Error])
+@router.post(
+    "/bug_report",
+    response_model=Union[BugReportOut, Error],
+    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+)
 def create_bug_report(
     bug_report: BugReportIn,
     repo: BugQueries = Depends(),

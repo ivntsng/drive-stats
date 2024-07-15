@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from queries.user_queries import UserQueries
 from models.users import UserRequest, UserResponse
 from queries.accounts import AccountRepo
+from config import oauth2_scheme
 from utils.exceptions import UserDatabaseException
 from utils.authentication import (
     try_get_jwt_user_data,
@@ -19,8 +20,6 @@ from utils.authentication import (
 )
 
 router = APIRouter(tags=["Authentication"], prefix="/api/auth")
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 
 @router.post("/signup")
