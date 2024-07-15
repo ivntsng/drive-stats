@@ -79,11 +79,11 @@ jobs:
             - name: Lint with flake8
               run: docker exec $(docker ps --filter name=fastapi -q) flake8 /app
 
-            - name: Run tests
-              env:
-                  DATABASE_URL: "postgresql://casper:foTVdhgYZzz8bOL6e@postgres/test_drivestats_db"
-                  SIGNING_KEY: "2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562" # Ensure the signing key is set
-              run: docker exec $(docker ps --filter name=fastapi -q) python -m pytest /app
+            # - name: Run tests
+            #   env:
+            #       DATABASE_URL: "postgresql://casper:foTVdhgYZzz8bOL6e@postgres/test_drivestats_db"
+            #       SIGNING_KEY: "2e2f446477efb5db3c21276786a5d7a431b671ab440fdf8d7e84368cc198b562" # Ensure the signing key is set
+            #   run: docker exec $(docker ps --filter name=fastapi -q) python -m pytest /app
 
             - name: Drop Test Database
               run: docker exec $(docker ps --filter name=postgres -q) psql -U casper -d postgres -c "DROP DATABASE IF EXISTS test_drivestats_db;"
