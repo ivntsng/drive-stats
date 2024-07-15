@@ -10,6 +10,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from queries.user_queries import UserQueries
 from models.users import UserRequest, UserResponse
 from queries.accounts import AccountRepo
+from config import oauth2_scheme
 from utils.exceptions import UserDatabaseException
 from utils.authentication import (
     try_get_jwt_user_data,
@@ -19,8 +20,6 @@ from utils.authentication import (
 )
 
 router = APIRouter(tags=["Authentication"], prefix="/api/auth")
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
 
 
 @router.post("/signup")
@@ -51,34 +50,6 @@ async def signup(
         secure=secure,
     )
     return user_out
-
-
-@router.post("/signin")
-async def signin(
-    request: Request,
-    response: Response,
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    repo: AccountRepo = Depends(),
-) -> dict:
-    user = repo.get_single_user(form_data.username)
-    if user and verify_password(form_data.password, user.password):
-        token = generate_jwt(user)
-        secure = request.url.scheme == "https"
-
-        response.set_cookie(
-            key="fast_api_token",
-            value=token,
-            httponly=True,
-            samesite="lax",
-            secure=secure,
-        )
-
-        return {"username": user.username, "token": token}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-        )
 
 
 @router.post("/token")
