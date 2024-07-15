@@ -106,7 +106,12 @@ async def authenticate(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Not logged in"
         )
-    return {"id": user.id, "username": user.username, "token": token}
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "token": token,
+    }
 
 
 @router.delete("/signout")
