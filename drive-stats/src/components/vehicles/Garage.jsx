@@ -111,7 +111,7 @@ export default function Garage() {
                                     Model
                                 </TableHead>
                                 <TableHead className="text-center font-bold">
-                                    Maintenance Logs
+                                    Full Maintenance Log
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -133,7 +133,9 @@ export default function Garage() {
                                         {vehicle.model}
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        Feature In Progress
+                                        <span style={{ color: 'red' }}>
+                                            (Feature In Development)
+                                        </span>
                                     </TableCell>
                                 </TableRow>
                             ))}
