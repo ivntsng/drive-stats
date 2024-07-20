@@ -16,6 +16,8 @@ app.include_router(bug_reports.router)
 # Set CORS origins to allow specific frontend hosts
 origins = [
     os.environ.get("CORS_HOST", "http://localhost:5173"),
+    "http://localhost:80",
+    "http://localhost",
 ]
 
 app.add_middleware(
