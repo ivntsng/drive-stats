@@ -1,38 +1,38 @@
 version: "3.8"
 
 services:
-    postgres:
-        image: postgres:16.2
-        environment:
-            POSTGRES_DB: drivestats_db
-            POSTGRES_USER: casper
-            POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
-        volumes:
-            - drive-statsDB:/var/lib/postgresql/data
+  postgres:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: drivestats_db
+      POSTGRES_USER: casper
+      POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
+    volumes:
+      - drive-statsDB:/var/lib/postgresql/data
 
-    flyway:
-        image: flyway/flyway
-        command: -url=jdbc:postgresql://postgres:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/sql migrate
-        volumes:
-            - ./api/sql:/flyway/sql
-        depends_on:
-            - postgres
+  flyway:
+    image: flyway/flyway
+    command: -url=jdbc:postgresql://postgres:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/flyway/sql migrate
+    volumes:
+      - ./api/sql:/flyway/sql
+    depends_on:
+      - postgres
 
-    backend:
-        build:
-            context: ./api
-            dockerfile: Dockerfile.prod
-        environment:
-            SIGNING_KEY: 06b261ced90b876af6e6e5834da0ca740f5b1e2e432988f129cab2eb95dcb11d
-            algorithm: HS256
-            VITE_API_HOST: http://18.144.80.250:8000  # Backend EC2 IP
-            CORS_HOST: http://54.193.45.102  # Frontend EC2 IP
-            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres:5432/drivestats_db
-        ports:
-            - "8000:8000"
-        depends_on:
-            - postgres
-            - flyway
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    environment:
+      SIGNING_KEY: 06b261ced90b876af6e6e5834da0ca740f5b1e2e432988f129cab2eb95dcb11d
+      ALGORITHM: HS256
+      VITE_API_HOST: http://18.144.80.250:8000  # Backend EC2 IP
+      CORS_HOST: http://54.193.45.102  # Frontend EC2 IP
+      DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres:5432/drivestats_db
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+      - flyway
 
 volumes:
-    drive-statsDB:
+  drive-statsDB:
