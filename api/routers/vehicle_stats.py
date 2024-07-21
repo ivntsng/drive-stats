@@ -7,6 +7,9 @@ from queries.vehicle_stats import (
 )
 from pydantic import ValidationError, BaseModel
 from config import oauth2_scheme, verify_api_host
+from models.jwt import JWTUserData
+from utils.authentication import try_get_jwt_user_data
+
 
 tags_metadata = [
     {
@@ -31,7 +34,10 @@ def create_vehicle_stat(
     vehicle: VehicleStatIn,
     response: Response,
     repo: VehicleStatRepository = Depends(),
+    current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ):
+    if not current_user:
+        return HTTPException(status_code=401, detail="Unauthorized")
     try:
         create_vehicle_stat = repo.create_vehicle_stat(vehicle)
         if create_vehicle_stat:
