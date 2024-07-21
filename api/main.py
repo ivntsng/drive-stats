@@ -1,8 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from routers import vehicles, vehicle_stats, accounts, auth, bug_reports
-from fastapi.security import OAuth2PasswordBearer
-from typing import Annotated
 import os
 
 app = FastAPI()
@@ -15,7 +13,11 @@ app.include_router(bug_reports.router)
 
 # Set CORS origins to allow specific frontend hosts
 origins = [
-    os.environ.get("CORS_HOST", "http://localhost:5173"),
+    "http://54.193.45.102",  # Frontend EC2 IP
+    "http://18.144.80.250",  # Backend EC2 IP (if needed)
+    "http://localhost:5173",  # Local development
+    "http://localhost",
+    "http://localhost:8000",
 ]
 
 app.add_middleware(
@@ -26,11 +28,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the DriveStats API"}
-
 
 @app.get("/health")
 def health_check():

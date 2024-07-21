@@ -39,8 +39,6 @@ class DuplicateAccountError(Exception):
     response_model=Optional[AccountOut],
     dependencies=[
         Depends(verify_api_host),
-        Depends(try_get_jwt_user_data),
-        Depends(oauth2_scheme),
     ],
 )
 def get_single_user(
@@ -60,8 +58,6 @@ def get_single_user(
     response_model=Optional[CheckAccountOut],
     dependencies=[
         Depends(verify_api_host),
-        Depends(try_get_jwt_user_data),
-        Depends(oauth2_scheme),
     ],
 )
 def check_single_user(
@@ -80,8 +76,6 @@ def check_single_user(
     response_model=Optional[CheckEmail],
     dependencies=[
         Depends(verify_api_host),
-        Depends(try_get_jwt_user_data),
-        Depends(oauth2_scheme),
     ],
 )
 def check_user_email(
