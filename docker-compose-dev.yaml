@@ -34,5 +34,13 @@ services:
             - postgres
             - flyway
 
+    frontend:
+        build:
+            context: ./drive-stats
+            dockerfile: Dockerfile.dev
+        ports:
+            - "80:80"
+            - "443:443"
+
 volumes:
     drive-statsDB:

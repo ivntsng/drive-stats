@@ -32,7 +32,7 @@ COPY assets /usr/share/nginx/html/assets
 COPY self-signed-cert/selfsigned.crt /etc/nginx/conf.d/selfsigned.crt
 COPY self-signed-cert/selfsigned.key /etc/nginx/conf.d/selfsigned.key
 
-# Expose port 80 and 443
+# Expose ports 80 and 443
 EXPOSE 80 443
 
 # Start nginx
