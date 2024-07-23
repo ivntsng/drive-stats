@@ -15,9 +15,9 @@ app.include_router(bug_reports.router)
 origins = [
     "http://54.193.45.102",  # Frontend EC2 IP
     "http://18.144.80.250",  # Backend EC2 IP (if needed)
-    "http://localhost:5173",  # Local development
-    "http://localhost",
-    "http://localhost:8000",
+    "https://localhost:5173",  # Local development
+    "https://localhost",
+    "https://localhost:8000",
 ]
 
 app.add_middleware(
@@ -28,9 +28,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the DriveStats API"}
+
 
 @app.get("/health")
 def health_check():
