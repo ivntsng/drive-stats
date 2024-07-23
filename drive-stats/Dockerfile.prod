@@ -27,8 +27,12 @@ COPY assets /usr/share/nginx/html/assets
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose port 80
-EXPOSE 80
+# Copy SSL certificates
+COPY ssl/fullchain.pem /etc/nginx/conf.d/fullchain.pem
+COPY ssl/privkey.pem /etc/nginx/conf.d/privkey.pem
+
+# Expose port 8080 and 443
+EXPOSE 8080 443
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

@@ -112,6 +112,7 @@ export default function VehicleStat() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+			Authorization: `Bearer ${user?.token}`,
                     },
                     body: JSON.stringify(processedFormData),
                     credentials: 'include',
