@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from fastapi import Cookie, Header
 from jose import JWTError, jwt
 from jose.constants import ALGORITHMS
-from typing import Annotated, Optional
+from typing import Annotated, Optional, Union
 from models.jwt import JWTPayload, JWTUserData
 
 from queries.user_queries import UserWithPw
@@ -32,8 +32,8 @@ async def decode_jwt(token: str) -> Optional[JWTPayload]:
 
 
 async def try_get_jwt_user_data(
-    fast_api_token: Annotated[str | None, Cookie()] = None,
-    authorization: Annotated[str | None, Header()] = None,
+    fast_api_token: Annotated[Optional[str], Cookie()] = None,
+    authorization: Annotated[Optional[str], Header()] = None,
 ) -> Optional[JWTUserData]:
     token = fast_api_token
     if not token and authorization:
