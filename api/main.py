@@ -1,11 +1,19 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Security, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyHeader
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv(".env")
 
 app = FastAPI()
 
 origins = [
     "https://drivestatsapp.com",  # Frontend URL
     "https://www.drivestatsapp.com",
+    "http://localhost",
 ]
 
 app.add_middleware(
@@ -15,6 +23,36 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+API_KEY = os.getenv("API_KEY")
+if not API_KEY:
+    raise ValueError("API_KEY environment variable not set")
+
+API_KEY_NAME = "access_token"
+api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
+
+
+async def get_api_key(api_key_header: str = Security(api_key_header)):
+    if api_key_header != API_KEY:
+        raise HTTPException(
+            status_code=403, detail="Could not validate credentials"
+        )
+    return api_key_header
+
+
+@app.get("/secure-endpoint")
+async def secure_endpoint(api_key: str = Depends(get_api_key)):
+    return {"message": "This is a secure endpoint"}
+
+
+@app.get("/docs", include_in_schema=False)
+async def get_swagger_documentation(api_key: str = Depends(get_api_key)):
+    return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
+
+
+@app.get("/redoc", include_in_schema=False)
+async def get_redoc_documentation(api_key: str = Depends(get_api_key)):
+    return get_redoc_html(openapi_url="/openapi.json", title="docs")
 
 
 @app.get("/")
