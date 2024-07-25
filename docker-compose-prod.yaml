@@ -12,7 +12,7 @@ services:
 
     flyway:
         image: flyway/flyway
-        command: -url=jdbc:postgresql://postgres:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/sql migrate
+        command: -url=jdbc:postgresql://postgres:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/flyway/sql migrate
         volumes:
             - ./api/sql:/flyway/sql
         depends_on:
@@ -29,7 +29,7 @@ services:
             CORS_HOST: https://drivestatsapp.com
             DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres:5432/drivestats_db
         ports:
-            - "8000:8000"
+            - "443:443"
         depends_on:
             - postgres
             - flyway
