@@ -1,23 +1,11 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import vehicles, vehicle_stats, accounts, auth, bug_reports
-import os
 
 app = FastAPI()
 
-app.include_router(vehicles.router)
-app.include_router(vehicle_stats.router)
-app.include_router(accounts.router)
-app.include_router(auth.router)
-app.include_router(bug_reports.router)
-
-# Set CORS origins to allow specific frontend hosts
 origins = [
-    "http://54.193.45.102",  # Frontend EC2 IP
-    "http://18.144.80.250",  # Backend EC2 IP (if needed)
-    "http://localhost:5173",  # Local development
-    "http://localhost",
-    "http://localhost:8000",
+    "https://drivestatsapp.com",  # Frontend URL
+    "https://www.drivestatsapp.com",
 ]
 
 app.add_middleware(
@@ -30,8 +18,13 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the DriveStats API"}
+    return {"Hello": "World"}
 
-@app.get("/health")
-def health_check():
-    return {"status": "ok"}
+# Include your routers here
+from routers import vehicles, vehicle_stats, accounts, auth, bug_reports
+
+app.include_router(vehicles.router)
+app.include_router(vehicle_stats.router)
+app.include_router(accounts.router)
+app.include_router(auth.router)
+app.include_router(bug_reports.router)
