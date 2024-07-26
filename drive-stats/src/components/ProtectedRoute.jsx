@@ -1,11 +1,13 @@
 import React, { useContext, useState, useEffect } from 'react'
 import { Navigate } from 'react-router-dom'
 import { UserContext } from '../UserContext'
+import { useToast } from '@/components/ui/use-toast'
 
 const ProtectedRoute = ({ element }) => {
     const { user, setUser } = useContext(UserContext)
     const [isLoading, setIsLoading] = useState(true)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
+    const { toast } = useToast()
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -13,6 +15,10 @@ const ProtectedRoute = ({ element }) => {
             if (!token) {
                 setIsAuthenticated(false)
                 setIsLoading(false)
+                toast({
+                    title: 'Unauthorized',
+                    description: 'Please login to access this page.',
+                })
                 return
             }
 
@@ -43,7 +49,7 @@ const ProtectedRoute = ({ element }) => {
         }
 
         checkAuth()
-    }, [setUser])
+    }, [setUser, toast, user])
 
     if (isLoading) {
         return <div>Loading...</div>

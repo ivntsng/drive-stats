@@ -83,7 +83,6 @@ export default function VehicleDetail() {
                     },
                 }
             )
-            console.log('Fetched vehicle stats:', response.data) // Logging the fetched data
 
             const stats = response.data
                 .map((stat) => {
