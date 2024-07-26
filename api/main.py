@@ -9,7 +9,7 @@ from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from pydantic_settings import BaseSettings
 import os
 
-load_dotenv(".env")
+load_dotenv(".env.production")
 
 
 class Settings(BaseSettings):
