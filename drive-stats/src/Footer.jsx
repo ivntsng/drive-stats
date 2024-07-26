@@ -51,7 +51,7 @@ function Footer() {
                             <p>
                                 <a
                                     className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="#"
+                                    href="https://ivntsng.github.io/ivntsng/"
                                 >
                                     About Us
                                 </a>
@@ -91,7 +91,7 @@ function Footer() {
                                         type="text"
                                         id="hero-input"
                                         name="hero-input"
-                                        className="py-3 px-4 block w-full border-transparent shadow-sm rounded-md focus:z-10 focus:border-blue-500 focus:ring-blue-500"
+                                        className="py-3 px-4 block w-full border-transparent shadow-sm rounded-md focus:z-10 focus:border-blue-500 focus:ring-blue-500 text-black"
                                         placeholder="Enter your email"
                                         defaultValue=""
                                     ></input>
