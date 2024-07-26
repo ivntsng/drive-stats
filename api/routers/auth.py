@@ -11,6 +11,7 @@ from queries.user_queries import UserQueries
 from models.users import UserRequest, UserResponse
 from queries.accounts import AccountRepo
 from config import oauth2_scheme
+from main import limiter
 from utils.exceptions import UserDatabaseException
 from utils.authentication import (
     try_get_jwt_user_data,
@@ -23,6 +24,7 @@ router = APIRouter(tags=["Authentication"], prefix="/api/auth")
 
 
 @router.post("/signup")
+@limiter.limit("2/minute")
 async def signup(
     new_user: UserRequest,
     request: Request,

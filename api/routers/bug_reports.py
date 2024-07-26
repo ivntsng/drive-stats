@@ -1,10 +1,18 @@
-from fastapi import APIRouter, Depends, Response, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    Response,
+    HTTPException,
+    status,
+    Request,
+)
 from typing import Union, List
 from queries.bug_reports import BugReportIn, BugReportOut, BugQueries, Error
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
 from config import oauth2_scheme, verify_api_host
+from main import limiter
 
 tags_metadata = [
     {
@@ -21,7 +29,9 @@ router = APIRouter(tags=["Bug Reports"])
     response_model=Union[BugReportOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("3/minute")
 def create_bug_report(
+    request: Request,
     bug_report: BugReportIn,
     repo: BugQueries = Depends(),
     current_user: JWTUserData = Depends(try_get_jwt_user_data),

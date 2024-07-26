@@ -6,11 +6,19 @@ from slowapi.errors import RateLimitExceeded
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from pydantic_settings import BaseSettings
 import os
 
 load_dotenv(".env")
 
-app = FastAPI()
+
+class Settings(BaseSettings):
+    openapi_url: str = ""
+
+
+settings = Settings()
+
+app = FastAPI(openapi_url=settings.openapi_url)
 
 # Set allowed origins
 origins = [

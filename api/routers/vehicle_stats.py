@@ -1,4 +1,11 @@
-from fastapi import APIRouter, Depends, Response, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    Response,
+    HTTPException,
+    status,
+    Request,
+)
 from typing import Union, List
 from queries.vehicle_stats import (
     VehicleStatIn,
@@ -9,6 +16,7 @@ from pydantic import ValidationError, BaseModel
 from config import oauth2_scheme, verify_api_host
 from models.jwt import JWTUserData
 from utils.authentication import try_get_jwt_user_data
+from main import limiter
 
 
 tags_metadata = [
@@ -30,7 +38,9 @@ class Error(BaseModel):
     response_model=Union[VehicleStatOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("5/minute")
 def create_vehicle_stat(
+    request: Request,
     vehicle: VehicleStatIn,
     response: Response,
     repo: VehicleStatRepository = Depends(),
@@ -58,7 +68,9 @@ def create_vehicle_stat(
     response_model=Union[VehicleStatOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("20/minute")
 async def get_vehicle_stat_by_id(
+    request: Request,
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleStatRepository = Depends(),
@@ -96,7 +108,9 @@ async def get_vehicle_stat_by_id(
     response_model=List[VehicleStatOut] | None,
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("20/minute")
 async def get_all_vehicles_stat_by_id(
+    request: Request,
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleStatRepository = Depends(),
