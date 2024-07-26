@@ -1,19 +1,23 @@
-from fastapi import FastAPI, HTTPException, Security, Depends
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, Request, HTTPException, Depends, Security
 from fastapi.security.api_key import APIKeyHeader
-from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 import os
-
 
 load_dotenv(".env")
 
 app = FastAPI()
 
+# Set allowed origins
 origins = [
-    "https://drivestatsapp.com",  # Frontend URL
+    "https://drivestatsapp.com",
     "https://www.drivestatsapp.com",
-    "http://localhost",
+    "https://localhost",
+    "https://localhost:8000",
 ]
 
 app.add_middleware(
@@ -23,6 +27,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 API_KEY = os.getenv("API_KEY")
 if not API_KEY:
@@ -41,23 +49,27 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
 
 
 @app.get("/secure-endpoint")
-async def secure_endpoint(api_key: str = Depends(get_api_key)):
-    return {"message": "This is a secure endpoint"}
+@limiter.limit("5/minute")
+async def secure_endpoint(
+    request: Request, api_key: str = Depends(get_api_key)
+):
+    return {"message": "This is a rate-limited and secure endpoint"}
 
 
 @app.get("/docs", include_in_schema=False)
-async def get_swagger_documentation(api_key: str = Depends(get_api_key)):
+@limiter.limit("10/minute")
+async def get_swagger_documentation(
+    request: Request, api_key: str = Depends(get_api_key)
+):
     return get_swagger_ui_html(openapi_url="/openapi.json", title="docs")
 
 
 @app.get("/redoc", include_in_schema=False)
-async def get_redoc_documentation(api_key: str = Depends(get_api_key)):
+@limiter.limit("10/minute")
+async def get_redoc_documentation(
+    request: Request, api_key: str = Depends(get_api_key)
+):
     return get_redoc_html(openapi_url="/openapi.json", title="docs")
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
 
 
 # Include your routers here

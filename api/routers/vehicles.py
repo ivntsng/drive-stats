@@ -12,6 +12,7 @@ from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
 from config import verify_api_host, oauth2_scheme
+from main import limiter
 
 
 tags_metadata = [
@@ -28,7 +29,9 @@ router = APIRouter(tags=["Vehicles"])
     response_model=Union[VehicleOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("5/minute")
 def create_vehicle(
+    request: Request,
     vehicle: VehicleIn,
     repo: VehicleRepository = Depends(),
     current_user: JWTUserData = Depends(try_get_jwt_user_data),
@@ -60,7 +63,9 @@ def create_vehicle(
     response_model=VehicleOut,
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("20/minute")
 async def get_vehicle_by_id(
+    request: Request,
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleRepository = Depends(),
@@ -84,7 +89,9 @@ async def get_vehicle_by_id(
     response_model=Union[List[VehicleOut], Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("20/minute")
 def list_vehicles(
+    request: Request,
     repo: VehicleRepository = Depends(),
     current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ):
@@ -103,7 +110,9 @@ def list_vehicles(
     response_model=Union[VehicleOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("5/minute")
 async def update_vehicle(
+    request: Request,
     response: Response,
     vehicle_id: int,
     vehicle: VehicleIn,
@@ -136,7 +145,9 @@ async def update_vehicle(
     response_model=Union[VehicleOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("5/minute")
 async def delete_vehicle(
+    request: Request,
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleRepository = Depends(),
@@ -166,6 +177,7 @@ async def delete_vehicle(
     response_model=List[VehicleOut],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("20/minute")
 async def get_vehicles_by_user_id(
     request: Request,
     response: Response,

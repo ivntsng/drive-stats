@@ -54,3 +54,4 @@ PyJWT==2.8.0
 pre-commit
 flake8
 passlib
+slowapi
