@@ -1,22 +1,11 @@
 version: "3.8"
 
 services:
-    postgres:
-        image: postgres:16.2
-        environment:
-            POSTGRES_DB: drivestats_db
-            POSTGRES_USER: casper
-            POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
-        volumes:
-            - drive-statsDB:/var/lib/postgresql/data
-
     flyway:
         image: flyway/flyway
-        command: -url=jdbc:postgresql://postgres:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/flyway/sql migrate
+        command: -url=jdbc:postgresql://drivestats-db.cjom0q2oekd7.us-west-1.rds.amazonaws.com:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/flyway/sql migrate
         volumes:
             - ./api/sql:/flyway/sql
-        depends_on:
-            - postgres
 
     backend:
         build:
@@ -27,12 +16,6 @@ services:
             ALGORITHM: HS256
             VITE_API_HOST: https://api.drivestatsapp.com
             CORS_HOST: https://drivestatsapp.com
-            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres:5432/drivestats_db
+            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@drivestats-db.cjom0q2oekd7.us-west-1.rds.amazonaws.com:5432/drivestats_db
         ports:
             - "443:443"
-        depends_on:
-            - postgres
-            - flyway
-
-volumes:
-    drive-statsDB:
