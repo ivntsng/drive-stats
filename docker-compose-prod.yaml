@@ -19,3 +19,15 @@ services:
             DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@drivestats-db.cjom0q2oekd7.us-west-1.rds.amazonaws.com:5432/drivestats_db
         ports:
             - "443:443"
+
+    frontend:
+        build:
+            context: ./drive-stats
+            dockerfile: Dockerfile.prod
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./drive-stats/assets:/usr/share/nginx/html/assets
+        depends_on:
+            - backend
