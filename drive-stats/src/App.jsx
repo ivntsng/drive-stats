@@ -45,6 +45,7 @@ function App() {
                 })
                 .catch((error) => {
                     console.error('User re-authentication failed:', error)
+                    sessionStorage.removeItem('token')
                     setUser(null)
                 })
         }
