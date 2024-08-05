@@ -9,14 +9,28 @@ services:
             POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
         volumes:
             - drive-statsDB:/var/lib/postgresql/data
+        networks:
+            - app-network
 
     flyway:
         image: flyway/flyway
-        command: -url=jdbc:postgresql://postgres:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/sql migrate
+        command: -url=jdbc:postgresql://postgres:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/flyway/sql migrate
         volumes:
-            - ./api/sql:/flyway/sql
+            - ./sql:/flyway/sql
         depends_on:
             - postgres
+        networks:
+            - app-network
+
+    migrations:
+        build:
+            context: ./api
+            dockerfile: Dockerfile.dev
+        command: python -m migrations up
+        depends_on:
+            - postgres
+        networks:
+            - app-network
 
     backend:
         build:
@@ -33,6 +47,9 @@ services:
         depends_on:
             - postgres
             - flyway
+            - migrations
+        networks:
+            - app-network
 
     frontend:
         build:
@@ -41,6 +58,11 @@ services:
         ports:
             - "80:80"
             - "443:443"
+        networks:
+            - app-network
 
 volumes:
     drive-statsDB:
+
+networks:
+    app-network:

@@ -98,4 +98,21 @@ steps = [
         DROP TABLE bug_report;
         """,
     ],
+    [
+        """
+        DO $$
+        BEGIN
+            IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'newsletter_subscribers') THEN
+                CREATE TABLE newsletter_subscribers (
+                    id SERIAL PRIMARY KEY NOT NULL,
+                    subscriber_email VARCHAR(254) NOT NULL UNIQUE
+                );
+            END IF;
+        END $$;
+        """,
+        # Dropping newsletter_subscribers.
+        """
+        DROP TABLE newsletter_subscribers;
+        """,
+    ],
 ]

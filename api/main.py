@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-app = FastAPI(openapi_url=settings.openapi_url)
+app = FastAPI()
 
 # Set allowed origins
 origins = [
@@ -81,10 +81,18 @@ async def get_redoc_documentation(
 
 
 # Include your routers here
-from routers import vehicles, vehicle_stats, accounts, auth, bug_reports
+from routers import (
+    vehicles,
+    vehicle_stats,
+    accounts,
+    auth,
+    bug_reports,
+    newsletter,
+)
 
 app.include_router(vehicles.router)
 app.include_router(vehicle_stats.router)
 app.include_router(accounts.router)
 app.include_router(auth.router)
 app.include_router(bug_reports.router)
+app.include_router(newsletter.router)
