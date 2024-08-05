@@ -22,16 +22,6 @@ services:
         networks:
             - app-network
 
-    migrations:
-        build:
-            context: ./api
-            dockerfile: Dockerfile.dev
-        command: python -m migrations up
-        depends_on:
-            - postgres
-        networks:
-            - app-network
-
     backend:
         build:
             context: ./api
@@ -47,7 +37,6 @@ services:
         depends_on:
             - postgres
             - flyway
-            - migrations
         networks:
             - app-network
 
