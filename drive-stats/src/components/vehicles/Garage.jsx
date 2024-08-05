@@ -94,8 +94,9 @@ export default function Garage() {
                                 </>
                             ) : (
                                 <>
-                                    You currently have {vehicles.length}{' '}
-                                    vehicles registered.
+                                    You have {vehicles.length} vehicles
+                                    registered. Click on vehicle's name to
+                                    navigate to vehicle details.
                                 </>
                             )}
                         </TableCaption>

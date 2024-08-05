@@ -22,7 +22,7 @@ tags_metadata = [
     }
 ]
 
-router = APIRouter(tags=["Email Subscribers"])
+router = APIRouter(tags=["Newsletter Subscriber List"], prefix="/api")
 
 
 @router.post(
