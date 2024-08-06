@@ -24,6 +24,8 @@ import {
     PaginationItem,
 } from '@/components/ui/pagination'
 import { ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { useToast } from '@/components/ui/use-toast'
 
 export default function VehicleDetail() {
     const { vehicle_id } = useParams()
@@ -32,6 +34,8 @@ export default function VehicleDetail() {
     const [vehicleStats, setVehicleStats] = useState([])
     const [showVehicleDetails, setShowVehicleDetails] = useState(true)
     const API_HOST = import.meta.env.VITE_API_HOST
+    const navigate = useNavigate()
+    const { toast } = useToast()
 
     const fetchUser = async () => {
         const token = sessionStorage.getItem('token')
@@ -70,6 +74,28 @@ export default function VehicleDetail() {
                 'There was an error fetching the vehicle details!',
                 error
             )
+        }
+    }
+
+    const deleteVehicle = async (id, token) => {
+        try {
+            const response = await axios.delete(`${API_HOST}/vehicles/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+
+            if (response.status === 200) {
+                console.log('Vehicle deleted successfully.')
+                navigate('/')
+                toast({
+                    title: 'Vehicle Deleted',
+                })
+            } else {
+                console.log('Failed to delete the vehicle.')
+            }
+        } catch (error) {
+            console.error('Error deleteing the vehicle:', error)
         }
     }
 
@@ -190,7 +216,16 @@ export default function VehicleDetail() {
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem>Edit</DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() =>
+                                            deleteVehicle(
+                                                vehicle.id,
+                                                user.token
+                                            )
+                                        }
+                                    >
+                                        Delete
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>

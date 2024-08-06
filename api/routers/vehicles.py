@@ -8,6 +8,7 @@ from fastapi import (
 )
 from typing import Union, List
 from queries.vehicles import VehicleIn, VehicleRepository, VehicleOut, Error
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
@@ -100,6 +101,11 @@ def list_vehicles(
 
     try:
         vehicles = repo.get_vehicles_by_user_id(current_user.id)
+        if not vehicles:  # Check if the vehicle list is empty
+            return JSONResponse(
+                status_code=200,
+                content={"message": "No vehicles in the garage"},
+            )
         return vehicles
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -174,7 +180,9 @@ async def delete_vehicle(
 
 @router.get(
     "/vehicles/user/{user_id}",
-    response_model=List[VehicleOut],
+    response_model=List[
+        VehicleOut
+    ],  # Ensure this matches your expected output
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
 @limiter.limit("20/minute")
@@ -191,15 +199,13 @@ async def get_vehicles_by_user_id(
         vehicles = vehicle_repo.get_vehicles_by_user_id(user_id)
         return vehicles
     except HTTPException as http_exc:
-        if http_exc.status_code == 404:
-            raise
-        else:
-            print(
-                f"Failed to grab USER ID {user_id} due to an error: ",
-                http_exc.detail,
-            )
-            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Internal server error",
-            )
+        print(
+            f"Failed to grab USER ID {user_id} due to an HTTP error: {http_exc.detail}"
+        )
+        raise
+    except Exception as exc:
+        print(f"Server error occurred: {exc}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        )

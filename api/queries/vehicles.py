@@ -137,10 +137,9 @@ class VehicleRepository:
                     )
                     results = cur.fetchall()
                     if not results:
-                        raise HTTPException(
-                            status_code=404,
-                            detail=f"No vehicles found for USER ID {user_id}.",
-                        )
+                        # Log and return an empty list instead of raising an HTTPException
+                        print(f"No vehicles found for USER ID {user_id}.")
+                        return []
                     return [
                         VehicleOut(**self.result_to_dict(result))
                         for result in results

@@ -51,9 +51,17 @@ export default function Garage() {
                     },
                 }
             )
-            setVehicles(response.data)
+
+            // Check if response data is an array before setting state
+            if (Array.isArray(response.data)) {
+                setVehicles(response.data)
+            } else {
+                console.warn('Unexpected response format:', response.data)
+                setVehicles([])
+            }
         } catch (error) {
             console.error('There was an error fetching the vehicles!', error)
+            setVehicles([])
         }
     }
 
@@ -134,9 +142,7 @@ export default function Garage() {
                                         {vehicle.model}
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        <span style={{ color: 'red' }}>
-                                            (Feature In Development)
-                                        </span>
+                                        Service Records
                                     </TableCell>
                                 </TableRow>
                             ))}
