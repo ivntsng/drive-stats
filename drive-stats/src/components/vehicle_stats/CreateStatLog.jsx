@@ -173,7 +173,14 @@ const DatePicker = ({ className, date, setDate }) => {
                                 </svg>
                             </button>
                             {isYearDropdownOpen && (
-                                <div className="absolute z-10 bg-gray-800 border border-gray-700 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                <div
+                                    className="absolute z-10 bg-gray-800 border border-gray-700 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto"
+                                    style={{
+                                        scrollbarColor:
+                                            'rgba(255, 255, 255, 0.3) transparent',
+                                        scrollbarWidth: 'thin',
+                                    }}
+                                >
                                     {Array.from(
                                         { length: 36 },
                                         (_, i) => year - 17 + i
@@ -428,18 +435,202 @@ export default function VehicleStat() {
                                                     <SelectTrigger id="maintenanceType">
                                                         <SelectValue placeholder="Select maintenance type" />
                                                     </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="Oil Change">
+                                                    <SelectContent className="max-h-64 overflow-y-auto">
+                                                        <div className="p-2 font-bold">
+                                                            Admin
+                                                        </div>
+                                                        <SelectItem value="inspection">
+                                                            Inspection
+                                                        </SelectItem>
+                                                        <SelectItem value="mileage">
+                                                            Mileage
+                                                        </SelectItem>
+                                                        <SelectItem value="registration">
+                                                            Registration
+                                                        </SelectItem>
+
+                                                        <div className="p-2 font-bold">
+                                                            Fuel
+                                                        </div>
+                                                        <SelectItem value="fuel">
+                                                            Fuel
+                                                        </SelectItem>
+
+                                                        <div className="p-2 font-bold">
+                                                            Maintenance
+                                                        </div>
+                                                        <SelectItem value="air conditioning recharge">
+                                                            Air Conditioning
+                                                            Recharge
+                                                        </SelectItem>
+                                                        <SelectItem value="air filter">
+                                                            Air Filter
+                                                        </SelectItem>
+                                                        <SelectItem value="battery">
+                                                            Battery
+                                                        </SelectItem>
+                                                        <SelectItem value="brake fluid flush">
+                                                            Brake Fluid Flush
+                                                        </SelectItem>
+                                                        <SelectItem value="brake pads">
+                                                            Brake Pads
+                                                        </SelectItem>
+                                                        <SelectItem value="brake rotors">
+                                                            Brake Rotors
+                                                        </SelectItem>
+                                                        <SelectItem value="cabin air filter">
+                                                            Cabin Air Filter
+                                                        </SelectItem>
+                                                        <SelectItem value="car wash">
+                                                            Car Wash
+                                                        </SelectItem>
+                                                        <SelectItem value="coolant flush">
+                                                            Coolant Flush
+                                                        </SelectItem>
+                                                        <SelectItem value="distributor cap & rotor">
+                                                            Distributor Cap &
+                                                            Rotor
+                                                        </SelectItem>
+                                                        <SelectItem value="fuel filter">
+                                                            Fuel Filter
+                                                        </SelectItem>
+                                                        <SelectItem value="headlight">
+                                                            Headlight
+                                                        </SelectItem>
+                                                        <SelectItem value="oil change">
                                                             Oil Change
                                                         </SelectItem>
-                                                        <SelectItem value="Tire Rotation">
+                                                        <SelectItem value="other">
+                                                            Other
+                                                        </SelectItem>
+                                                        <SelectItem value="power steering flush">
+                                                            Power Steering Flush
+                                                        </SelectItem>
+                                                        <SelectItem value="smog check">
+                                                            Smog Check
+                                                        </SelectItem>
+                                                        <SelectItem value="spark plugs">
+                                                            Spark Plugs
+                                                        </SelectItem>
+                                                        <SelectItem value="timing belt">
+                                                            Timing Belt
+                                                        </SelectItem>
+                                                        <SelectItem value="tire - new">
+                                                            Tire - New
+                                                        </SelectItem>
+                                                        <SelectItem value="tire balancing">
+                                                            Tire Balancing
+                                                        </SelectItem>
+                                                        <SelectItem value="tire inflation">
+                                                            Tire Inflation
+                                                        </SelectItem>
+                                                        <SelectItem value="tire rotation">
                                                             Tire Rotation
                                                         </SelectItem>
-                                                        <SelectItem value="Brake Inspection">
-                                                            Brake Inspection
+                                                        <SelectItem value="transmission fluid flush">
+                                                            Transmission Fluid
+                                                            Flush
                                                         </SelectItem>
-                                                        <SelectItem value="General Check-up">
-                                                            General Check-up
+                                                        <SelectItem value="wheel alignment">
+                                                            Wheel Alignment
+                                                        </SelectItem>
+                                                        <SelectItem value="wiper blades">
+                                                            Wiper Blades
+                                                        </SelectItem>
+
+                                                        <div className="p-2 font-bold">
+                                                            Repairs
+                                                        </div>
+                                                        <SelectItem value="alternator">
+                                                            Alternator
+                                                        </SelectItem>
+                                                        <SelectItem value="belt">
+                                                            Belt
+                                                        </SelectItem>
+                                                        <SelectItem value="body work">
+                                                            Body Work
+                                                        </SelectItem>
+                                                        <SelectItem value="brake caliper">
+                                                            Brake Caliper
+                                                        </SelectItem>
+                                                        <SelectItem value="carburetor">
+                                                            Carburetor
+                                                        </SelectItem>
+                                                        <SelectItem value="catalytic converter">
+                                                            Catalytic Converter
+                                                        </SelectItem>
+                                                        <SelectItem value="clutch">
+                                                            Clutch
+                                                        </SelectItem>
+                                                        <SelectItem value="control arm">
+                                                            Control Arm
+                                                        </SelectItem>
+                                                        <SelectItem value="coolant temperature sensor">
+                                                            Coolant Temperature
+                                                            Sensor
+                                                        </SelectItem>
+                                                        <SelectItem value="exhaust">
+                                                            Exhaust
+                                                        </SelectItem>
+                                                        <SelectItem value="fuel injector">
+                                                            Fuel Injector
+                                                        </SelectItem>
+                                                        <SelectItem value="fuel tank">
+                                                            Fuel Tank
+                                                        </SelectItem>
+                                                        <SelectItem value="head gasket">
+                                                            Head Gasket
+                                                        </SelectItem>
+                                                        <SelectItem value="heater core">
+                                                            Heater Core
+                                                        </SelectItem>
+                                                        <SelectItem value="hose">
+                                                            Hose
+                                                        </SelectItem>
+                                                        <SelectItem value="line">
+                                                            Line
+                                                        </SelectItem>
+                                                        <SelectItem value="mass air flow sensor">
+                                                            Mass Air Flow Sensor
+                                                        </SelectItem>
+                                                        <SelectItem value="muffler">
+                                                            Muffler
+                                                        </SelectItem>
+                                                        <SelectItem value="oxygen sensor">
+                                                            Oxygen Sensor
+                                                        </SelectItem>
+                                                        <SelectItem value="radiator">
+                                                            Radiator
+                                                        </SelectItem>
+                                                        <SelectItem value="sensor">
+                                                            Sensor
+                                                        </SelectItem>
+                                                        <SelectItem value="shock/strut">
+                                                            Shock/Strut
+                                                        </SelectItem>
+                                                        <SelectItem value="starter">
+                                                            Starter
+                                                        </SelectItem>
+                                                        <SelectItem value="thermostat">
+                                                            Thermostat
+                                                        </SelectItem>
+                                                        <SelectItem value="tie rod">
+                                                            Tie Rod
+                                                        </SelectItem>
+                                                        <SelectItem value="transmission">
+                                                            Transmission
+                                                        </SelectItem>
+                                                        <SelectItem value="water pump">
+                                                            Water Pump
+                                                        </SelectItem>
+                                                        <SelectItem value="wheel bearings">
+                                                            Wheel Bearings
+                                                        </SelectItem>
+                                                        <SelectItem value="window">
+                                                            Window
+                                                        </SelectItem>
+                                                        <SelectItem value="windshield">
+                                                            Windshield
                                                         </SelectItem>
                                                     </SelectContent>
                                                 </Select>
@@ -472,13 +663,19 @@ export default function VehicleStat() {
                                         render={({ field }) => (
                                             <FormItem className="flex flex-col">
                                                 <FormLabel>Cost</FormLabel>
-                                                <FormControl>
-                                                    <Input
-                                                        type="number"
-                                                        placeholder="Cost"
-                                                        {...field}
-                                                    />
-                                                </FormControl>
+                                                <div className="relative">
+                                                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 pointer-events-none">
+                                                        $
+                                                    </span>
+                                                    <FormControl>
+                                                        <Input
+                                                            type="number"
+                                                            placeholder="Cost"
+                                                            className="pl-7"
+                                                            {...field}
+                                                        />
+                                                    </FormControl>
+                                                </div>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
