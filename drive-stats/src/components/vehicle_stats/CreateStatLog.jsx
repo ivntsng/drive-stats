@@ -1,16 +1,10 @@
-import React, { useContext, useState, useRef, useEffect } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { UserContext } from '../../UserContext'
 import axios from 'axios'
 import { useToast } from '@/components/ui/use-toast'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
     Select,
     SelectContent,
@@ -18,33 +12,230 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { Label } from '@/components/ui/label'
 import { useNavigate } from 'react-router-dom'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { CalendarIcon, ChevronsUpDown } from 'lucide-react'
+import { format } from 'date-fns'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { Calendar } from '@/components/ui/calendar'
+import { cn } from '@/lib/utils'
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form'
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover'
+
+// Define schema for the date using zod
+const FormSchema = z.object({
+    service_date: z.date({
+        required_error: 'A maintenance date is required.',
+    }),
+})
+
+const monthNames = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+]
+
+const DatePicker = ({ className, date, setDate }) => {
+    const [month, setMonth] = useState(new Date().getMonth())
+    const [year, setYear] = useState(new Date().getFullYear())
+    const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+    const [isMonthDropdownOpen, setIsMonthDropdownOpen] = useState(false)
+    const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false)
+
+    const handleMonthChange = (newMonth) => {
+        setMonth(newMonth)
+        setIsMonthDropdownOpen(false)
+    }
+
+    const handleYearChange = (newYear) => {
+        setYear(newYear)
+        setIsYearDropdownOpen(false)
+    }
+
+    return (
+        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant={'outline'}
+                    className={cn(
+                        'overflow-hidden dark:text-white',
+                        !date && 'text-muted-foreground',
+                        className
+                    )}
+                >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? (
+                        <span>
+                            {window.innerWidth > 1024
+                                ? format(updateDatePart(month, date), 'PPP')
+                                : format(updateDatePart(month, date), 'd MMM')}
+                        </span>
+                    ) : (
+                        <span className="hidden sm:block">Pick a date</span>
+                    )}
+                    <ChevronsUpDown className="sm:ml-2 h-4 w-4 shrink-0 opacity-50 " />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+                <div className="flex justify-center pt-1 relative items-center">
+                    <div className="flex justify-between gap-1 w-full">
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setIsMonthDropdownOpen(!isMonthDropdownOpen)
+                                }
+                                className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&amp;>span]:line-clamp-1 pr-1.5 focus:ring-0"
+                            >
+                                <span style={{ pointerEvents: 'none' }}>
+                                    {monthNames[month]}
+                                </span>
+                                <svg
+                                    width="15"
+                                    height="15"
+                                    viewBox="0 0 15 15"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 opacity-50"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M4.93179 5.43179C4.75605 5.60753 4.75605 5.89245 4.93179 6.06819C5.10753 6.24392 5.39245 6.24392 5.56819 6.06819L7.49999 4.13638L9.43179 6.06819C9.60753 6.24392 9.89245 6.24392 10.0682 6.06819C10.2439 5.89245 10.2439 5.60753 10.0682 5.43179L7.81819 3.18179C7.73379 3.0974 7.61933 3.04999 7.49999 3.04999C7.38064 3.04999 7.26618 3.0974 7.18179 3.18179L4.93179 5.43179ZM10.0682 9.56819C10.2439 9.39245 10.2439 9.10753 10.0682 8.93179C9.89245 8.75606 9.60753 8.75606 9.43179 8.93179L7.49999 10.8636L5.56819 8.93179C5.39245 8.75606 5.10753 8.75606 4.93179 8.93179C4.75605 9.10753 4.75605 9.39245 4.93179 9.56819L7.18179 11.8182C7.35753 11.9939 7.64245 11.9939 7.81819 11.8182L10.0682 9.56819Z"
+                                        fill="currentColor"
+                                        fillRule="evenodd"
+                                        clipRule="evenodd"
+                                    ></path>
+                                </svg>
+                            </button>
+                            {isMonthDropdownOpen && (
+                                <div className="absolute z-10 bg-gray-800 border border-gray-700 mt-1 rounded-md shadow-lg">
+                                    {monthNames.map((monthName, index) => (
+                                        <div
+                                            key={monthName}
+                                            className="cursor-pointer px-3 py-1 text-sm text-white hover:bg-gray-600"
+                                            onClick={() =>
+                                                handleMonthChange(index)
+                                            }
+                                        >
+                                            {monthName}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setIsYearDropdownOpen(!isYearDropdownOpen)
+                                }
+                                className="flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&amp;>span]:line-clamp-1 pr-1.5 focus:ring-0"
+                            >
+                                <span style={{ pointerEvents: 'none' }}>
+                                    {year}
+                                </span>
+                                <svg
+                                    width="15"
+                                    height="15"
+                                    viewBox="0 0 15 15"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 opacity-50"
+                                    aria-hidden="true"
+                                >
+                                    <path
+                                        d="M4.93179 5.43179C4.75605 5.60753 4.75605 5.89245 4.93179 6.06819C5.10753 6.24392 5.39245 6.24392 5.56819 6.06819L7.49999 4.13638L9.43179 6.06819C9.60753 6.24392 9.89245 6.24392 10.0682 6.06819C10.2439 5.89245 10.2439 5.60753 10.0682 5.43179L7.81819 3.18179C7.73379 3.0974 7.61933 3.04999 7.49999 3.04999C7.38064 3.04999 7.26618 3.0974 7.18179 3.18179L4.93179 5.43179ZM10.0682 9.56819C10.2439 9.39245 10.2439 9.10753 10.0682 8.93179C9.89245 8.75606 9.60753 8.75606 9.43179 8.93179L7.49999 10.8636L5.56819 8.93179C5.39245 8.75606 5.10753 8.75606 4.93179 8.93179C4.75605 9.10753 4.75605 9.39245 4.93179 9.56819L7.18179 11.8182C7.35753 11.9939 7.64245 11.9939 7.81819 11.8182L10.0682 9.56819Z"
+                                        fill="currentColor"
+                                        fillRule="evenodd"
+                                        clipRule="evenodd"
+                                    ></path>
+                                </svg>
+                            </button>
+                            {isYearDropdownOpen && (
+                                <div className="absolute z-10 bg-gray-800 border border-gray-700 mt-1 rounded-md shadow-lg max-h-48 overflow-y-auto">
+                                    {Array.from(
+                                        { length: 36 },
+                                        (_, i) => year - 17 + i
+                                    ).map((yearOption) => (
+                                        <div
+                                            key={yearOption}
+                                            className="cursor-pointer px-3 py-1 text-sm text-white hover:bg-gray-600"
+                                            onClick={() =>
+                                                handleYearChange(yearOption)
+                                            }
+                                        >
+                                            {yearOption}
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <Calendar
+                    mode="single"
+                    month={new Date(year, month)}
+                    onMonthChange={(newMonth) => setMonth(newMonth.getMonth())}
+                    selected={date}
+                    onSelect={(e) => {
+                        setDate(e)
+                        setIsCalendarOpen(false)
+                    }}
+                    initialFocus
+                />
+            </PopoverContent>
+        </Popover>
+    )
+}
+
+function updateDatePart(month, date) {
+    const updatedDate = new Date(date)
+    updatedDate.setMonth(month)
+    return updatedDate
+}
 
 export default function VehicleStat() {
     const { user, setUser } = useContext(UserContext)
     const [vehicles, setVehicles] = useState([])
-    const formRef = useRef(null)
     const [error, setError] = useState('')
     const [isLoading, setIsLoading] = useState(false)
     const API_HOST = import.meta.env.VITE_API_HOST
     const { toast } = useToast()
     const navigate = useNavigate()
-    const [formData, setFormData] = useState({
-        vehicle_id: '',
-        last_oil_change: '',
-        last_tire_rotation: '',
-        last_tire_change: '',
-        last_air_filter: '',
-        last_brake_flush: '',
-        last_brake_rotor: '',
-        last_brake_pad: '',
-        last_coolant_flush: '',
-        last_transmission_fluid_flush: '',
-        last_cabin_filter_change: '',
-        last_wiper_blades_change: '',
+
+    // Initialize form with react-hook-form
+    const form = useForm({
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            service_date: new Date(),
+            vehicle_id: '',
+            maintenance_type: '',
+            mileage: '',
+            cost: '',
+            description: '',
+        },
     })
-    const [selectedVehicleName, setSelectedVehicleName] = useState('')
 
     const fetchUser = async () => {
         const token = sessionStorage.getItem('token')
@@ -53,9 +244,7 @@ export default function VehicleStat() {
             const response = await axios.get(
                 `${API_HOST}/api/auth/authenticate`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                     withCredentials: true,
                 }
             )
@@ -69,14 +258,13 @@ export default function VehicleStat() {
             return null
         }
     }
+
     const fetchVehicles = async (userId, token) => {
         try {
             const response = await axios.get(
                 `${API_HOST}/vehicles/user/${userId}`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                 }
             )
             setVehicles(response.data)
@@ -100,14 +288,19 @@ export default function VehicleStat() {
         e.preventDefault()
         setIsLoading(true)
 
-        const processedFormData = Object.keys(formData).reduce((acc, key) => {
-            acc[key] = formData[key] === '' ? 0 : formData[key]
-            return acc
-        }, {})
+        const formattedServiceDate = format(
+            form.getValues('service_date'),
+            'yyyy-MM-dd'
+        )
+
+        const processedFormData = {
+            ...form.getValues(),
+            service_date: formattedServiceDate,
+        }
 
         try {
             const response = await fetch(
-                `${API_HOST}/vehicle_stats/${formData.vehicle_id}`,
+                `${API_HOST}/api/vehicle-maintenance/create/${processedFormData.vehicle_id}`,
                 {
                     method: 'POST',
                     headers: {
@@ -120,21 +313,7 @@ export default function VehicleStat() {
             )
 
             if (response.ok) {
-                setFormData({
-                    vehicle_id: '',
-                    last_oil_change: '',
-                    last_tire_rotation: '',
-                    last_tire_change: '',
-                    last_air_filter: '',
-                    last_brake_flush: '',
-                    last_brake_rotor: '',
-                    last_brake_pad: '',
-                    last_coolant_flush: '',
-                    last_transmission_fluid_flush: '',
-                    last_cabin_filter_change: '',
-                    last_wiper_blades_change: '',
-                })
-                setSelectedVehicleName('')
+                form.reset()
                 toast({
                     title: `Successfully created a new maintenance log!`,
                     description: `You can view the maintenance log in your vehicle details.`,
@@ -154,210 +333,201 @@ export default function VehicleStat() {
     }
 
     return (
-        <div className="flex justify-center items-center min-h-screen px-4 py-6 sm:px-6 lg:px-8">
-            <Card className="w-[380px] mx-auto p-4">
-                <div ref={formRef}>
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="w-[850px]">
+                <Card className="rounded-xl border bg-card text-card-foreground shadow">
                     <CardHeader>
-                        <CardTitle className="text-center text-2xl font-bold">
+                        <CardTitle className="font-semibold leading-none tracking-tight">
                             New Maintenance Log
                         </CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                            Please fill in the details for your vehicle's
+                            maintenance.
+                        </p>
                     </CardHeader>
                     <CardContent>
                         <form
                             onSubmit={createMaintenanceLog}
                             className="space-y-4"
                         >
-                            <div className="flex flex-col space-y-2">
-                                <Label
-                                    htmlFor="vehicleName"
-                                    className="font-bold"
-                                >
-                                    Choose Vehicle
-                                </Label>
-                                <Select
-                                    onValueChange={(value) => {
-                                        const selectedVehicle = vehicles.find(
-                                            (vehicle) =>
-                                                vehicle.id === Number(value)
-                                        )
-                                        setFormData({
-                                            ...formData,
-                                            vehicle_id: selectedVehicle
-                                                ? selectedVehicle.id
-                                                : '',
-                                        })
-                                        setSelectedVehicleName(
-                                            selectedVehicle
-                                                ? selectedVehicle.vehicle_name
-                                                : ''
-                                        )
-                                    }}
-                                >
-                                    <SelectTrigger id="vehicleName">
-                                        <SelectValue placeholder="Select a vehicle">
-                                            {selectedVehicleName ||
-                                                'Select a vehicle'}
-                                        </SelectValue>
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {vehicles.map((vehicle) => (
-                                            <SelectItem
-                                                key={vehicle.id}
-                                                value={vehicle.id.toString()}
-                                            >
-                                                {vehicle.vehicle_name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            {[
-                                {
-                                    id: 'oilChange',
-                                    label: 'Last Oil Change',
-                                    placeholder: '(Ex. 55,000)',
-                                    value: formData.last_oil_change,
-                                    key: 'last_oil_change',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'tireRotation',
-                                    label: 'Last Tire Rotation',
-                                    placeholder: '(Ex. 24,000)',
-                                    value: formData.last_tire_rotation,
-                                    key: 'last_tire_rotation',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'tireChange',
-                                    label: 'Last Tire Change',
-                                    placeholder: '(Ex. 60,000)',
-                                    value: formData.last_tire_change,
-                                    key: 'last_tire_change',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'engineAirFilter',
-                                    label: 'Last Engine Air Filter Change',
-                                    placeholder: '(Ex. 15,000)',
-                                    value: formData.last_air_filter,
-                                    key: 'last_air_filter',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'brakeFluidFlush',
-                                    label: 'Last Brake Fluid Flush',
-                                    placeholder: '(Ex. 75,000)',
-                                    value: formData.last_brake_flush,
-                                    key: 'last_brake_flush',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'brakeRotor',
-                                    label: 'Last Brake Rotor Replacement',
-                                    placeholder: '(Ex. 50,000)',
-                                    value: formData.last_brake_rotor,
-                                    key: 'last_brake_rotor',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'brakePad',
-                                    label: 'Last Brake Pad Replacement',
-                                    placeholder: '(Ex. 50,000)',
-                                    value: formData.last_brake_pad,
-                                    key: 'last_brake_pad',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'coolantFlush',
-                                    label: 'Last Coolant Flush',
-                                    placeholder: '(Ex. 50,000)',
-                                    value: formData.last_coolant_flush,
-                                    key: 'last_coolant_flush',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'transmissionFluidFlush',
-                                    label: 'Last Transmission Fluid Flush',
-                                    placeholder: '(Ex. 50,000)',
-                                    value: formData.last_transmission_fluid_flush,
-                                    key: 'last_transmission_fluid_flush',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'cabinFilter',
-                                    label: 'Last Cabin Filter Replacement',
-                                    placeholder: '(Ex. 50,000)',
-                                    value: formData.last_cabin_filter_change,
-                                    key: 'last_cabin_filter_change',
-                                    pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'wiperBlade',
-                                    label: 'Last Wiper Blade Replacement',
-                                    placeholder: '(Ex. 15,000)',
-                                    value: formData.last_wiper_blades_change,
-                                    key: 'last_wiper_blades_change',
-                                    pattern: /^\d*$/,
-                                },
-                            ].map(
-                                ({
-                                    id,
-                                    label,
-                                    placeholder,
-                                    value,
-                                    key,
-                                    pattern,
-                                }) => (
-                                    <div
-                                        key={id}
-                                        className="flex flex-col space-y-2"
+                            <Form {...form}>
+                                {/* Custom Date Picker */}
+                                <FormField
+                                    control={form.control}
+                                    name="service_date"
+                                    render={({ field }) => (
+                                        <FormItem className="flex flex-col">
+                                            <FormLabel>
+                                                Maintenance Date
+                                            </FormLabel>
+                                            <DatePicker
+                                                className="w-[100px] sm:w-1/4 lg:w-48"
+                                                date={field.value}
+                                                setDate={field.onChange}
+                                            />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {/* Vehicle Selection */}
+                                    <FormField
+                                        control={form.control}
+                                        name="vehicle_id"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>
+                                                    Choose Vehicle
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) =>
+                                                        field.onChange(value)
+                                                    }
+                                                    value={field.value}
+                                                >
+                                                    <SelectTrigger id="vehicleName">
+                                                        <SelectValue placeholder="Select a vehicle" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        {vehicles.map(
+                                                            (vehicle) => (
+                                                                <SelectItem
+                                                                    key={
+                                                                        vehicle.id
+                                                                    }
+                                                                    value={vehicle.id.toString()}
+                                                                >
+                                                                    {
+                                                                        vehicle.vehicle_name
+                                                                    }
+                                                                </SelectItem>
+                                                            )
+                                                        )}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    {/* Maintenance Type Dropdown */}
+                                    <FormField
+                                        control={form.control}
+                                        name="maintenance_type"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>
+                                                    Maintenance Type
+                                                </FormLabel>
+                                                <Select
+                                                    onValueChange={(value) =>
+                                                        field.onChange(value)
+                                                    }
+                                                    value={field.value}
+                                                >
+                                                    <SelectTrigger id="maintenanceType">
+                                                        <SelectValue placeholder="Select maintenance type" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="Oil Change">
+                                                            Oil Change
+                                                        </SelectItem>
+                                                        <SelectItem value="Tire Rotation">
+                                                            Tire Rotation
+                                                        </SelectItem>
+                                                        <SelectItem value="Brake Inspection">
+                                                            Brake Inspection
+                                                        </SelectItem>
+                                                        <SelectItem value="General Check-up">
+                                                            General Check-up
+                                                        </SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="mileage"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Mileage</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Mileage"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="cost"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col">
+                                                <FormLabel>Cost</FormLabel>
+                                                <FormControl>
+                                                    <Input
+                                                        type="number"
+                                                        placeholder="Cost"
+                                                        {...field}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <FormField
+                                        control={form.control}
+                                        name="description"
+                                        render={({ field }) => (
+                                            <FormItem className="flex flex-col sm:col-span-2">
+                                                <FormLabel>
+                                                    Description
+                                                </FormLabel>
+                                                <FormControl>
+                                                    <textarea
+                                                        placeholder="Description"
+                                                        {...field}
+                                                        className="min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+                                {/* Buttons */}
+                                <div className="flex justify-between space-x-4 mt-4">
+                                    <Button
+                                        type="button"
+                                        onClick={() => navigate('/')}
+                                        className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
                                     >
-                                        <label
-                                            htmlFor={id}
-                                            className="font-bold"
-                                        >
-                                            {label}
-                                        </label>
-                                        <Input
-                                            id={id}
-                                            placeholder={placeholder}
-                                            value={value}
-                                            onChange={(e) => {
-                                                const inputValue =
-                                                    e.target.value
-                                                if (
-                                                    !pattern ||
-                                                    pattern.test(inputValue)
-                                                ) {
-                                                    setFormData({
-                                                        ...formData,
-                                                        [key]: inputValue,
-                                                    })
-                                                }
-                                            }}
-                                            autoComplete={`current-${id}`}
-                                            className="w-full"
-                                        />
-                                    </div>
-                                )
-                            )}
-                            {error && <p className="text-red-500">{error}</p>}
-                            <CardFooter className="flex flex-col md:flex-row md:justify-center space-y-2 md:space-y-0 md:space-x-4">
-                                <Button
-                                    type="submit"
-                                    disabled={isLoading}
-                                    className="w-full md:w-auto"
-                                >
-                                    {isLoading
-                                        ? `Creating Maintenance Log...`
-                                        : `Create Maintenance Log`}
-                                </Button>
-                            </CardFooter>
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        type="submit"
+                                        disabled={isLoading}
+                                        className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2"
+                                    >
+                                        {isLoading
+                                            ? 'Creating Maintenance Log...'
+                                            : 'Create Maintenance Log'}
+                                    </Button>
+                                </div>
+                            </Form>
                         </form>
                     </CardContent>
-                </div>
-            </Card>
+                </Card>
+            </div>
         </div>
     )
 }

@@ -50,52 +50,23 @@ steps = [
         """
         DO $$
         BEGIN
-            IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'vehicle_stats') THEN
-                CREATE TABLE vehicle_stats (
-                    id SERIAL PRIMARY KEY,
-                    vehicle_id INTEGER REFERENCES vehicles(id) ON DELETE CASCADE,
-                    last_oil_change INT,
-                    last_tire_rotation INT,
-                    last_tire_change INT,
-                    last_air_filter INT,
-                    last_brake_flush INT,
-                    last_brake_rotor INT,
-                    last_brake_pad INT,
-                    last_coolant_flush INT,
-                    last_transmission_fluid_flush INT,
-                    last_cabin_filter_change INT,
-                    last_wiper_blades_change INT,
-                    last_update_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'vehicle_maintenance') THEN
+                CREATE TABLE vehicle_maintenance (
+                    id SERIAL PRIMARY KEY NOT NULL,
+                    vehicle_id INTEGER NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
+                    maintenance_type VARCHAR(255) NOT NULL,
+                    mileage INT,
+                    cost NUMERIC(10, 2),
+                    description TEXT,
+                    service_date DATE NOT NULL,
+                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
                 );
             END IF;
         END $$;
         """,
         # Dropping the vehicle_stats table
         """
-        DROP TABLE vehicle_stats;
-        """,
-    ],
-    [
-        # Creating the bug_report table with a check
-        """
-        DO $$
-        BEGIN
-            IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'bug_report') THEN
-                CREATE TABLE bug_report (
-                    id SERIAL PRIMARY KEY NOT NULL,
-                    bug_title VARCHAR(200) NOT NULL,
-                    bug_desc VARCHAR NOT NULL,
-                    bug_behavior VARCHAR NOT NULL,
-                    bug_rating VARCHAR NOT NULL,
-                    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-                    user_id INTEGER NOT NULL REFERENCES accounts(id) ON DELETE CASCADE
-                );
-            END IF;
-        END $$;
-        """,
-        # Dropping bug_report table
-        """
-        DROP TABLE bug_report;
+        DROP TABLE IF EXISTS vehicle_maintenance;
         """,
     ],
     [

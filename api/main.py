@@ -26,6 +26,8 @@ origins = [
     "https://www.drivestatsapp.com",
     "https://localhost",
     "https://localhost:8000",
+    "http://localhost:5173",
+    "http://localhost:8000",
 ]
 
 app.add_middleware(
@@ -88,6 +90,7 @@ from routers import (
     auth,
     bug_reports,
     newsletter,
+    vehicle_maintenance,
 )
 
 app.include_router(vehicles.router)
@@ -96,3 +99,4 @@ app.include_router(accounts.router)
 app.include_router(auth.router)
 app.include_router(bug_reports.router)
 app.include_router(newsletter.router)
+app.include_router(vehicle_maintenance.router)

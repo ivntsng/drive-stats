@@ -13,12 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the current directory contents into the container at /app
 COPY . .
 
-# Copy SSL certificates
-COPY self-signed-cert/cert.pem /app/cert.pem
-COPY self-signed-cert/key.pem /app/key.pem
-
 # Expose port 8000 to the outside world
 EXPOSE 8000
 
 # Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--ssl-keyfile", "/app/key.pem", "--ssl-certfile", "/app/cert.pem"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
