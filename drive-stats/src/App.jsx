@@ -4,6 +4,7 @@ import MainPage from './MainPage'
 import CreateVehicle from './components/vehicles/CreateVehicle'
 import VehicleDetail from './components/vehicles/VehicleDetail'
 import VehicleStat from './components/vehicle_stats/CreateStatLog'
+import UpdatedVehicleDetail from './components/vehicle_stats/UpdateVehicleDetails'
 import CreateBugReportForm from './components/bug_reports/create_bug_reports'
 import MyAccount from './components/accounts/myAccount'
 import NavBar from './NavBar'
@@ -80,6 +81,14 @@ function App() {
                                     element={
                                         <ProtectedRoute
                                             element={<VehicleDetail />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/vehicles/garage/update/:vehicle_id"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<UpdatedVehicleDetail />}
                                         />
                                     }
                                 />

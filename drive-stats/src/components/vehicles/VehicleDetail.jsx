@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { UserContext } from '../../UserContext'
 import { Button } from '@/components/ui/button'
@@ -24,8 +24,34 @@ import {
     PaginationItem,
 } from '@/components/ui/pagination'
 import { ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
 import { useToast } from '@/components/ui/use-toast'
+import { CheckIcon } from '@radix-ui/react-icons'
+
+function ConfirmDialog({ onConfirm, onCancel }) {
+    return (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <Card className="w-[380px]">
+                <CardHeader>
+                    <CardTitle className="flex items-center justify-center">
+                        Confirm Deletion
+                    </CardTitle>
+                    <CardDescription>
+                        Are you sure you want to delete this vehicle? This
+                        action cannot be undone.
+                    </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex justify-between">
+                    <Button onClick={onCancel} variant="outline">
+                        Cancel
+                    </Button>
+                    <Button onClick={onConfirm} variant="destructive">
+                        Confirm
+                    </Button>
+                </CardFooter>
+            </Card>
+        </div>
+    )
+}
 
 export default function VehicleDetail() {
     const { vehicle_id } = useParams()
@@ -33,6 +59,7 @@ export default function VehicleDetail() {
     const [vehicle, setVehicle] = useState(null)
     const [vehicleStats, setVehicleStats] = useState([])
     const [showVehicleDetails, setShowVehicleDetails] = useState(true)
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false)
     const API_HOST = import.meta.env.VITE_API_HOST
     const navigate = useNavigate()
     const { toast } = useToast()
@@ -98,8 +125,21 @@ export default function VehicleDetail() {
                 console.log('Failed to delete the vehicle.')
             }
         } catch (error) {
-            console.error('Error deleteing the vehicle:', error)
+            console.error('Error deleting the vehicle:', error)
         }
+    }
+
+    const handleDeleteClick = () => {
+        setShowConfirmDialog(true)
+    }
+
+    const handleConfirmDelete = () => {
+        setShowConfirmDialog(false)
+        deleteVehicle(vehicle.id, user.token)
+    }
+
+    const handleCancelDelete = () => {
+        setShowConfirmDialog(false)
     }
 
     const fetchVehicleStats = async (id, token) => {
@@ -180,6 +220,10 @@ export default function VehicleDetail() {
         setShowVehicleDetails(true)
     }
 
+    const handleEditClick = () => {
+        navigate(`/vehicles/garage/update/${vehicle.id}`)
+    }
+
     if (!vehicle) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -217,15 +261,12 @@ export default function VehicleDetail() {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={handleEditClick}>
+                                        Edit
+                                    </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem
-                                        onClick={() =>
-                                            deleteVehicle(
-                                                vehicle.id,
-                                                user.token
-                                            )
-                                        }
+                                        onClick={handleDeleteClick}
                                     >
                                         Delete
                                     </DropdownMenuItem>
@@ -353,6 +394,12 @@ export default function VehicleDetail() {
                         </Pagination>
                     </CardFooter>
                 </Card>
+            )}
+            {showConfirmDialog && (
+                <ConfirmDialog
+                    onConfirm={handleConfirmDelete}
+                    onCancel={handleCancelDelete}
+                />
             )}
         </div>
     )
