@@ -99,7 +99,13 @@ const DatePicker = ({ className, date, setDate }) => {
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0">
                 <div className="flex justify-center pt-1 relative items-center">
-                    <div className="flex justify-between gap-1 w-full">
+                    <div
+                        className="flex justify-between gap-1 w-full"
+                        style={{
+                            marginRight: '45px',
+                            marginLeft: '45px',
+                        }}
+                    >
                         <div className="relative">
                             <button
                                 type="button"

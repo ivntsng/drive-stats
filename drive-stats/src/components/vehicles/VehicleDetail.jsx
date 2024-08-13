@@ -79,11 +79,14 @@ export default function VehicleDetail() {
 
     const deleteVehicle = async (id, token) => {
         try {
-            const response = await axios.delete(`${API_HOST}/vehicles/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            const response = await axios.delete(
+                `${API_HOST}/vehicles/delete/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
 
             if (response.status === 200) {
                 console.log('Vehicle deleted successfully.')

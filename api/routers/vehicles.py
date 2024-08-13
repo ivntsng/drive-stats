@@ -112,7 +112,7 @@ def list_vehicles(
 
 
 @router.put(
-    "/vehicles/{vehicle_id}",
+    "/vehicles/update/{vehicle_id}",
     response_model=Union[VehicleOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
@@ -133,7 +133,7 @@ async def update_vehicle(
             return updated_vehicle
         else:
             raise HTTPException(
-                status_code=500, detail="Failed to update vehicle"
+                status_code=404, detail=f"Vehicle ID {vehicle_id} not found"
             )
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -142,12 +142,12 @@ async def update_vehicle(
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return Error(
             detail="Internal server error",
-            message=f"Vehicle {vehicle_id} does not exist.",
+            message=f"Failed to update vehicle ID {vehicle_id} due to an error.",
         )
 
 
 @router.delete(
-    "/vehicles/{vehicle_id}",
+    "/vehicles/delete/{vehicle_id}",
     response_model=Union[VehicleOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )

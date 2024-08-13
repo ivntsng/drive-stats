@@ -165,9 +165,10 @@ class VehicleRepository:
                           make = %s,
                           model = %s,
                           vin = %s,
-                          mileage = %s
+                          mileage = %s,
+                          about = %s
                         WHERE id = %s
-                        RETURNING id, vehicle_name, year, make, model, vin, mileage;
+                        RETURNING id, vehicle_name, year, make, model, vin, mileage, about, created_date, user_id;
                         """,
                         [
                             vehicle.vehicle_name,
@@ -176,18 +177,22 @@ class VehicleRepository:
                             vehicle.model,
                             vehicle.vin,
                             vehicle.mileage,
+                            vehicle.about,
                             vehicle_id,
                         ],
                     )
                     result = cur.fetchone()
-                    if result:
+                    if result is not None:
                         result_dict = self.result_to_dict(result)
                         return VehicleOut(**result_dict)
                     else:
-                        print("No result found")
+                        print(f"No vehicle found with ID {vehicle_id}")
                         return None
         except ValidationError as e:
             print(f"Failed to update vehicle: {e}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error while updating vehicle: {e}")
             return None
 
     def delete_vehicle(self, vehicle_id: int) -> Optional[VehicleOut]:

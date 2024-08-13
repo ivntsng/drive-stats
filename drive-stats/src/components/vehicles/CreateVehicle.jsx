@@ -1,27 +1,15 @@
-import React, {
-    useContext,
-    useState,
-    useRef,
-    useCallback,
-    useEffect,
-} from 'react'
+import React, { useContext, useState } from 'react'
 import { UserContext } from '../../UserContext'
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/components/ui/use-toast'
 import { Button } from '@/components/ui/button'
 import { useNavigate } from 'react-router-dom'
+import { Label } from '@/components/ui/label'
 
-function RegisterVehicleForm() {
+export default function RegisterVehicleForm() {
     const { user } = useContext(UserContext)
     const { toast } = useToast()
-    const formRef = useRef(null)
     const [formData, setFormData] = useState({
         vehicle_name: '',
         year: '',
@@ -77,17 +65,24 @@ function RegisterVehicleForm() {
         }
     }
 
+    const handleCancel = () => {
+        navigate('/') // Navigate back to the home page
+    }
+
     return (
-        <div className="flex justify-center items-center min-h-screen px-4 py-6 sm:px-6 lg:px-8">
-            <Card className="w-[380px] mx-auto p-4">
-                <div ref={formRef}>
+        <div className="flex items-center justify-center min-h-screen px-4 py-6 sm:px-6 lg:px-8">
+            <div className="w-full max-w-xl">
+                <Card className="rounded-xl border bg-card text-card-foreground shadow">
                     <CardHeader>
                         <CardTitle className="text-center text-2xl font-bold">
                             Register New Vehicle
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={registerVehicle} className="space-y-4">
+                        <form
+                            onSubmit={registerVehicle}
+                            className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+                        >
                             {[
                                 {
                                     id: 'vehicleName',
@@ -124,21 +119,22 @@ function RegisterVehicleForm() {
                                     placeholder: '(Ex. 4T1BF1FK1CU013354)',
                                     value: formData.vin,
                                     key: 'vin',
+                                    onChange: (e) => {
+                                        const inputValue =
+                                            e.target.value.toUpperCase() // Convert to uppercase
+                                        setFormData({
+                                            ...formData,
+                                            vin: inputValue,
+                                        })
+                                    },
                                 },
                                 {
                                     id: 'vehicleMileage',
-                                    label: 'Mileage of vehicle',
+                                    label: 'Mileage of Vehicle',
                                     placeholder: '(Ex. 72,629)',
                                     value: formData.mileage,
                                     key: 'mileage',
                                     pattern: /^\d*$/,
-                                },
-                                {
-                                    id: 'aboutVehicle',
-                                    label: 'About',
-                                    placeholder: '(Ex. My First vehicle)',
-                                    value: formData.about,
-                                    key: 'about',
                                 },
                             ].map(
                                 ({
@@ -148,58 +144,85 @@ function RegisterVehicleForm() {
                                     value,
                                     key,
                                     pattern,
+                                    onChange, // Added this line
                                 }) => (
-                                    <div
-                                        key={id}
-                                        className="flex flex-col space-y-2"
-                                    >
-                                        <label
+                                    <div key={id} className="grid gap-2">
+                                        <Label
                                             htmlFor={id}
-                                            className="font-bold"
+                                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                         >
                                             {label}
-                                        </label>
+                                        </Label>
                                         <Input
                                             id={id}
                                             placeholder={placeholder}
                                             value={value}
-                                            onChange={(e) => {
-                                                const inputValue =
-                                                    e.target.value
-                                                if (
-                                                    !pattern ||
-                                                    pattern.test(inputValue)
-                                                ) {
-                                                    setFormData({
-                                                        ...formData,
-                                                        [key]: inputValue,
-                                                    })
-                                                }
-                                            }}
+                                            onChange={
+                                                onChange ||
+                                                ((e) => {
+                                                    const inputValue =
+                                                        e.target.value
+                                                    if (
+                                                        !pattern ||
+                                                        pattern.test(inputValue)
+                                                    ) {
+                                                        setFormData({
+                                                            ...formData,
+                                                            [key]: inputValue,
+                                                        })
+                                                    }
+                                                })
+                                            }
                                             autoComplete={`current-${id}`}
                                             className="w-full"
                                         />
                                     </div>
                                 )
                             )}
+                            <div className="grid gap-2 col-span-full">
+                                <Label
+                                    htmlFor="aboutVehicle"
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    About
+                                </Label>
+                                <Input
+                                    id="aboutVehicle"
+                                    placeholder="(Ex. My First Vehicle)"
+                                    value={formData.about}
+                                    onChange={(e) =>
+                                        setFormData({
+                                            ...formData,
+                                            about: e.target.value,
+                                        })
+                                    }
+                                    autoComplete="current-aboutVehicle"
+                                    className="w-full"
+                                />
+                            </div>
                             {error && <p className="text-red-500">{error}</p>}
-                            <CardFooter className="flex flex-col md:flex-row md:justify-center space-y-2 md:space-y-0 md:space-x-4">
+                            <div className="flex flex-row items-center justify-between space-x-2 p-6 pt-0 col-span-full">
+                                <Button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full sm:w-auto"
+                                >
+                                    Cancel
+                                </Button>
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full md:w-auto"
+                                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 h-9 px-4 py-2 w-full sm:w-auto"
                                 >
                                     {isLoading
-                                        ? 'Registering Vehicle to DriveStats...'
-                                        : 'Register Vehicle'}
+                                        ? 'Registering Vehicle...'
+                                        : 'Register'}
                                 </Button>
-                            </CardFooter>
+                            </div>
                         </form>
                     </CardContent>
-                </div>
-            </Card>
+                </Card>
+            </div>
         </div>
     )
 }
-
-export default RegisterVehicleForm
