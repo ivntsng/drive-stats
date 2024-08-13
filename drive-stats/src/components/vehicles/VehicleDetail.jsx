@@ -97,10 +97,26 @@ export default function VehicleDetail() {
             })
             setVehicle(response.data)
         } catch (error) {
-            console.error(
-                'There was an error fetching the vehicle details!',
-                error
-            )
+            if (error.response && error.response.status === 403) {
+                toast({
+                    title: 'Access Denied',
+                    description:
+                        'You do not have permission to view this vehicle.',
+                })
+                navigate('/') // Redirect to home or another safe page
+            } else if (error.response && error.response.status === 404) {
+                toast({
+                    title: 'Vehicle Not Found',
+                    description:
+                        'The vehicle you are looking for does not exist.',
+                })
+                navigate('/') // Redirect to home or another safe page
+            } else {
+                console.error(
+                    'There was an error fetching the vehicle details!',
+                    error
+                )
+            }
         }
     }
 

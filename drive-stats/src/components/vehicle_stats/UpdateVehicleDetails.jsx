@@ -84,7 +84,7 @@ export default function UpdatedVehicleDetail() {
     }
 
     const handleCancel = () => {
-        navigate('/')
+        navigate(`/vehicles/garage/${vehicle_id}`)
     }
 
     return (

@@ -82,6 +82,11 @@ async def get_vehicle_by_id(
                 "error": f"Vehicle with ID {vehicle_id} not found",
             },
         )
+    if vehicle.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to access this vehicle.",
+        )
     return vehicle
 
 
