@@ -132,6 +132,20 @@ async def update_vehicle(
 ) -> Union[VehicleOut, Error]:
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
+
+    existing_vehicle = vehicle_repo.get_vehicle_by_id(vehicle_id)
+
+    if existing_vehicle is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Vehicle with ID {vehicle_id} not found",
+        )
+
+    if existing_vehicle.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to update this vehicle.",
+        )
     try:
         updated_vehicle = vehicle_repo.update_vehicle(vehicle_id, vehicle)
         if updated_vehicle:
@@ -166,6 +180,20 @@ async def delete_vehicle(
 ) -> Union[VehicleOut, Error]:
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
+    existing_vehicle = vehicle_repo.get_vehicle_by_id(vehicle_id)
+
+    if existing_vehicle is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Vehicle with ID {vehicle_id} not found",
+        )
+
+    # Check if the current user is the owner of the vehicle
+    if existing_vehicle.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this vehicle.",
+        )
     try:
         deleted_vehicle = vehicle_repo.delete_vehicle(vehicle_id)
         if deleted_vehicle:

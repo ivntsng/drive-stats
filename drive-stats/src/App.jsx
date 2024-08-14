@@ -6,6 +6,7 @@ import VehicleDetail from './components/vehicles/VehicleDetail'
 import VehicleStat from './components/vehicle_stats/CreateStatLog'
 import UpdatedVehicleDetail from './components/vehicle_stats/UpdateVehicleDetails'
 import CreateBugReportForm from './components/bug_reports/create_bug_reports'
+import ServiceLogPage from './components/service_logs/ServiceLogs'
 import MyAccount from './components/accounts/myAccount'
 import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -89,6 +90,14 @@ function App() {
                                     element={
                                         <ProtectedRoute
                                             element={<UpdatedVehicleDetail />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/vehicles/garage/service/"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<ServiceLogPage />}
                                         />
                                     }
                                 />

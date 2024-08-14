@@ -71,3 +71,59 @@ class VehicleMaintenanceRepo(BaseModel):
             raise HTTPException(
                 status_code=500, detail="Failed to add vehicle maintenance"
             )
+
+    def get_maintenance_log_by_vehicle_id(
+        self, vehicle_id: int
+    ) -> Optional[VehicleMaintenanceOut]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        SELECT * FROM vehicle_maintenance
+                        WHERE vehicle_id = %s
+                        ORDER BY service_date DESC
+                        LIMIT 1
+                        """,
+                        (vehicle_id,),
+                    )
+                    result = cur.fetchone()
+                    if result is None:
+                        raise HTTPException(
+                            status_code=404,
+                            detail=f"Vehicle maintenance log with Vehicle ID ({vehicle_id}) does not exist.",
+                        )
+                    result_dict = self.result_to_dict(result)
+                    return VehicleMaintenanceOut(**result_dict)
+        except Exception as e:
+            print(f"Exception occurred: {e}")
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error"
+            )
+
+    def get_all_maintenance_log_by_vehicle_id(
+        self, vehicle_id: int
+    ) -> Optional[list[VehicleMaintenanceOut]]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        SELECT * FROM vehicle_maintenance
+                        WHERE vehicle_id = %s
+                        ORDER by service_date DESC
+                        """,
+                        (vehicle_id,),
+                    )
+                    results = cur.fetchall()
+                    vehicles = [
+                        self.result_to_dict(result) for result in results
+                    ]
+                    return [
+                        VehicleMaintenanceOut(**vehicle)
+                        for vehicle in vehicles
+                    ]
+        except Exception:
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error."
+            )

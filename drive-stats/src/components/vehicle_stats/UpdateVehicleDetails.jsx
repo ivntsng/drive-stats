@@ -71,13 +71,29 @@ export default function UpdatedVehicleDetail() {
                     title: `Successfully updated ${formData.vehicle_name}.`,
                     description: 'The vehicle details have been updated.',
                 })
-                navigate('/')
+                navigate(`/vehicles/garage/${vehicle_id}`) // Redirect to vehicle details page
             } else {
                 setError('There was an issue updating the vehicle.')
             }
         } catch (error) {
-            console.error('Error updating the vehicle:', error)
-            setError('An error occurred while updating the vehicle.')
+            if (error.response && error.response.status === 403) {
+                toast({
+                    title: 'Access Denied',
+                    description:
+                        'You do not have permission to update this vehicle.',
+                })
+                navigate('/') // Redirect to home or another safe page
+            } else if (error.response && error.response.status === 404) {
+                toast({
+                    title: 'Vehicle Not Found',
+                    description:
+                        'The vehicle you are trying to update does not exist.',
+                })
+                navigate('/') // Redirect to home or another safe page
+            } else {
+                console.error('Error updating the vehicle:', error)
+                setError('An error occurred while updating the vehicle.')
+            }
         } finally {
             setIsLoading(false)
         }
