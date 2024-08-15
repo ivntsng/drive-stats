@@ -85,11 +85,9 @@ const DatePicker = ({ className, date, setDate }) => {
                     )}
                 >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? (
+                    {date instanceof Date && !isNaN(date.getTime()) ? (
                         <span>
-                            {window.innerWidth > 1024
-                                ? format(updateDatePart(month, date), 'PPP')
-                                : format(updateDatePart(month, date), 'd MMM')}
+                            {format(updateDatePart(month, date), 'PPP')}
                         </span>
                     ) : (
                         <span className="hidden sm:block">Pick a date</span>
@@ -212,8 +210,12 @@ const DatePicker = ({ className, date, setDate }) => {
                     onMonthChange={(newMonth) => setMonth(newMonth.getMonth())}
                     selected={date}
                     onSelect={(e) => {
-                        setDate(e)
-                        setIsCalendarOpen(false)
+                        if (e instanceof Date && !isNaN(e.getTime())) {
+                            setDate(e)
+                            setIsCalendarOpen(false)
+                        } else {
+                            console.error('Invalid date selected')
+                        }
                     }}
                     initialFocus
                 />
@@ -223,8 +225,10 @@ const DatePicker = ({ className, date, setDate }) => {
 }
 
 function updateDatePart(month, date) {
+    // Ensure the date has no time component and only updates the month part
     const updatedDate = new Date(date)
     updatedDate.setMonth(month)
+    updatedDate.setHours(0, 0, 0, 0) // Reset time to avoid timezone issues
     return updatedDate
 }
 
@@ -241,7 +245,7 @@ export default function VehicleStat() {
     const form = useForm({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            service_date: new Date(),
+            service_date: new Date(), // Ensure this is set correctly
             vehicle_id: '',
             maintenance_type: '',
             mileage: '',
@@ -299,7 +303,6 @@ export default function VehicleStat() {
 
     async function createMaintenanceLog(e) {
         e.preventDefault()
-        setIsLoading(true)
 
         const formattedServiceDate = format(
             form.getValues('service_date'),
@@ -374,7 +377,7 @@ export default function VehicleStat() {
                                                 Maintenance Date
                                             </FormLabel>
                                             <DatePicker
-                                                className="w-[100px] sm:w-1/4 lg:w-48"
+                                                className=""
                                                 date={field.value}
                                                 setDate={field.onChange}
                                             />
