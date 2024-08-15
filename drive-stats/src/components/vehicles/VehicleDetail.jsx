@@ -340,12 +340,11 @@ export default function VehicleDetail() {
                     <CardHeader className="flex flex-row items-start bg-muted/50">
                         <div className="grid gap-0.5">
                             <CardTitle className="group flex items-center gap-2 text-lg">
-                                Maintenance Log:
+                                Upcoming Maintenance: {vehicle.vehicle_name}
                             </CardTitle>
-                            <CardDescription>
-                                Most recent logs for vehicle:{' '}
+                            {/* <CardDescription>
                                 {vehicle.vehicle_name}
-                            </CardDescription>
+                            </CardDescription> */}
                         </div>
                         <div className="ml-auto flex items-center gap-1">
                             <DropdownMenu>
@@ -361,19 +360,23 @@ export default function VehicleDetail() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem>
-                                        Edit Current Log
+                                        Development
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem>
-                                        Add New Log
+                                        Development
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6 text-sm">
-                        <div className="grid gap-3">
-                            <ul className="grid gap-3">
+                        <div className="grid gap-3 justify-center">
+                            <>
+                                This feature is in development - have an idea?
+                                Submit a feature request!
+                            </>
+                            {/* <ul className="grid gap-3">
                                 {vehicleStats.map((stat, index) => (
                                     <li
                                         key={index}
@@ -387,7 +390,7 @@ export default function VehicleDetail() {
                                         <span>{stat.value} miles</span>
                                     </li>
                                 ))}
-                            </ul>
+                            </ul> */}
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">

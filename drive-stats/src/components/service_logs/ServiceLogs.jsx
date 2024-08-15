@@ -1,84 +1,118 @@
-import React from 'react'
+import React, { useState, useEffect, useContext } from 'react'
+import { useParams } from 'react-router-dom'
+import axios from 'axios'
+import { UserContext } from '../../UserContext'
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table'
 
 const ServiceLogPage = () => {
-    return (
-        <div className="flex h-screen items-center justify-center p-4 sm:p-6">
-            <div className="flex flex-col h-full w-full max-w-4xl space-y-8 sm:space-y-10">
-                <div className="space-y-4 sm:space-y-6 w-full">
-                    <div className="flex flex-col space-y-2 sm:space-y-3 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <h2 className="text-xl font-bold tracking-tight md:text-2xl">
-                                Welcome back!
-                            </h2>
-                            <p className="text-muted-foreground text-sm md:text-base">
-                                Here&apos;s a record of all your vehicle
-                                services.
-                            </p>
-                        </div>
-                    </div>
+    const API_HOST = import.meta.env.VITE_API_HOST
+    const { vehicle_id } = useParams()
+    const { user, setUser } = useContext(UserContext)
+    const [vehicleLogs, setVehicleLogs] = useState([])
+    const totalCost = vehicleLogs.reduce((acc, log) => acc + log.cost, 0)
 
-                    <div className="rounded-md border">
-                        <div className="relative w-full overflow-auto">
-                            <table className="w-full caption-bottom text-sm table-fixed">
-                                <thead className="[&>tr]:border-b">
-                                    <tr className="border-b transition-colors hover:bg-muted/50">
-                                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground w-[5%]" />
-                                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground w-[15%]">
-                                            Date of service
-                                        </th>
-                                        <th className="h-10 px-2 text-center align-middle font-medium text-muted-foreground w-[40%]">
-                                            Service Type
-                                        </th>
-                                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground w-[20%]">
-                                            Mileage
-                                        </th>
-                                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground w-[15%]">
-                                            Cost
-                                        </th>
-                                        <th className="h-10 px-2 text-left align-middle font-medium text-muted-foreground w-[5%]" />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {/* Example row */}
-                                    <tr className="border-b transition-colors hover:bg-muted/50">
-                                        <td className="p-2 align-middle"></td>
-                                        <td className="p-2 align-middle">
-                                            Aug 13, 2024
-                                        </td>
-                                        <td className="p-2 align-middle text-center">
-                                            <div className="inline-flex items-center text-xs font-semibold">
-                                                Window Replacement
-                                            </div>
-                                        </td>
-                                        <td className="p-2 align-middle">
-                                            32000
-                                        </td>
-                                        <td className="p-2 align-middle">
-                                            $85
-                                        </td>
-                                        <td className="p-2 align-middle">
-                                            <button
-                                                type="button"
-                                                className="items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring h-8 w-8 p-0"
-                                            >
-                                                <svg
-                                                    width="15"
-                                                    height="15"
-                                                    viewBox="0 0 15 15"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    className="h-4 w-4"
-                                                >
-                                                    {/* SVG path */}
-                                                </svg>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    {/* Add more rows as needed */}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+    const fetchVehicleLogs = async (id, token) => {
+        try {
+            const response = await axios.get(
+                `${API_HOST}/api/vehicle-maintenance/maintenance-logs/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+            setVehicleLogs(response.data)
+        } catch (error) {
+            console.error(
+                'There was an error fetching the maintenance logs:',
+                error
+            )
+        }
+    }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const token = sessionStorage.getItem('token')
+            if (!token) return
+
+            try {
+                const userResponse = await axios.get(
+                    `${API_HOST}/api/auth/authenticate`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        withCredentials: true,
+                    }
+                )
+                setUser(userResponse.data)
+                await fetchVehicleLogs(vehicle_id, token)
+            } catch (error) {
+                console.error('There was an error:', error)
+            }
+        }
+
+        fetchData()
+    }, [vehicle_id])
+
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+            <div className="w-full max-w-4xl p-0 sm:p-6 md:p-8 rounded-lg shadow-md mb-[170px]">
+                <div className="overflow-x-auto rounded-lg border border-gray-300 p-4">
+                    <Table className="min-w-full">
+                        <TableCaption className="text-center">
+                            {vehicleLogs.length === 0 ? (
+                                <>No service logs found.</>
+                            ) : (
+                                <>
+                                    You have {vehicleLogs.length} maintenance
+                                    logs. Total spent ${totalCost.toFixed(2)}.
+                                </>
+                            )}
+                        </TableCaption>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[150px] text-center font-bold">
+                                    Service Date
+                                </TableHead>
+                                <TableHead className="text-center font-bold">
+                                    Service Type
+                                </TableHead>
+                                <TableHead className="text-center font-bold">
+                                    Mileage
+                                </TableHead>
+                                <TableHead className="text-center font-bold">
+                                    Cost
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {vehicleLogs.map((log, index) => (
+                                <TableRow key={index}>
+                                    <TableCell className="text-center">
+                                        {log.service_date}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {log.maintenance_type}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        {log.mileage}
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        ${log.cost}
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 </div>
             </div>
         </div>

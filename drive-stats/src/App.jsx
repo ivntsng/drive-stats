@@ -94,7 +94,7 @@ function App() {
                                     }
                                 />
                                 <Route
-                                    path="/vehicles/garage/service/"
+                                    path="/vehicles/garage/service/:vehicle_id"
                                     element={
                                         <ProtectedRoute
                                             element={<ServiceLogPage />}
