@@ -46,7 +46,7 @@ steps = [
         """,
     ],
     [
-        # Creating the vehicle_stats table with a check
+        # Creating the vehicle_maintenance table with a check
         """
         DO $$
         BEGIN
@@ -64,7 +64,7 @@ steps = [
             END IF;
         END $$;
         """,
-        # Dropping the vehicle_stats table
+        # Dropping the vehicle_maintenance table
         """
         DROP TABLE IF EXISTS vehicle_maintenance;
         """,

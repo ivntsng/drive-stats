@@ -39,6 +39,11 @@ const FormSchema = z.object({
     service_date: z.date({
         required_error: 'A maintenance date is required.',
     }),
+    vehicle_id: z.string().min(1, 'Please select a vehicle.'), // Vehicle must be selected
+    maintenance_type: z.string().min(1, 'Please select a maintenance type.'), // Maintenance type must be selected
+    mileage: z.number().optional(), // Mileage is optional
+    cost: z.number().optional(), // Cost is also optional
+    description: z.string().optional(),
 })
 
 const monthNames = [
@@ -314,6 +319,34 @@ export default function VehicleStat() {
             service_date: formattedServiceDate,
         }
 
+        if (!form.getValues('vehicle_id')) {
+            setError('Please select a vehicle.')
+            return
+        }
+
+        if (!form.getValues('maintenance_type')) {
+            setError('Please select a maintenance type.')
+            return
+        }
+
+        if (!form.getValues('description')) {
+            setError('Please enter a short description.')
+            return
+        }
+
+        if (!form.getValues('mileage')) {
+            setError('Please enter a mileage for this maintenance.')
+            return
+        }
+
+        if (!form.getValues('cost')) {
+            setError('Please enter the cost for this maintenance.')
+            return
+        }
+
+        setError('')
+        setIsLoading(true)
+
         try {
             const response = await fetch(
                 `${API_HOST}/api/vehicle-maintenance/create/${processedFormData.vehicle_id}`,
@@ -446,21 +479,14 @@ export default function VehicleStat() {
                                                     </SelectTrigger>
                                                     <SelectContent className="max-h-64 overflow-y-auto">
                                                         <div className="p-2 font-bold">
-                                                            Admin
+                                                            General
                                                         </div>
                                                         <SelectItem value="inspection">
                                                             Inspection
                                                         </SelectItem>
-                                                        <SelectItem value="mileage">
-                                                            Mileage
-                                                        </SelectItem>
                                                         <SelectItem value="registration">
                                                             Registration
                                                         </SelectItem>
-
-                                                        <div className="p-2 font-bold">
-                                                            Fuel
-                                                        </div>
                                                         <SelectItem value="fuel">
                                                             Fuel
                                                         </SelectItem>
@@ -710,6 +736,11 @@ export default function VehicleStat() {
                                         )}
                                     />
                                 </div>
+                                {error && (
+                                    <p className="text-red-500 flex justify-center">
+                                        {error}
+                                    </p>
+                                )}
                                 {/* Buttons */}
                                 <div className="flex justify-between space-x-4 mt-4">
                                     <Button

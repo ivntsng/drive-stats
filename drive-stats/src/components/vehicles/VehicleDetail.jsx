@@ -103,14 +103,14 @@ export default function VehicleDetail() {
                     description:
                         'You do not have permission to view this vehicle.',
                 })
-                navigate('/') // Redirect to home or another safe page
+                navigate('/')
             } else if (error.response && error.response.status === 404) {
                 toast({
                     title: 'Vehicle Not Found',
                     description:
                         'The vehicle you are looking for does not exist.',
                 })
-                navigate('/') // Redirect to home or another safe page
+                navigate('/')
             } else {
                 console.error(
                     'There was an error fetching the vehicle details!',
@@ -244,8 +244,8 @@ export default function VehicleDetail() {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="w-full max-w-md p-6 rounded-lg shadow-md border border-gray-300 text-center">
-                    We ran into an issue loading your vehicle! Try refreshing
-                    the page and if nothing happens please submit a bug report.
+                    We ran into an issue loading your vehicle! Try re-logging
+                    into your account.
                 </div>
             </div>
         )
@@ -321,7 +321,7 @@ export default function VehicleDetail() {
                         <Pagination className="ml-auto mr-0 w-auto">
                             <PaginationContent>
                                 <PaginationItem>
-                                    <Button
+                                    {/* <Button
                                         size="icon"
                                         variant="outline"
                                         className="h-6 w-6"
@@ -329,7 +329,7 @@ export default function VehicleDetail() {
                                     >
                                         <ChevronRight className="h-3.5 w-3.5" />
                                         <span className="sr-only">Next</span>
-                                    </Button>
+                                    </Button> */}
                                 </PaginationItem>
                             </PaginationContent>
                         </Pagination>

@@ -127,3 +127,57 @@ class VehicleMaintenanceRepo(BaseModel):
             raise HTTPException(
                 status_code=500, detail="Internal Server Error."
             )
+
+    def get_maintenance_log_by_log_id(
+        self, maintenance_log_id: int
+    ) -> Optional[VehicleMaintenanceOut]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        SELECT * from vehicle_maintenance
+                        WHERE id = %s
+                        """,
+                        (maintenance_log_id,),
+                    )
+                    result = cur.fetchone()
+                    if result is None:
+                        raise HTTPException(
+                            status_code=404,
+                            detail=f"Maintenance log with ID ({id}) does not exist.",
+                        )
+                    result_dict = self.result_to_dict(result)
+                    return VehicleMaintenanceOut(**result_dict)
+        except Exception as e:
+            print(f"Exception occurred: {e}")
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error"
+            )
+
+    def delete_maintenance_log_by_id(
+        self, maintenance_log_id: int
+    ) -> Optional[VehicleMaintenanceOut]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        "DELETE FROM vehicle_maintenance WHERE id = %s RETURNING *",
+                        (maintenance_log_id,),
+                    )
+                    result = cur.fetchone()
+                    if result:
+                        result_dict = self.result_to_dict(result)
+                        return VehicleMaintenanceOut(**result_dict)
+                    else:
+                        print(
+                            f"Maintenance log ID {maintenance_log_id} does not exist."
+                        )
+                        return None  # Return None if the record does not exist
+        except Exception as e:
+            print(
+                f"Error deleting maintenance log ID {maintenance_log_id}: {e}"
+            )
+            raise HTTPException(
+                status_code=500, detail="Internal Server Error during deletion"
+            )

@@ -6,7 +6,8 @@ import VehicleDetail from './components/vehicles/VehicleDetail'
 import VehicleStat from './components/vehicle_stats/CreateStatLog'
 import UpdatedVehicleDetail from './components/vehicle_stats/UpdateVehicleDetails'
 import CreateBugReportForm from './components/bug_reports/create_bug_reports'
-import ServiceLogPage from './components/service_logs/ServiceLogs'
+import MaintenanceLogPage from './components/maintenance_logs/MaintenanceLogs'
+import MaintenanceLogDetails from './components/maintenance_logs/MaintenanceLogDetails'
 import MyAccount from './components/accounts/myAccount'
 import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -94,10 +95,18 @@ function App() {
                                     }
                                 />
                                 <Route
-                                    path="/vehicles/garage/service/:vehicle_id"
+                                    path="/vehicles/garage/maintenance/:vehicle_id"
                                     element={
                                         <ProtectedRoute
-                                            element={<ServiceLogPage />}
+                                            element={<MaintenanceLogPage />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/vehicles/garage/maintenance/maintenance-log/:log_id"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<MaintenanceLogDetails />}
                                         />
                                     }
                                 />

@@ -92,7 +92,7 @@ export default function Garage() {
                                     <a
                                         href="/vehicles/register"
                                         style={{
-                                            color: '#551A8B',
+                                            color: '#001d3d',
                                             textDecoration: 'underline',
                                         }}
                                     >
@@ -120,7 +120,7 @@ export default function Garage() {
                                     Model
                                 </TableHead>
                                 <TableHead className="w-1/4 text-center font-bold">
-                                    Service Log
+                                    Maintenance Log
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -143,10 +143,10 @@ export default function Garage() {
                                     </TableCell>
                                     <TableCell className="w-1/4 text-center">
                                         <Link
-                                            to={`/vehicles/garage/service/${vehicle.id}`}
+                                            to={`/vehicles/garage/maintenance/${vehicle.id}`}
                                             className="hover:text-purple-600 hover:underline"
                                         >
-                                            Service Log
+                                            Maintenance Log
                                         </Link>
                                     </TableCell>
                                 </TableRow>
