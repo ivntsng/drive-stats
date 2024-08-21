@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { UserContext } from '../../UserContext'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,34 @@ import {
     PaginationItem,
 } from '@/components/ui/pagination'
 import { ChevronLeft, ChevronRight, MoreVertical } from 'lucide-react'
+import { useToast } from '@/components/ui/use-toast'
+import { CheckIcon } from '@radix-ui/react-icons'
+
+function ConfirmDialog({ onConfirm, onCancel }) {
+    return (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <Card className="w-[380px]">
+                <CardHeader>
+                    <CardTitle className="flex items-center justify-center">
+                        Confirm Deletion
+                    </CardTitle>
+                    <CardDescription>
+                        Are you sure you want to delete this vehicle? This
+                        action cannot be undone.
+                    </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex justify-between">
+                    <Button onClick={onCancel} variant="outline">
+                        Cancel
+                    </Button>
+                    <Button onClick={onConfirm} variant="destructive">
+                        Confirm
+                    </Button>
+                </CardFooter>
+            </Card>
+        </div>
+    )
+}
 
 export default function VehicleDetail() {
     const { vehicle_id } = useParams()
@@ -31,7 +59,10 @@ export default function VehicleDetail() {
     const [vehicle, setVehicle] = useState(null)
     const [vehicleStats, setVehicleStats] = useState([])
     const [showVehicleDetails, setShowVehicleDetails] = useState(true)
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false)
     const API_HOST = import.meta.env.VITE_API_HOST
+    const navigate = useNavigate()
+    const { toast } = useToast()
 
     const fetchUser = async () => {
         const token = sessionStorage.getItem('token')
@@ -66,11 +97,64 @@ export default function VehicleDetail() {
             })
             setVehicle(response.data)
         } catch (error) {
-            console.error(
-                'There was an error fetching the vehicle details!',
-                error
-            )
+            if (error.response && error.response.status === 403) {
+                toast({
+                    title: 'Access Denied',
+                    description:
+                        'You do not have permission to view this vehicle.',
+                })
+                navigate('/')
+            } else if (error.response && error.response.status === 404) {
+                toast({
+                    title: 'Vehicle Not Found',
+                    description:
+                        'The vehicle you are looking for does not exist.',
+                })
+                navigate('/')
+            } else {
+                console.error(
+                    'There was an error fetching the vehicle details!',
+                    error
+                )
+            }
         }
+    }
+
+    const deleteVehicle = async (id, token) => {
+        try {
+            const response = await axios.delete(
+                `${API_HOST}/vehicles/delete/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+
+            if (response.status === 200) {
+                navigate('/')
+                toast({
+                    title: 'Vehicle Deleted',
+                })
+            } else {
+                console.log('Failed to delete the vehicle.')
+            }
+        } catch (error) {
+            console.error('Error deleting the vehicle:', error)
+        }
+    }
+
+    const handleDeleteClick = () => {
+        setShowConfirmDialog(true)
+    }
+
+    const handleConfirmDelete = () => {
+        setShowConfirmDialog(false)
+        deleteVehicle(vehicle.id, user.token)
+    }
+
+    const handleCancelDelete = () => {
+        setShowConfirmDialog(false)
     }
 
     const fetchVehicleStats = async (id, token) => {
@@ -83,7 +167,6 @@ export default function VehicleDetail() {
                     },
                 }
             )
-            console.log('Fetched vehicle stats:', response.data) // Logging the fetched data
 
             const stats = response.data
                 .map((stat) => {
@@ -152,12 +235,16 @@ export default function VehicleDetail() {
         setShowVehicleDetails(true)
     }
 
+    const handleEditClick = () => {
+        navigate(`/vehicles/garage/update/${vehicle.id}`)
+    }
+
     if (!vehicle) {
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="w-full max-w-md p-6 rounded-lg shadow-md border border-gray-300 text-center">
-                    We ran into an issue loading your vehicle! Try refreshing
-                    the page and if nothing happens please submit a bug report.
+                    We ran into an issue loading your vehicle! Try re-logging
+                    into your account.
                 </div>
             </div>
         )
@@ -189,9 +276,15 @@ export default function VehicleDetail() {
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>Edit</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={handleEditClick}>
+                                        Edit
+                                    </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Delete</DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={handleDeleteClick}
+                                    >
+                                        Delete
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
@@ -227,7 +320,7 @@ export default function VehicleDetail() {
                         <Pagination className="ml-auto mr-0 w-auto">
                             <PaginationContent>
                                 <PaginationItem>
-                                    <Button
+                                    {/* <Button
                                         size="icon"
                                         variant="outline"
                                         className="h-6 w-6"
@@ -235,7 +328,7 @@ export default function VehicleDetail() {
                                     >
                                         <ChevronRight className="h-3.5 w-3.5" />
                                         <span className="sr-only">Next</span>
-                                    </Button>
+                                    </Button> */}
                                 </PaginationItem>
                             </PaginationContent>
                         </Pagination>
@@ -246,12 +339,11 @@ export default function VehicleDetail() {
                     <CardHeader className="flex flex-row items-start bg-muted/50">
                         <div className="grid gap-0.5">
                             <CardTitle className="group flex items-center gap-2 text-lg">
-                                Maintenance Log:
+                                Upcoming Maintenance: {vehicle.vehicle_name}
                             </CardTitle>
-                            <CardDescription>
-                                Most recent logs for vehicle:{' '}
+                            {/* <CardDescription>
                                 {vehicle.vehicle_name}
-                            </CardDescription>
+                            </CardDescription> */}
                         </div>
                         <div className="ml-auto flex items-center gap-1">
                             <DropdownMenu>
@@ -267,19 +359,23 @@ export default function VehicleDetail() {
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem>
-                                        Edit Current Log
+                                        Development
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem>
-                                        Add New Log
+                                        Development
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
                     </CardHeader>
                     <CardContent className="p-6 text-sm">
-                        <div className="grid gap-3">
-                            <ul className="grid gap-3">
+                        <div className="grid gap-3 justify-center">
+                            <>
+                                This feature is in development - have an idea?
+                                Submit a feature request!
+                            </>
+                            {/* <ul className="grid gap-3">
                                 {vehicleStats.map((stat, index) => (
                                     <li
                                         key={index}
@@ -293,7 +389,7 @@ export default function VehicleDetail() {
                                         <span>{stat.value} miles</span>
                                     </li>
                                 ))}
-                            </ul>
+                            </ul> */}
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
@@ -316,6 +412,12 @@ export default function VehicleDetail() {
                         </Pagination>
                     </CardFooter>
                 </Card>
+            )}
+            {showConfirmDialog && (
+                <ConfirmDialog
+                    onConfirm={handleConfirmDelete}
+                    onCancel={handleCancelDelete}
+                />
             )}
         </div>
     )

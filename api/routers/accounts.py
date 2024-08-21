@@ -20,11 +20,7 @@ from dotenv import load_dotenv
 from utils.authentication import try_get_jwt_user_data
 from config import API_HOST, verify_api_host, oauth2_scheme
 from models.jwt import JWTUserData
-
 import os
-
-# Load environment variables from .env file
-load_dotenv()
 
 router = APIRouter(tags=["Accounts"])
 blacklisted_tokens = set()

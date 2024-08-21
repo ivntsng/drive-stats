@@ -61,7 +61,6 @@ function LoginForm({
             if (response.ok) {
                 const data = await response.json()
                 const { access_token } = data
-                console.log('Login successful. Received token:', access_token)
                 sessionStorage.setItem('token', access_token)
                 setUser({ username, token: access_token })
                 closeLoginForm()
@@ -108,7 +107,7 @@ function LoginForm({
     }, [handleClickOutside])
 
     return (
-        <Card className="w-full md:w-[400px] mx-auto">
+        <Card className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
             <div ref={formRef}>
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-bold">

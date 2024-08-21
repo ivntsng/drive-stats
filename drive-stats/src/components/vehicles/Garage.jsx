@@ -51,9 +51,17 @@ export default function Garage() {
                     },
                 }
             )
-            setVehicles(response.data)
+
+            // Check if response data is an array before setting state
+            if (Array.isArray(response.data)) {
+                setVehicles(response.data)
+            } else {
+                console.warn('Unexpected response format:', response.data)
+                setVehicles([])
+            }
         } catch (error) {
             console.error('There was an error fetching the vehicles!', error)
+            setVehicles([])
         }
     }
 
@@ -75,7 +83,7 @@ export default function Garage() {
                     Welcome to your garage, {user?.username}!
                 </p>
                 <div className="overflow-x-auto rounded-lg border border-gray-300 p-4">
-                    <Table className="min-w-full">
+                    <Table className="min-w-full table-fixed">
                         <TableCaption className="text-center">
                             {vehicles.length === 0 ? (
                                 <>
@@ -84,7 +92,7 @@ export default function Garage() {
                                     <a
                                         href="/vehicles/register"
                                         style={{
-                                            color: '#551A8B',
+                                            color: '#001d3d',
                                             textDecoration: 'underline',
                                         }}
                                     >
@@ -94,31 +102,32 @@ export default function Garage() {
                                 </>
                             ) : (
                                 <>
-                                    You currently have {vehicles.length}{' '}
-                                    vehicles registered.
+                                    You have {vehicles.length} vehicles
+                                    registered. Click on a vehicle's name to
+                                    navigate to vehicle details.
                                 </>
                             )}
                         </TableCaption>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[100px] text-center font-bold">
+                                <TableHead className="w-1/4 text-center font-bold">
                                     Name
                                 </TableHead>
-                                <TableHead className="text-center font-bold">
+                                <TableHead className="w-1/4 text-center font-bold">
                                     Make
                                 </TableHead>
-                                <TableHead className="text-center font-bold">
+                                <TableHead className="w-1/4 text-center font-bold">
                                     Model
                                 </TableHead>
-                                <TableHead className="text-center font-bold">
-                                    Full Maintenance Log
+                                <TableHead className="w-1/4 text-center font-bold">
+                                    Maintenance Log
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {vehicles.map((vehicle) => (
                                 <TableRow key={vehicle.vin}>
-                                    <TableCell className="font-medium text-center">
+                                    <TableCell className="w-1/4 font-medium text-center">
                                         <Link
                                             to={`/vehicles/garage/${vehicle.id}`}
                                             className="hover:text-purple-600 hover:underline"
@@ -126,16 +135,19 @@ export default function Garage() {
                                             {vehicle.vehicle_name}
                                         </Link>
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-1/4 text-center">
                                         {vehicle.make}
                                     </TableCell>
-                                    <TableCell className="text-center">
+                                    <TableCell className="w-1/4 text-center">
                                         {vehicle.model}
                                     </TableCell>
-                                    <TableCell className="text-center">
-                                        <span style={{ color: 'red' }}>
-                                            (Feature In Development)
-                                        </span>
+                                    <TableCell className="w-1/4 text-center">
+                                        <Link
+                                            to={`/vehicles/garage/maintenance/${vehicle.id}`}
+                                            className="hover:text-purple-600 hover:underline"
+                                        >
+                                            Maintenance Log
+                                        </Link>
                                     </TableCell>
                                 </TableRow>
                             ))}

@@ -4,7 +4,11 @@ import MainPage from './MainPage'
 import CreateVehicle from './components/vehicles/CreateVehicle'
 import VehicleDetail from './components/vehicles/VehicleDetail'
 import VehicleStat from './components/vehicle_stats/CreateStatLog'
+import UpdatedVehicleDetail from './components/vehicle_stats/UpdateVehicleDetails'
 import CreateBugReportForm from './components/bug_reports/create_bug_reports'
+import MaintenanceLogPage from './components/maintenance_logs/MaintenanceLogs'
+import MaintenanceLogDetails from './components/maintenance_logs/MaintenanceLogDetails'
+import UpdateMaintenanceLog from './components/maintenance_logs/UpdateMaintenanceLog'
 import MyAccount from './components/accounts/myAccount'
 import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -47,6 +51,7 @@ function App() {
                 })
                 .catch((error) => {
                     console.error('User re-authentication failed:', error)
+                    sessionStorage.removeItem('token')
                     setUser(null)
                 })
         }
@@ -81,6 +86,38 @@ function App() {
                                     element={
                                         <ProtectedRoute
                                             element={<VehicleDetail />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/vehicles/garage/update/:vehicle_id"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<UpdatedVehicleDetail />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/vehicles/garage/maintenance/:vehicle_id"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<MaintenanceLogPage />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/vehicles/garage/maintenance/maintenance-log/:log_id"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<MaintenanceLogDetails />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/vehicles/garage/maintenance/maintenance-log/update/:maintenance_log_id"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<UpdateMaintenanceLog />}
                                         />
                                     }
                                 />

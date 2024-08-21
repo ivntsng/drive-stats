@@ -1,4 +1,4 @@
-# Use the official Python image from the Docker Hub
+# Use an official Python runtime as a base image
 FROM python:3.10-bullseye
 
 # Set the working directory in the container
@@ -7,14 +7,18 @@ WORKDIR /app
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Install any dependencies
+# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the current directory contents into the container at /app
+# Copy the rest of the application code into the container
 COPY . .
 
-# Expose port 8000 to the outside world
-EXPOSE 8000
+# Copy SSL certificates
+COPY ssl/fullchain.pem /etc/ssl/certs/fullchain.pem
+COPY ssl/privkey.pem /etc/ssl/private/privkey.pem
 
-# Command to run the application using Uvicorn with Gunicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Expose port 443
+EXPOSE 443
+
+# Run the Uvicorn server with SSL
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "443", "--ssl-keyfile", "/etc/ssl/private/privkey.pem", "--ssl-certfile", "/etc/ssl/certs/fullchain.pem"]

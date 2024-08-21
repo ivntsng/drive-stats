@@ -8,10 +8,12 @@ from fastapi import (
 )
 from typing import Union, List
 from queries.vehicles import VehicleIn, VehicleRepository, VehicleOut, Error
+from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
 from config import verify_api_host, oauth2_scheme
+from main import limiter
 
 
 tags_metadata = [
@@ -28,7 +30,9 @@ router = APIRouter(tags=["Vehicles"])
     response_model=Union[VehicleOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("5/minute")
 def create_vehicle(
+    request: Request,
     vehicle: VehicleIn,
     repo: VehicleRepository = Depends(),
     current_user: JWTUserData = Depends(try_get_jwt_user_data),
@@ -60,7 +64,9 @@ def create_vehicle(
     response_model=VehicleOut,
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("20/minute")
 async def get_vehicle_by_id(
+    request: Request,
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleRepository = Depends(),
@@ -76,6 +82,11 @@ async def get_vehicle_by_id(
                 "error": f"Vehicle with ID {vehicle_id} not found",
             },
         )
+    if vehicle.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to access this vehicle.",
+        )
     return vehicle
 
 
@@ -84,7 +95,9 @@ async def get_vehicle_by_id(
     response_model=Union[List[VehicleOut], Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("20/minute")
 def list_vehicles(
+    request: Request,
     repo: VehicleRepository = Depends(),
     current_user: JWTUserData = Depends(try_get_jwt_user_data),
 ):
@@ -93,17 +106,24 @@ def list_vehicles(
 
     try:
         vehicles = repo.get_vehicles_by_user_id(current_user.id)
+        if not vehicles:  # Check if the vehicle list is empty
+            return JSONResponse(
+                status_code=200,
+                content={"message": "No vehicles in the garage"},
+            )
         return vehicles
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.put(
-    "/vehicles/{vehicle_id}",
+    "/vehicles/update/{vehicle_id}",
     response_model=Union[VehicleOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("5/minute")
 async def update_vehicle(
+    request: Request,
     response: Response,
     vehicle_id: int,
     vehicle: VehicleIn,
@@ -112,13 +132,27 @@ async def update_vehicle(
 ) -> Union[VehicleOut, Error]:
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
+
+    existing_vehicle = vehicle_repo.get_vehicle_by_id(vehicle_id)
+
+    if existing_vehicle is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Vehicle with ID {vehicle_id} not found",
+        )
+
+    if existing_vehicle.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to update this vehicle.",
+        )
     try:
         updated_vehicle = vehicle_repo.update_vehicle(vehicle_id, vehicle)
         if updated_vehicle:
             return updated_vehicle
         else:
             raise HTTPException(
-                status_code=500, detail="Failed to update vehicle"
+                status_code=404, detail=f"Vehicle ID {vehicle_id} not found"
             )
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -127,16 +161,18 @@ async def update_vehicle(
         response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
         return Error(
             detail="Internal server error",
-            message=f"Vehicle {vehicle_id} does not exist.",
+            message=f"Failed to update vehicle ID {vehicle_id} due to an error.",
         )
 
 
 @router.delete(
-    "/vehicles/{vehicle_id}",
+    "/vehicles/delete/{vehicle_id}",
     response_model=Union[VehicleOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("5/minute")
 async def delete_vehicle(
+    request: Request,
     response: Response,
     vehicle_id: int,
     vehicle_repo: VehicleRepository = Depends(),
@@ -144,6 +180,20 @@ async def delete_vehicle(
 ) -> Union[VehicleOut, Error]:
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
+    existing_vehicle = vehicle_repo.get_vehicle_by_id(vehicle_id)
+
+    if existing_vehicle is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Vehicle with ID {vehicle_id} not found",
+        )
+
+    # Check if the current user is the owner of the vehicle
+    if existing_vehicle.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this vehicle.",
+        )
     try:
         deleted_vehicle = vehicle_repo.delete_vehicle(vehicle_id)
         if deleted_vehicle:
@@ -163,9 +213,12 @@ async def delete_vehicle(
 
 @router.get(
     "/vehicles/user/{user_id}",
-    response_model=List[VehicleOut],
+    response_model=List[
+        VehicleOut
+    ],  # Ensure this matches your expected output
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
+@limiter.limit("20/minute")
 async def get_vehicles_by_user_id(
     request: Request,
     response: Response,
@@ -179,15 +232,13 @@ async def get_vehicles_by_user_id(
         vehicles = vehicle_repo.get_vehicles_by_user_id(user_id)
         return vehicles
     except HTTPException as http_exc:
-        if http_exc.status_code == 404:
-            raise
-        else:
-            print(
-                f"Failed to grab USER ID {user_id} due to an error: ",
-                http_exc.detail,
-            )
-            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Internal server error",
-            )
+        print(
+            f"Failed to grab USER ID {user_id} due to an HTTP error: {http_exc.detail}"
+        )
+        raise
+    except Exception as exc:
+        print(f"Server error occurred: {exc}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error",
+        )

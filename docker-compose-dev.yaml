@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+    postgres:
+        image: postgres:16.2
+        environment:
+            POSTGRES_DB: drivestats_db
+            POSTGRES_USER: casper
+            POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
+        volumes:
+            - drive-statsDB:/var/lib/postgresql/data
+        networks:
+            - app-network
+
+    flyway:
+        image: flyway/flyway
+        command: migrate
+        volumes:
+            - ./sql:/flyway/sql
+        environment:
+            FLYWAY_URL: jdbc:postgresql://postgres:5432/drivestats_db
+            FLYWAY_USER: casper
+            FLYWAY_PASSWORD: foTVdhgYZzz8bOL6e
+            FLYWAY_LOCATIONS: filesystem:/flyway/sql
+        depends_on:
+            - postgres
+        networks:
+            - app-network
+
+    backend:
+        build:
+            context: ./api
+            dockerfile: Dockerfile.dev
+        environment:
+            SIGNING_KEY: 06b261ced90b876af6e6e5834da0ca740f5b1e2e432988f129cab2eb95dcb11d
+            ALGORITHM: HS256
+            VITE_API_HOST: https://localhost:8000
+            CORS_HOST: https://localhost
+            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres:5432/drivestats_db
+        ports:
+            - "8000:8000"
+        depends_on:
+            - postgres
+            - flyway
+        networks:
+            - app-network
+
+    frontend:
+        build:
+            context: ./drive-stats
+            dockerfile: Dockerfile.dev
+        ports:
+            - "5173:5173" # Vite default dev port
+        volumes:
+            - ./drive-stats:/app # Mount the frontend source code
+        environment:
+            CHOKIDAR_USEPOLLING: "true" # Enable polling for file changes if necessary
+        networks:
+            - app-network
+
+volumes:
+    drive-statsDB:
+
+networks:
+    app-network:

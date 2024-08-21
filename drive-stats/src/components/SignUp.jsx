@@ -117,7 +117,7 @@ function SignupForm({
     }, [handleClickOutside])
 
     return (
-        <Card className="w-full md:w-[400px] mx-auto">
+        <Card className="w-full max-w-[400px] mx-auto px-4 sm:px-6 lg:px-8">
             <div ref={formRef}>
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-bold">

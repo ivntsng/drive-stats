@@ -34,6 +34,9 @@ export default function CreateBugReportForm() {
     const [isLoading, setIsLoading] = useState(false)
     const API_HOST = import.meta.env.VITE_API_HOST
     const navigate = useNavigate()
+    const handleCancel = () => {
+        navigate('/') // Navigates back to the home page
+    }
 
     async function createBugReport(e) {
         e.preventDefault()
@@ -228,6 +231,7 @@ export default function CreateBugReportForm() {
                             <div className="flex items-center justify-between space-x-2 p-6 pt-0">
                                 <Button
                                     type="button"
+                                    onClick={handleCancel}
                                     className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
                                 >
                                     Cancel
