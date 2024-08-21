@@ -89,7 +89,7 @@ export default function UpdatedVehicleDetail() {
                     description:
                         'The vehicle you are trying to update does not exist.',
                 })
-                navigate('/') // Redirect to home or another safe page
+                navigate('/')
             } else {
                 console.error('Error updating the vehicle:', error)
                 setError('An error occurred while updating the vehicle.')
