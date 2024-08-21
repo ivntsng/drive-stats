@@ -132,7 +132,6 @@ export default function VehicleDetail() {
             )
 
             if (response.status === 200) {
-                console.log('Vehicle deleted successfully.')
                 navigate('/')
                 toast({
                     title: 'Vehicle Deleted',
