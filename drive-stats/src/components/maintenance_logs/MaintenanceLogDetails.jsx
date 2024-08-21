@@ -186,6 +186,12 @@ export default function MaintenanceLogDetails() {
         setShowConfirmDialog(false)
     }
 
+    const handleEditClick = () => {
+        navigate(
+            `/vehicles/garage/maintenance/maintenance-log/update/${log_id}`
+        )
+    }
+
     if (!maintenanceLog) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -203,7 +209,7 @@ export default function MaintenanceLogDetails() {
                 <CardHeader className="flex flex-row items-start bg-muted/50">
                     <div className="grid gap-0.5">
                         <CardTitle className="group flex items-center gap-2 text-lg">
-                            Maintenance Log Details
+                            Log Details
                         </CardTitle>
                         <CardDescription>
                             {maintenanceLog.description}
@@ -222,6 +228,10 @@ export default function MaintenanceLogDetails() {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={handleEditClick}>
+                                    Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem onClick={handleDeleteClick}>
                                     Delete
                                 </DropdownMenuItem>

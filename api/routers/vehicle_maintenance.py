@@ -137,7 +137,7 @@ def retrieve_all_vehicle_maintenance_logs_by_vehicle_id(
     response_model=Union[VehicleMaintenanceOut, Error],
     dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
 )
-@limiter.limit("5/minute")
+@limiter.limit("1000/minute")
 def retrieve_maintenance_log_by_maintenance_id(
     request: Request,
     response: Response,
@@ -216,7 +216,7 @@ async def delete_maintenance_log_id(
     if vehicle.user_id != current_user.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to delete this maintenance log.",
+            detail="You do not have permission to delete this maintenance log, please submit a bug report if this is an error.",
         )
 
     try:
@@ -238,4 +238,77 @@ async def delete_maintenance_log_id(
         return Error(
             message="Internal server error",
             detail=f"Failed to delete maintenance log ID {maintenance_id}.",
+        )
+
+
+@router.put(
+    "/maintenance-log/update/{maintenance_id}",
+    response_model=Union[VehicleMaintenanceOut, Error],
+    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+)
+@limiter.limit("1000/minute")
+async def update_maintenance_log(
+    request: Request,
+    response: Response,
+    maintenance_log_id: int,
+    maintenance_log: VehicleMaintenanceIn,
+    maintenance_repo: VehicleMaintenanceRepo = Depends(),
+    vehicle_repo: VehicleRepository = Depends(),
+    current_user: JWTUserData = Depends(try_get_jwt_user_data),
+) -> Union[VehicleMaintenanceOut, Error]:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+        # Retrieve the maintenance log details
+    existing_maintenance_log = maintenance_repo.get_maintenance_log_by_log_id(
+        maintenance_log_id
+    )
+
+    if existing_maintenance_log is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Maintenance log with ID {maintenance_log_id} not found",
+        )
+
+    # Now retrieve the vehicle associated with this maintenance log
+    vehicle = vehicle_repo.get_vehicle_by_id(
+        existing_maintenance_log.vehicle_id
+    )
+
+    if vehicle is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Vehicle with ID {existing_maintenance_log.vehicle_id} not found",
+        )
+
+    # Check if the current user is the owner of the vehicle
+    if vehicle.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to edit this maintenance log, please submit a bug report if this is an error.",
+        )
+
+    try:
+        current_maintenance_log = (
+            maintenance_repo.update_maintenance_log_by_id(
+                maintenance_log_id, maintenance_log
+            )
+        )
+        if current_maintenance_log:
+            return current_maintenance_log
+        else:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Maintenance Log ID {maintenance_log_id} not found.",
+            )
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        print(
+            f"Failed to update vehicle ID {maintenance_log_id} due to an error: {e}"
+        )
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return Error(
+            detail="Internal server error",
+            message=f"Failed to update vehicle ID {maintenance_log_id} due to an error.",
         )

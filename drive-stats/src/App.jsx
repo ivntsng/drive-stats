@@ -8,6 +8,7 @@ import UpdatedVehicleDetail from './components/vehicle_stats/UpdateVehicleDetail
 import CreateBugReportForm from './components/bug_reports/create_bug_reports'
 import MaintenanceLogPage from './components/maintenance_logs/MaintenanceLogs'
 import MaintenanceLogDetails from './components/maintenance_logs/MaintenanceLogDetails'
+import UpdateMaintenanceLog from './components/maintenance_logs/UpdateMaintenanceLog'
 import MyAccount from './components/accounts/myAccount'
 import NavBar from './NavBar'
 import { ThemeProvider } from '@/components/theme-provider'
@@ -107,6 +108,14 @@ function App() {
                                     element={
                                         <ProtectedRoute
                                             element={<MaintenanceLogDetails />}
+                                        />
+                                    }
+                                />
+                                <Route
+                                    path="/vehicles/garage/maintenance/maintenance-log/update/:maintenance_log_id"
+                                    element={
+                                        <ProtectedRoute
+                                            element={<UpdateMaintenanceLog />}
                                         />
                                     }
                                 />

@@ -181,3 +181,50 @@ class VehicleMaintenanceRepo(BaseModel):
             raise HTTPException(
                 status_code=500, detail="Internal Server Error during deletion"
             )
+
+    def update_maintenance_log_by_id(
+        self, maintenance_log_id: int, log_id: VehicleMaintenanceIn
+    ) -> Optional[VehicleMaintenanceOut]:
+        try:
+            with pool.connection() as conn:
+                with conn.cursor() as cur:
+                    cur.execute(
+                        """
+                        UPDATE vehicle_maintenance
+                        SET
+                          vehicle_id = %s,
+                          maintenance_type = %s,
+                          mileage = %s,
+                          cost = %s,
+                          description = %s,
+                          service_date = %s
+                        WHERE id = %s
+                        RETURNING id, vehicle_id, maintenance_type, mileage, cost, description, service_date, created_date
+                        """,
+                        [
+                            log_id.vehicle_id,
+                            log_id.maintenance_type,
+                            log_id.mileage,
+                            log_id.cost,
+                            log_id.description,
+                            log_id.service_date,
+                            maintenance_log_id,  # This is the value for the WHERE clause
+                        ],
+                    )
+                    result = cur.fetchone()
+                    if result is not None:
+                        result_dict = self.result_to_dict(result)
+                        return VehicleMaintenanceOut(**result_dict)
+                    else:
+                        print(
+                            f"No maintenance log found with ID {maintenance_log_id}"
+                        )
+                        return None
+        except ValidationError as e:
+            print(f"Failed to update vehicle maintenance log: {e}")
+            return None
+        except Exception as e:
+            print(
+                f"Unexpected error while updating vehicle maintenance log: {e}"
+            )
+            return None
