@@ -25,6 +25,8 @@ if (!API_HOST) {
 }
 
 function App() {
+    console.log('App component initialized')
+
     const [user, setUser] = useState(() => {
         const token = sessionStorage.getItem('token')
         const username = sessionStorage.getItem('username')
