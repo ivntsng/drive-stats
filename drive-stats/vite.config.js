@@ -18,5 +18,11 @@ export default defineConfig({
     },
     build: {
         outDir: 'dist',
+        rollupOptions: {
+            input: {
+                main: path.resolve(__dirname, 'index.html'),
+            },
+        },
     },
+    publicDir: 'assets', // This line ensures that the assets folder is copied to the dist directory
 })
