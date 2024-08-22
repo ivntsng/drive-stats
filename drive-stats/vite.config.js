@@ -7,6 +7,7 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': path.resolve(__dirname, './src'),
+            assets: path.resolve(__dirname, './assets'), // Add this alias for assets
         },
     },
     server: {
@@ -24,5 +25,4 @@ export default defineConfig({
             },
         },
     },
-    publicDir: 'assets', // This line ensures that the assets folder is copied to the dist directory
 })
