@@ -4,7 +4,6 @@ from typing import Optional, List, Union
 from queries.pool import pool
 from pydantic import ValidationError
 import logging
-from psycopg2 import DatabaseError, IntegrityError
 
 
 class NewsLetterEmails:
@@ -28,12 +27,6 @@ class NewsLetterEmails:
                             id=result[0], subscriber_email=result[1]
                         )
                     return None
-        except IntegrityError as e:
-            logging.error(f"Integrity error while storing email: {e}")
-            return None
-        except DatabaseError as e:
-            logging.error(f"Database error while storing email: {e}")
-            return None
         except Exception as e:
             logging.error(f"Unexpected error: {e}")
             return None

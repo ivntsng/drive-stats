@@ -1,4 +1,3 @@
-// Footer.jsx
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/components/ui/use-toast'
@@ -17,8 +16,8 @@ function Footer() {
     }
 
     return (
-        <footer className="bg-gray-900">
-            <div className="py-2 px-4 sm:px-6 lg:px-8 lg:pt-8">
+        <footer className="bg-gray-900 w-full">
+            <div className="w-full max-w-screen-xl mx-auto py-2 px-4 sm:px-6 lg:px-8 lg:pt-8">
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
                     <div className="col-span-full lg:col-span-1">
                         <a
@@ -32,22 +31,6 @@ function Footer() {
                     <div className="col-span-1">
                         <h4 className="font-bold text-gray-100">Product</h4>
                         <div className="mt-3 grid space-y-3">
-                            {/* <p>
-                                <a
-                                    className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="#"
-                                >
-                                    Support
-                                </a>
-                            </p>
-                            <p>
-                                <a
-                                    className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="#"
-                                >
-                                    Documentation
-                                </a>
-                            </p> */}
                             <p>
                                 <a
                                     className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
@@ -69,22 +52,6 @@ function Footer() {
                                     About Us
                                 </a>
                             </p>
-                            {/* <p>
-                                <a
-                                    className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="#"
-                                >
-                                    Careers
-                                </a>
-                            </p>
-                            <p>
-                                <a
-                                    className="inline-flex gap-x-2 text-gray-400 hover:text-gray-200"
-                                    href="#"
-                                >
-                                    Contact Us
-                                </a>
-                            </p> */}
                         </div>
                     </div>
                     <div className="col-span-2">
@@ -92,7 +59,7 @@ function Footer() {
                             Stay in the loop! - Subscribe to our Newsletter
                         </h4>
                         <form onSubmit={handleSubscribe}>
-                            <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-3 bg-white rounded-md p-2">
+                            <div className="mt-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-3 bg-white rounded-md p-2 w-full">
                                 <div className="w-full">
                                     <label
                                         htmlFor="hero-input"
@@ -123,8 +90,8 @@ function Footer() {
                     </div>
                 </div>
             </div>
-            <div className="mt-5 sm:mt-12 grid gap-y-2 sm:gap-y-0 sm:flex sm:justify-between sm:items-center">
-                <div className="flex justify-between items-center">
+            <div className="mt-5 sm:mt-12 grid gap-y-2 sm:gap-y-0 sm:flex sm:justify-between sm:items-center w-full px-4">
+                <div className="flex justify-between items-center w-full">
                     <p className="text-sm text-gray-400">
                         © 2024 Drivestats. All rights reserved.
                     </p>

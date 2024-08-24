@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from pydantic_settings import BaseSettings
 import os
+from mangum import Mangum
 
 load_dotenv(".env.production")
 
@@ -19,6 +20,7 @@ class Settings(BaseSettings):
 settings = Settings()
 
 app = FastAPI()
+handler = Mangum(app)
 
 # Set allowed origins
 origins = [
@@ -56,6 +58,11 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
             status_code=403, detail="Could not validate credentials"
         )
     return api_key_header
+
+
+@app.get("/")
+async def read_root():
+    return {"message": "Welcome to DriveStats API"}
 
 
 @app.get("/secure-endpoint")

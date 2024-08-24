@@ -43,12 +43,12 @@ function MainPage() {
             <div className="flex-grow">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-20 md:items-center py-32">
-                        <div className="mb-8 md:mb-0">
+                        <div className="mb-8 md:mb-0 flex flex-col items-center justify-center text-center md:text-left md:items-start">
                             <h1 className="block font-bold sm:text-4xl lg:text-6xl lg:leading-tight">
                                 Navigate your vehicle maintenance journey
                                 effortlessly.
                             </h1>
-                            <div className="flex mt-12">
+                            <div className="flex mt-12 flex-row justify-center items-center">
                                 {!user && (
                                     <>
                                         <Button
@@ -58,7 +58,7 @@ function MainPage() {
                                             Sign Up
                                         </Button>
                                         <Button
-                                            className="bg-sky-600 py-3 px-5 inline-flex justify-center ml-8 items-center gap-2 rounded-md border font-medium text-white shadow-sm align-middle hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white transition-all text-sm"
+                                            className="bg-sky-600 py-3 px-5 inline-flex justify-center ml-4 items-center gap-2 rounded-md border font-medium text-white shadow-sm align-middle hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white transition-all text-sm"
                                             onClick={togglePop}
                                         >
                                             Login
@@ -68,8 +68,6 @@ function MainPage() {
                             </div>
                         </div>
                         <div className="mt-32 justify-center">
-                            {' '}
-                            {/* Adjusted mt-10 for larger margin-top */}
                             <img
                                 className="w-full rounded-md"
                                 src="/assets/R8GT.jpg"
