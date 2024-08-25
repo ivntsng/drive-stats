@@ -120,7 +120,7 @@ export default function Garage() {
                                     Model
                                 </TableHead>
                                 <TableHead className="w-1/4 text-center font-bold">
-                                    Maintenance Log
+                                    Maintenance
                                 </TableHead>
                             </TableRow>
                         </TableHeader>
@@ -146,7 +146,7 @@ export default function Garage() {
                                             to={`/vehicles/garage/maintenance/${vehicle.id}`}
                                             className="hover:text-purple-600 hover:underline"
                                         >
-                                            Maintenance Log
+                                            Records
                                         </Link>
                                     </TableCell>
                                 </TableRow>

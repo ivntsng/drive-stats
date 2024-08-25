@@ -97,15 +97,6 @@ async def signout(
     request: Request,
     response: Response,
 ):
-    # Check if the fast_api_token cookie exists
-    if not request.cookies.get("fast_api_token"):
-        # Raise an error if the token does not exist
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No authentication token found.",
-        )
-
-    # Proceed to delete the cookie if it exists
     secure = request.url.scheme == "https"
     response.delete_cookie(
         key="fast_api_token", httponly=True, samesite="lax", secure=secure

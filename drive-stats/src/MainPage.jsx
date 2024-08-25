@@ -44,31 +44,31 @@ function MainPage() {
             <div className="flex-grow">
                 <div className="px-4 sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-20 md:items-center py-32">
-                        <div className="mb-8 md:mb-0 flex flex-col items-center justify-center text-center md:text-left md:items-start">
+                        <div className="mb-8 md:mb-0 flex flex-col items-center justify-center text-center">
                             <h1 className="block font-bold sm:text-4xl lg:text-6xl lg:leading-tight">
                                 <TextEffect per="char" preset="fade">
                                     Navigate your vehicle maintenance journey
                                     effortlessly.
                                 </TextEffect>
+                                <div className="flex mt-12 flex-row justify-center items-center">
+                                    {!user && (
+                                        <>
+                                            <Button
+                                                className="inline-flex justify-center items-center gap-x-3 text-center hover:bg-green-500 border-2 text-sm lg:text-base font-medium rounded-md transition py-3 px-4"
+                                                onClick={toggleSignupForm}
+                                            >
+                                                Sign Up
+                                            </Button>
+                                            <Button
+                                                className="bg-sky-600 py-3 px-5 inline-flex justify-center ml-4 items-center gap-2 rounded-md border font-medium text-white shadow-sm align-middle hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white transition-all text-sm"
+                                                onClick={togglePop}
+                                            >
+                                                Login
+                                            </Button>
+                                        </>
+                                    )}
+                                </div>
                             </h1>
-                            <div className="flex mt-12 flex-row justify-center items-center">
-                                {!user && (
-                                    <>
-                                        <Button
-                                            className="inline-flex justify-center items-center gap-x-3 text-center hover:bg-green-500 border-2 text-sm lg:text-base font-medium rounded-md transition py-3 px-4"
-                                            onClick={toggleSignupForm}
-                                        >
-                                            Sign Up
-                                        </Button>
-                                        <Button
-                                            className="bg-sky-600 py-3 px-5 inline-flex justify-center ml-4 items-center gap-2 rounded-md border font-medium text-white shadow-sm align-middle hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white transition-all text-sm"
-                                            onClick={togglePop}
-                                        >
-                                            Login
-                                        </Button>
-                                    </>
-                                )}
-                            </div>
                         </div>
                         <div className="mt-32 justify-center">
                             <img

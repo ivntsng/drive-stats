@@ -106,8 +106,12 @@ function LoginForm({
         }
     }, [handleClickOutside])
 
+    const handleCancel = () => {
+        closeLoginForm()
+    }
+
     return (
-        <Card className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <Card className="w-[95vw] max-w-[400px] sm:w-[80vw] sm:max-w-[450px] lg:w-[60vw] lg:max-w-[500px] mx-auto px-4 sm:px-6 lg:px-8">
             <div ref={formRef}>
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-bold">
@@ -145,7 +149,14 @@ function LoginForm({
                         </div>
                         {error && <p className="text-red-500">{error}</p>}
                         <CardFooter className="flex flex-col items-center md:flex-row md:justify-center">
-                            <div className="w-full md:w-auto mb-2 md:mb-0">
+                            <div className="flex flex-row items-center justify-between space-x-2 p-6 pt-0 col-span-full">
+                                <Button
+                                    type="button"
+                                    onClick={handleCancel}
+                                    className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full sm:w-auto"
+                                >
+                                    Cancel
+                                </Button>
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
