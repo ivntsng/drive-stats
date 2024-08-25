@@ -19,13 +19,15 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-app = FastAPI()
+app = FastAPI(docs_url=None, redoc_url=None, openapi_url=None)
+# app = FastAPI()
 handler = Mangum(app)
 
 # Set allowed origins
 origins = [
     "https://drivestatsapp.com",
     "https://www.drivestatsapp.com",
+    "https://www.api.drivestatsapp.com",
     "https://localhost",
     "https://localhost:8000",
     "http://localhost:5173",

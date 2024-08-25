@@ -14,7 +14,7 @@ from queries.vehicle_maintenance import (
 )
 from queries.vehicles import VehicleRepository
 from pydantic import ValidationError, BaseModel
-from config import oauth2_scheme, verify_api_host
+from config import oauth2_scheme
 from models.jwt import JWTUserData
 from utils.authentication import try_get_jwt_user_data
 from main import limiter
@@ -39,7 +39,7 @@ class Error(BaseModel):
 @router.post(
     "/create/{vehicle_id}",
     response_model=Union[VehicleMaintenanceOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("5/minute")
 def create_maintenance_log(
@@ -68,7 +68,7 @@ def create_maintenance_log(
 @router.get(
     "/maintenance-log/{vehicle_id}",
     response_model=Union[VehicleMaintenanceOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("10/minute")
 def retrieve_vehicle_maintenance_log_by_vehicle_id(
@@ -110,7 +110,7 @@ def retrieve_vehicle_maintenance_log_by_vehicle_id(
 @router.get(
     "/maintenance-logs/{vehicle_id}",
     response_model=List[VehicleMaintenanceOut] | None,
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("20/minute")
 def retrieve_all_vehicle_maintenance_logs_by_vehicle_id(
@@ -135,9 +135,9 @@ def retrieve_all_vehicle_maintenance_logs_by_vehicle_id(
 @router.get(
     "/maintenance-log/detail/{maintenance_id}",
     response_model=Union[VehicleMaintenanceOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
-@limiter.limit("1000/minute")
+@limiter.limit("30/minute")
 def retrieve_maintenance_log_by_maintenance_id(
     request: Request,
     response: Response,
@@ -177,7 +177,7 @@ def retrieve_maintenance_log_by_maintenance_id(
 @router.delete(
     "/maintenance-log/delete/{maintenance_id}",
     response_model=Union[VehicleMaintenanceOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 async def delete_maintenance_log_id(
     request: Request,
@@ -244,9 +244,9 @@ async def delete_maintenance_log_id(
 @router.put(
     "/maintenance-log/update/{maintenance_id}",
     response_model=Union[VehicleMaintenanceOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
-@limiter.limit("1000/minute")
+@limiter.limit("30/minute")
 async def update_maintenance_log(
     request: Request,
     response: Response,

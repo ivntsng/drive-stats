@@ -25,6 +25,7 @@
     "class-variance-authority": "^0.7.0",
     "date-fns": "^3.6.0",
     "form": "^0.2.4",
+    "framer-motion": "^11.3.30",
     "input": "^1.0.1",
     "lucide-react": "^0.359.0",
     "navigation-menu": "^1.0.0",

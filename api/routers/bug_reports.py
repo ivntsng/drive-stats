@@ -11,7 +11,7 @@ from queries.bug_reports import BugReportIn, BugReportOut, BugQueries, Error
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
-from config import oauth2_scheme, verify_api_host
+from config import oauth2_scheme
 from main import limiter
 
 tags_metadata = [
@@ -27,7 +27,7 @@ router = APIRouter(tags=["Bug Reports"])
 @router.post(
     "/bug_report",
     response_model=Union[BugReportOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("3/minute")
 def create_bug_report(

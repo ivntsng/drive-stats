@@ -13,7 +13,7 @@ from queries.vehicle_stats import (
     VehicleStatOut,
 )
 from pydantic import ValidationError, BaseModel
-from config import oauth2_scheme, verify_api_host
+from config import oauth2_scheme
 from models.jwt import JWTUserData
 from utils.authentication import try_get_jwt_user_data
 from main import limiter
@@ -36,7 +36,7 @@ class Error(BaseModel):
 @router.post(
     "/vehicle_stats/{vehicle_id}",
     response_model=Union[VehicleStatOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("5/minute")
 def create_vehicle_stat(
@@ -66,7 +66,7 @@ def create_vehicle_stat(
 @router.get(
     "/vehicle_stats/{vehicle_id}",
     response_model=Union[VehicleStatOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("20/minute")
 async def get_vehicle_stat_by_id(
@@ -106,7 +106,7 @@ async def get_vehicle_stat_by_id(
 @router.get(
     "/vehicle_stats/all/{vehicle_id}",
     response_model=List[VehicleStatOut] | None,
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("20/minute")
 async def get_all_vehicles_stat_by_id(

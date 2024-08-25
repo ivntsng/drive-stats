@@ -24,7 +24,7 @@ router = APIRouter(tags=["Authentication"], prefix="/api/auth")
 
 
 @router.post("/signup")
-@limiter.limit("2/minute")
+@limiter.limit("10/minute")
 async def signup(
     new_user: UserRequest,
     request: Request,
@@ -55,7 +55,9 @@ async def signup(
 
 
 @router.post("/token")
+@limiter.limit("20/minute")
 async def login_for_access_token(
+    request: Request,
     form_data: OAuth2PasswordRequestForm = Depends(),
     repo: AccountRepo = Depends(),
 ):
@@ -71,7 +73,9 @@ async def login_for_access_token(
 
 
 @router.get("/authenticate")
+@limiter.limit("30/minute")
 async def authenticate(
+    request: Request,
     token: str = Depends(oauth2_scheme),
     user: UserResponse = Depends(try_get_jwt_user_data),
 ) -> UserResponse:
@@ -88,10 +92,20 @@ async def authenticate(
 
 
 @router.delete("/signout")
+@limiter.limit("10/minute")
 async def signout(
     request: Request,
     response: Response,
 ):
+    # Check if the fast_api_token cookie exists
+    if not request.cookies.get("fast_api_token"):
+        # Raise an error if the token does not exist
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No authentication token found.",
+        )
+
+    # Proceed to delete the cookie if it exists
     secure = request.url.scheme == "https"
     response.delete_cookie(
         key="fast_api_token", httponly=True, samesite="lax", secure=secure

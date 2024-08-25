@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster'
 import { UserContext } from './UserContext'
 import SignupForm from './components/SignUp'
 import Footer from './Footer'
+import { TextEffect } from '@/components/core/text-effect'
 
 function MainPage() {
     const [isLoginFormOpen, setIsLoginFormOpen] = useState(false)
@@ -45,8 +46,10 @@ function MainPage() {
                     <div className="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-20 md:items-center py-32">
                         <div className="mb-8 md:mb-0 flex flex-col items-center justify-center text-center md:text-left md:items-start">
                             <h1 className="block font-bold sm:text-4xl lg:text-6xl lg:leading-tight">
-                                Navigate your vehicle maintenance journey
-                                effortlessly.
+                                <TextEffect per="char" preset="fade">
+                                    Navigate your vehicle maintenance journey
+                                    effortlessly.
+                                </TextEffect>
                             </h1>
                             <div className="flex mt-12 flex-row justify-center items-center">
                                 {!user && (

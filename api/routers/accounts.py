@@ -16,11 +16,11 @@ from queries.accounts import (
     UpdatePasswordIn,
 )
 from typing import Optional
-from dotenv import load_dotenv
 from utils.authentication import try_get_jwt_user_data
-from config import API_HOST, verify_api_host, oauth2_scheme
+from config import oauth2_scheme
 from models.jwt import JWTUserData
-import os
+from main import limiter
+
 
 router = APIRouter(tags=["Accounts"])
 blacklisted_tokens = set()
@@ -33,11 +33,10 @@ class DuplicateAccountError(Exception):
 @router.get(
     "/users/{username}",
     response_model=Optional[AccountOut],
-    dependencies=[
-        Depends(verify_api_host),
-    ],
 )
+@limiter.limit("10/minute")
 def get_single_user(
+    request: Request,
     username: str,
     response: Response,
     repo: AccountRepo = Depends(),
@@ -52,11 +51,10 @@ def get_single_user(
 @router.get(
     "/check/users/{username}",
     response_model=Optional[CheckAccountOut],
-    dependencies=[
-        Depends(verify_api_host),
-    ],
 )
+@limiter.limit("10/minute")
 def check_single_user(
+    request: Request,
     username: str,
     repo: AccountRepo = Depends(),
 ) -> CheckAccountOut:
@@ -70,11 +68,10 @@ def check_single_user(
 @router.get(
     "/check/email/{email}",
     response_model=Optional[CheckEmail],
-    dependencies=[
-        Depends(verify_api_host),
-    ],
 )
+@limiter.limit("10/minute")
 def check_user_email(
+    request: Request,
     email: str,
     repo: AccountRepo = Depends(),
 ) -> CheckEmail:
@@ -89,12 +86,13 @@ def check_user_email(
     "/account/update-password",
     response_model=Optional[AccountOut],
     dependencies=[
-        Depends(verify_api_host),
         Depends(try_get_jwt_user_data),
         Depends(oauth2_scheme),
     ],
 )
+@limiter.limit("10/minute")
 async def update_password(
+    request: Request,
     update_password_data: UpdatePasswordIn,
     current_user: JWTUserData = Depends(try_get_jwt_user_data),
     repo: AccountRepo = Depends(),
@@ -122,7 +120,6 @@ def is_token_blacklisted(token: str):
 @router.post(
     "/logout",
     dependencies=[
-        Depends(verify_api_host),
         Depends(try_get_jwt_user_data),
         Depends(oauth2_scheme),
     ],

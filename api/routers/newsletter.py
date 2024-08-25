@@ -12,7 +12,7 @@ from typing import Union, List
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
-from config import oauth2_scheme, verify_api_host
+from config import oauth2_scheme
 from main import limiter
 
 tags_metadata = [
@@ -28,7 +28,6 @@ router = APIRouter(tags=["Newsletter Subscriber List"], prefix="/api")
 @router.post(
     "/subscribe-email",
     response_model=Union[NewsletterEmailOut, Error],
-    dependencies=[Depends(verify_api_host)],
 )
 @limiter.limit("1/minute")
 def store_subscriber_email(

@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from utils.authentication import try_get_jwt_user_data
 from models.jwt import JWTUserData
-from config import verify_api_host, oauth2_scheme
+from config import oauth2_scheme
 from main import limiter
 
 
@@ -28,7 +28,7 @@ router = APIRouter(tags=["Vehicles"])
 @router.post(
     "/vehicles",
     response_model=Union[VehicleOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("5/minute")
 def create_vehicle(
@@ -62,7 +62,7 @@ def create_vehicle(
 @router.get(
     "/vehicles/{vehicle_id}",
     response_model=VehicleOut,
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("20/minute")
 async def get_vehicle_by_id(
@@ -93,7 +93,7 @@ async def get_vehicle_by_id(
 @router.get(
     "/vehicles",
     response_model=Union[List[VehicleOut], Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("20/minute")
 def list_vehicles(
@@ -119,7 +119,7 @@ def list_vehicles(
 @router.put(
     "/vehicles/update/{vehicle_id}",
     response_model=Union[VehicleOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("5/minute")
 async def update_vehicle(
@@ -168,7 +168,7 @@ async def update_vehicle(
 @router.delete(
     "/vehicles/delete/{vehicle_id}",
     response_model=Union[VehicleOut, Error],
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("5/minute")
 async def delete_vehicle(
@@ -216,7 +216,7 @@ async def delete_vehicle(
     response_model=List[
         VehicleOut
     ],  # Ensure this matches your expected output
-    dependencies=[Depends(verify_api_host), Depends(oauth2_scheme)],
+    dependencies=[Depends(oauth2_scheme)],
 )
 @limiter.limit("20/minute")
 async def get_vehicles_by_user_id(
