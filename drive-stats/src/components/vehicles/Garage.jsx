@@ -92,7 +92,7 @@ export default function Garage() {
                                     <a
                                         href="/vehicles/register"
                                         style={{
-                                            color: '#001d3d',
+                                            color: '#84a98c',
                                             textDecoration: 'underline',
                                         }}
                                     >

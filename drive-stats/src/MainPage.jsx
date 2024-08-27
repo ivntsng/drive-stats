@@ -30,6 +30,26 @@ function MainPage() {
 
     useEffect(() => {
         retrieveUsernameFromSession()
+    }, [retrieveUsernameFromSession])
+
+    useEffect(() => {
+        const script = document.createElement('script')
+        script.async = true
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-TN8B4G6B4W'
+        document.head.appendChild(script)
+
+        script.onload = () => {
+            window.dataLayer = window.dataLayer || []
+            function gtag() {
+                dataLayer.push(arguments)
+            }
+            gtag('js', new Date())
+            gtag('config', 'G-TN8B4G6B4W')
+        }
+
+        return () => {
+            document.head.removeChild(script)
+        }
     }, [])
 
     return (
