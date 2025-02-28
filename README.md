@@ -34,6 +34,33 @@ drive-stats: A tool for auto enthusiasts to meticulously track vehicle data, inc
 
 ## Project Initialization
 
+### Environment Setup
+
+1. Create a `.env` file in the root directory based on the example below:
+
+    ```
+    # Database Configuration
+    POSTGRES_DB=drivestats_db
+    POSTGRES_USER=your_username
+    POSTGRES_PASSWORD=your_secure_password
+
+    # Backend Configuration
+    SIGNING_KEY=your_secure_signing_key
+    ALGORITHM=HS256
+    VITE_API_HOST=https://localhost:8000
+    CORS_HOST=https://localhost
+    ```
+
+2. Make sure to add `.env` to your `.gitignore` file to prevent committing sensitive information.
+
+### Docker Compose Setup
+
+To run the entire application stack using Docker Compose:
+
+```
+docker-compose -f docker-compose-dev.yaml up --build
+```
+
 ### Frontend Setup
 
 To run the frontend locally:

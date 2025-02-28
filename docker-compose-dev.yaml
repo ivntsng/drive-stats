@@ -4,9 +4,9 @@ services:
     postgres:
         image: postgres:16.2
         environment:
-            POSTGRES_DB: drivestats_db
-            POSTGRES_USER: casper
-            POSTGRES_PASSWORD: foTVdhgYZzz8bOL6e
+            POSTGRES_DB: ${POSTGRES_DB:-drivestats_db}
+            POSTGRES_USER: ${POSTGRES_USER:-postgres}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
         volumes:
             - drive-statsDB:/var/lib/postgresql/data
         networks:
@@ -18,9 +18,9 @@ services:
         volumes:
             - ./sql:/flyway/sql
         environment:
-            FLYWAY_URL: jdbc:postgresql://postgres:5432/drivestats_db
-            FLYWAY_USER: casper
-            FLYWAY_PASSWORD: foTVdhgYZzz8bOL6e
+            FLYWAY_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-drivestats_db}
+            FLYWAY_USER: ${POSTGRES_USER:-postgres}
+            FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
             FLYWAY_LOCATIONS: filesystem:/flyway/sql
         depends_on:
             - postgres
@@ -32,11 +32,11 @@ services:
             context: ./api
             dockerfile: Dockerfile.dev
         environment:
-            SIGNING_KEY: 06b261ced90b876af6e6e5834da0ca740f5b1e2e432988f129cab2eb95dcb11d
-            ALGORITHM: HS256
-            VITE_API_HOST: https://localhost:8000
-            CORS_HOST: https://localhost
-            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@postgres:5432/drivestats_db
+            SIGNING_KEY: ${SIGNING_KEY}
+            ALGORITHM: ${ALGORITHM:-HS256}
+            VITE_API_HOST: ${VITE_API_HOST:-https://localhost:8000}
+            CORS_HOST: ${CORS_HOST:-https://localhost}
+            DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-drivestats_db}
         ports:
             - "8000:8000"
         depends_on:
