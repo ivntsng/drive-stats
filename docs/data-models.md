@@ -41,16 +41,3 @@ This document outlines the database schema for the Drive Stats application.
 | cost             | decimal | no     | yes      |
 | description      | text    | no     | yes      |
 | service_provider | string  | no     | yes      |
-
-## Modifications
-
-| name              | type    | unique | optional |
-| ----------------- | ------- | ------ | -------- |
-| id                | int     | yes    | no       |
-| vehicle_id        | int     | no     | no       |
-| mod_name          | string  | no     | no       |
-| mod_type          | string  | no     | yes      |
-| installation_date | date    | no     | yes      |
-| cost              | decimal | no     | yes      |
-| description       | text    | no     | yes      |
-| installer         | string  | no     | yes      |
