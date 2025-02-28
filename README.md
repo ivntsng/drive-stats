@@ -25,13 +25,68 @@ drive-stats: A tool for auto enthusiasts to meticulously track vehicle data, inc
 
 ## Design
 
--   [API Designs]()
--   [Data Models]()
+-   [API Designs](docs/api-design.md)
+-   [Data Models](docs/data-models.md)
 -   [GHI Wireframes]()
 -   [Integrations]()
 
 ## Functionality
 
-### Customers
-
 ## Project Initialization
+
+### Frontend Setup
+
+To run the frontend locally:
+
+1. Navigate to the drive-stats directory:
+
+    ```
+    cd drive-stats
+    ```
+
+2. Install dependencies (if you haven't already):
+
+    ```
+    npm install
+    ```
+
+3. Start the development server:
+
+    ```
+    npm run dev
+    ```
+
+4. Open your browser and navigate to the URL displayed in the terminal (typically http://localhost:5173)
+
+### Backend Setup
+
+To run the backend locally:
+
+1. Navigate to the api directory:
+
+    ```
+    cd api
+    ```
+
+2. Create and activate a virtual environment:
+
+    ```
+    python -m venv venv
+    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    ```
+
+3. Install dependencies:
+
+    ```
+    pip install -r requirements.txt
+    ```
+
+4. Create a .env file based on .env.example and configure your environment variables
+
+5. Start the FastAPI server:
+
+    ```
+    uvicorn main:app --reload
+    ```
+
+6. Access the API documentation at http://localhost:8000/docs
