@@ -3,7 +3,7 @@ version: "3.8"
 services:
     flyway:
         image: flyway/flyway
-        command: -url=jdbc:postgresql://drivestats-db.cjom0q2oekd7.us-west-1.rds.amazonaws.com:5432/drivestats_db -user=casper -password=foTVdhgYZzz8bOL6e -locations=filesystem:/flyway/sql migrate
+        command: -url=jdbc:${PROD_DB_URL} -user=${POSTGRES_USER} -password=${POSTGRES_PASSWORD} -locations=filesystem:/flyway/sql migrate
         volumes:
             - ./api/sql:/flyway/sql
 
@@ -12,11 +12,11 @@ services:
             context: ./api
             dockerfile: Dockerfile.prod
         environment:
-            SIGNING_KEY: 06b261ced90b876af6e6e5834da0ca740f5b1e2e432988f129cab2eb95dcb11d
-            ALGORITHM: HS256
-            VITE_API_HOST: https://api.drivestatsapp.com
-            CORS_HOST: https://drivestatsapp.com
-            DATABASE_URL: postgresql://casper:foTVdhgYZzz8bOL6e@drivestats-db.cjom0q2oekd7.us-west-1.rds.amazonaws.com:5432/drivestats_db
+            SIGNING_KEY: ${SIGNING_KEY}
+            ALGORITHM: ${ALGORITHM}
+            VITE_API_HOST: ${VITE_API_HOST}
+            CORS_HOST: ${CORS_HOST}
+            DATABASE_URL: ${PROD_DB_URL}
         ports:
             - "443:443"
 

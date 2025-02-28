@@ -187,3 +187,20 @@ scratch-paper.txt
 
 # .gitignore
 .env.production
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Environment variables
+.env
+.env.production
+.env.local
+.env.development
+
+# Other sensitive files
+**/credentials.json
+**/secrets.json

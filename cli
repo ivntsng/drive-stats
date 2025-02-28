@@ -1,6 +1,0 @@
-glv-cloud-cli deploy -a userdb -i postgres:14.5-bullseye -e POSTGRES_DB=user -e POSTGRES_USER=user -e POSTGRES_PASSWORD=user -m /var/lib/postgresql -p 5432 -x=false
-
-glv-cloud-cli deploy -a postgres --delete
-
-
-glv-cloud-cli deploy -a marPTapi -i registry.gitlab.com/rc678-galvanize/cirrus-deploy-test/sample_service_image:latest -e SIGNING_KEY=key -e DATABASE_URL=postgresql://user:user@pt-instructors-userdb-service.default.svc.cluster.local/postgres -e CORS_HOST=https://rc678-galvanize.gitlab.io
