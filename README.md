@@ -27,8 +27,6 @@ drive-stats: A tool for auto enthusiasts to meticulously track vehicle data, inc
 
 -   [API Designs](docs/api-design.md)
 -   [Data Models](docs/data-models.md)
--   [GHI Wireframes]()
--   [Integrations]()
 
 ## Functionality
 
@@ -49,6 +47,7 @@ drive-stats: A tool for auto enthusiasts to meticulously track vehicle data, inc
     ALGORITHM=HS256
     VITE_API_HOST=https://localhost:8000
     CORS_HOST=https://localhost
+    API_KEY=your_api_key_here
     ```
 
 2. Make sure to add `.env` to your `.gitignore` file to prevent committing sensitive information.
