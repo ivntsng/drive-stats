@@ -34,23 +34,35 @@ drive-stats: A tool for auto enthusiasts to meticulously track vehicle data, inc
 
 ### Environment Setup
 
-1. Create a `.env` file in the root directory based on the example below:
+1. Create environment files for both backend and frontend:
+
+    **Backend Environment**: Create `api/.env` file with the following variables:
 
     ```
+    # Security
+    SIGNING_KEY=your_secure_signing_key
+    ALGORITHM=HS256
+    API_KEY=your_api_key_here
+
+    # CORS Configuration
+    CORS_HOST=http://localhost
+    VITE_API_HOST=http://localhost:8000
+
     # Database Configuration
+    DATABASE_URL=postgresql://username:password@postgres:5432/drivestats_db
     POSTGRES_DB=drivestats_db
     POSTGRES_USER=your_username
     POSTGRES_PASSWORD=your_secure_password
-
-    # Backend Configuration
-    SIGNING_KEY=your_secure_signing_key
-    ALGORITHM=HS256
-    VITE_API_HOST=https://localhost:8000
-    CORS_HOST=https://localhost
-    API_KEY=your_api_key_here
     ```
 
-2. Make sure to add `.env` to your `.gitignore` file to prevent committing sensitive information.
+    **Frontend Environment**: Create `drive-stats/.env.local` file with:
+
+    ```
+    VITE_API_HOST=http://localhost:8000
+    CORS_HOST=http://localhost
+    ```
+
+2. Make sure to add all `.env` files to your `.gitignore` to prevent committing sensitive information.
 
 ### Docker Compose Setup
 
@@ -107,12 +119,10 @@ To run the backend locally:
     pip install -r requirements.txt
     ```
 
-4. Create a .env file based on .env.example and configure your environment variables
-
-5. Start the FastAPI server:
+4. Start the FastAPI server:
 
     ```
     uvicorn main:app --reload
     ```
 
-6. Access the API documentation at http://localhost:8000/docs
+5. Access the API documentation at http://localhost:8000/docs

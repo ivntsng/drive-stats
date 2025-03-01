@@ -18,10 +18,10 @@ import { TimerProvider } from './components/timer'
 import ProtectedRoute from './components/ProtectedRoute'
 import axios from 'axios'
 
-const API_HOST = import.meta.env.VITE_API_HOST
+const apiHost = import.meta.env.VITE_API_HOST
 
-if (!API_HOST) {
-    throw new Error('VITE_API_HOST is not defined')
+if (!apiHost) {
+    console.warn('VITE_API_HOST is not defined, using default value')
 }
 
 function App() {
@@ -40,7 +40,7 @@ function App() {
         const token = sessionStorage.getItem('token')
         if (token) {
             axios
-                .get(`${API_HOST}/api/auth/authenticate`, {
+                .get(`${apiHost}/api/auth/authenticate`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
