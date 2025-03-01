@@ -5,7 +5,6 @@ from queries.pool import pool
 from datetime import date
 import pytz
 from models.vehicle_maintenance import (
-    Error,
     VehicleMaintenanceIn,
     VehicleMaintenanceOut,
 )

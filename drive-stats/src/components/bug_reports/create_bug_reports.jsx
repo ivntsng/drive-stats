@@ -3,7 +3,6 @@ import { useToast } from '@/components/ui/use-toast'
 import {
     Card,
     CardContent,
-    CardFooter,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card'

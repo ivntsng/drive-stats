@@ -1,8 +1,6 @@
 from models.newsletter import NewsletterEmailIn, NewsletterEmailOut
-import pytz
-from typing import Optional, List, Union
+from typing import Optional
 from queries.pool import pool
-from pydantic import ValidationError
 import logging
 
 

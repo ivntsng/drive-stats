@@ -1,6 +1,6 @@
 from models.bug_reports import BugReportIn, BugReportOut, Error
 import pytz
-from typing import Optional, List, Union
+from typing import Optional, Union
 from queries.pool import pool
 from pydantic import ValidationError
 
